@@ -30,4 +30,7 @@ public interface BagInterface<T> {
     
     public boolean isFull();
     
+    public boolean equals(Bag<T> otherBag);
+    
+    public T getMostFrequent();
 }

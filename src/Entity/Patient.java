@@ -12,10 +12,14 @@ import java.util.Date;
  */
 public class Patient {
 
+    private static int idCounter = 1001;
+    private static int queueCounter = 1001;
+
     private String patientID;
     private String fullName;
+    private String identityNumber;
     private Date dateOfBirth;
-    private String gender;
+    private char gender;
     private String contactNumber;
     private String email;
     private String address;
@@ -25,10 +29,10 @@ public class Patient {
     private String status;
 
     // Constructor
-    public Patient(String patientID, String fullName, Date dateOfBirth, String gender,
+    public Patient(String patientID, String fullName, Date dateOfBirth, char gender,
             String contactNumber, String email, String address, String emergencyContact,
             Date registrationDate, int queueNumber, String status) {
-        this.patientID = patientID;
+        this.patientID = "P" + idCounter++;
         this.fullName = fullName;
         this.dateOfBirth = dateOfBirth;
         this.gender = gender;
@@ -37,7 +41,7 @@ public class Patient {
         this.address = address;
         this.emergencyContact = emergencyContact;
         this.registrationDate = registrationDate;
-        this.queueNumber = queueNumber;
+        this.queueNumber = queueCounter++;
         this.status = status;
     }
 
@@ -53,7 +57,7 @@ public class Patient {
         return dateOfBirth;
     }
 
-    public String getGender() {
+    public char getGender() {
         return gender;
     }
 
@@ -73,12 +77,20 @@ public class Patient {
         return emergencyContact;
     }
 
+    public String getIdentityNumber() {
+        return identityNumber;
+    }
+
     public Date getRegistrationDate() {
         return registrationDate;
     }
 
     public int getQueueNumber() {
         return queueNumber;
+    }
+
+    public String getStatus() {
+        return status;
     }
 
     public void setPatientID(String patientID) {
@@ -93,7 +105,7 @@ public class Patient {
         this.dateOfBirth = dateOfBirth;
     }
 
-    public void setGender(String gender) {
+    public void setGender(char gender) {
         this.gender = gender;
     }
 
@@ -125,8 +137,7 @@ public class Patient {
         this.status = status;
     }
 
-    public String getStatus() {
-        return status;
+    public void setIdentityNumber(String identityNumber) {
+        this.identityNumber = identityNumber;
     }
-
 }
