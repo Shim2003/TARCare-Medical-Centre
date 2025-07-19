@@ -112,4 +112,45 @@ public class Bag<T> implements BagInterface<T> {
         return size >= capacity;
     }
 
+    @Override
+    public boolean equals(Bag<T> otherBag) {
+        if (otherBag == null || otherBag.getCurrentSize() != this.size) {
+            return false;
+        }
+
+        // Copy both arrays to temporary arrays
+        T[] thisArray = this.toArray();
+        T[] otherArray = otherBag.toArray();
+
+        // Check if each unique item has the same frequency in both bags
+        for (int i = 0; i < thisArray.length; i++) {
+            T item = thisArray[i];
+            if (this.getFrequencyOf(item) != otherBag.getFrequencyOf(item)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public T getMostFrequent() {
+        if (isEmpty()) {
+            return null; // or throw an exception if preferred
+        }
+
+        T[] array = toArray();
+        T mostFrequentItem = array[0];
+        int highestFrequency = 0;
+
+        for (int i = 0; i < array.length; i++) {
+            int freq = getFrequencyOf(array[i]);
+            if (freq > highestFrequency) {
+                highestFrequency = freq;
+                mostFrequentItem = array[i];
+            }
+        }
+
+        return mostFrequentItem;
+    }
+
 }
