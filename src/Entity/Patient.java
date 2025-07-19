@@ -61,6 +61,14 @@ public class Patient {
         return gender;
     }
 
+    @Override
+    public String toString() {
+        return "Patient{" + "patientID=" + patientID + ", fullName=" + fullName + ", identityNumber=" + identityNumber + 
+                ", dateOfBirth=" + dateOfBirth + ", gender=" + gender + ", contactNumber=" + contactNumber + 
+                ", email=" + email + ", address=" + address + ", emergencyContact=" + emergencyContact +
+                ", registrationDate=" + registrationDate + ", queueNumber=" + queueNumber + ", status=" + status + '}';
+    }
+
     public String getContactNumber() {
         return contactNumber;
     }
