@@ -133,6 +133,7 @@ public class Bag<T> implements BagInterface<T> {
         return true;
     }
 
+    @Override
     public T getMostFrequent() {
         if (isEmpty()) {
             return null; // or throw an exception if preferred
