@@ -104,6 +104,24 @@ public class MyArrayList<T> implements MyList<T> {
         size = 0;
     }
     
+    @Override
+    public T getFirst(){
+        if (isEmpty()){
+            return null;
+        }else{
+            return data[0];
+        }
+    }
+    
+    @Override
+    public T getLast(){
+        if (isEmpty()){
+            return null;
+        }else{
+            return data[size - 1];
+        }
+    }
+    
     @SuppressWarnings("unchecked")
     private void ensureCapacity() {
         if (size == data.length) {
