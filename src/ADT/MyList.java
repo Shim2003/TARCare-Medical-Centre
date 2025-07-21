@@ -18,5 +18,7 @@ public interface MyList<T> {
     int size();         
     int indexOf(T item);  
     boolean contains(T item); 
-    void clear();              
+    void clear();
+    T getFirst();
+    T getLast();
 }
