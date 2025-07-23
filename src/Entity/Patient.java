@@ -8,7 +8,7 @@ import java.util.Date;
 
 /**
  *
- * @author user
+ * @author Lee Wei Hao
  */
 public class Patient {
 
@@ -26,14 +26,19 @@ public class Patient {
     private String emergencyContact;
     private Date registrationDate;
     private int queueNumber;
-    private String status;
-
+    private String queueStatus;
+    
     // Constructor
-    public Patient(String patientID, String fullName, Date dateOfBirth, char gender,
+    public Patient(){
+        this.patientID = "P" + idCounter++;
+    }
+    
+    public Patient(String fullName,String identityNumber, Date dateOfBirth, char gender,
             String contactNumber, String email, String address, String emergencyContact,
-            Date registrationDate, int queueNumber, String status) {
+            Date registrationDate) {
         this.patientID = "P" + idCounter++;
         this.fullName = fullName;
+        this.identityNumber = identityNumber;
         this.dateOfBirth = dateOfBirth;
         this.gender = gender;
         this.contactNumber = contactNumber;
@@ -41,8 +46,6 @@ public class Patient {
         this.address = address;
         this.emergencyContact = emergencyContact;
         this.registrationDate = registrationDate;
-        this.queueNumber = queueCounter++;
-        this.status = status;
     }
 
     public String getPatientID() {
@@ -66,7 +69,7 @@ public class Patient {
         return "Patient{" + "patientID=" + patientID + ", fullName=" + fullName + ", identityNumber=" + identityNumber + 
                 ", dateOfBirth=" + dateOfBirth + ", gender=" + gender + ", contactNumber=" + contactNumber + 
                 ", email=" + email + ", address=" + address + ", emergencyContact=" + emergencyContact +
-                ", registrationDate=" + registrationDate + ", queueNumber=" + queueNumber + ", status=" + status + '}';
+                ", registrationDate=" + registrationDate + ", queueNumber=" + queueNumber + ", Queue status=" + queueStatus + '}';
     }
 
     public String getContactNumber() {
@@ -97,8 +100,8 @@ public class Patient {
         return queueNumber;
     }
 
-    public String getStatus() {
-        return status;
+    public String getQueueStatus() {
+        return queueStatus;
     }
 
     public void setPatientID(String patientID) {
@@ -141,8 +144,8 @@ public class Patient {
         this.queueNumber = queueNumber;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setQueueStatus(String queueStatus) {
+        this.queueStatus = queueStatus;
     }
 
     public void setIdentityNumber(String identityNumber) {

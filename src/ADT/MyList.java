@@ -1,5 +1,7 @@
 package ADT;
 
+import java.util.function.Predicate;
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Interface.java to edit this template
@@ -21,4 +23,5 @@ public interface MyList<T> {
     void clear();
     T getFirst();
     T getLast();
+    T findFirst(Predicate<T> predicate);
 }
