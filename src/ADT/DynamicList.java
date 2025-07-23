@@ -1,34 +1,37 @@
 package ADT;
 
+import java.util.function.Predicate;
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-public class MyArrayList<T> implements MyList<T> {
+public class DynamicList<T> implements MyList<T> {
+
     private T[] data;
     private int size;
-    
+
     @SuppressWarnings("unchecked")
-    public MyArrayList() {
+    public DynamicList() {
         data = (T[]) new Object[10];
         size = 0;
     }
-    
+
     @SuppressWarnings("unchecked")
-    public MyArrayList(int initialCapacity) {
+    public DynamicList(int initialCapacity) {
         if (initialCapacity < 0) {
             throw new IllegalArgumentException("Illegal Capacity: " + initialCapacity);
         }
         data = (T[]) new Object[initialCapacity];
         size = 0;
     }
-    
+
     @Override
     public void add(T item) {
         ensureCapacity();
         data[size++] = item;
     }
-    
+
     @Override
     public void add(int index, T item) {
         if (index < 0 || index > size) {
@@ -41,7 +44,7 @@ public class MyArrayList<T> implements MyList<T> {
         data[index] = item;
         size++;
     }
-    
+
     @Override
     public T get(int index) {
         if (index < 0 || index >= size) {
@@ -49,7 +52,7 @@ public class MyArrayList<T> implements MyList<T> {
         }
         return data[index];
     }
-    
+
     @Override
     public T remove(int index) {
         if (index < 0 || index >= size) {
@@ -62,17 +65,17 @@ public class MyArrayList<T> implements MyList<T> {
         data[--size] = null;
         return removed;
     }
-    
+
     @Override
     public boolean isEmpty() {
         return size == 0;
     }
-    
+
     @Override
     public int size() {
         return size;
     }
-    
+
     @Override
     public int indexOf(T item) {
         if (item == null) {
@@ -90,12 +93,12 @@ public class MyArrayList<T> implements MyList<T> {
         }
         return -1;
     }
-    
+
     @Override
     public boolean contains(T item) {
         return indexOf(item) >= 0;
     }
-    
+
     @Override
     public void clear() {
         for (int i = 0; i < size; i++) {
@@ -103,25 +106,35 @@ public class MyArrayList<T> implements MyList<T> {
         }
         size = 0;
     }
-    
+
     @Override
-    public T getFirst(){
-        if (isEmpty()){
+    public T getFirst() {
+        if (isEmpty()) {
             return null;
-        }else{
+        } else {
             return data[0];
         }
     }
-    
+
     @Override
-    public T getLast(){
-        if (isEmpty()){
+    public T getLast() {
+        if (isEmpty()) {
             return null;
-        }else{
+        } else {
             return data[size - 1];
         }
     }
-    
+
+    @Override
+    public T findFirst(Predicate<T> predicate) {
+        for (int i = 0; i < size; i++) {
+            if (predicate.test(data[i])) {
+                return data[i];
+            }
+        }
+        return null;
+    }
+
     @SuppressWarnings("unchecked")
     private void ensureCapacity() {
         if (size == data.length) {
@@ -132,7 +145,7 @@ public class MyArrayList<T> implements MyList<T> {
             data = newData;
         }
     }
-    
+
     @SuppressWarnings("unchecked")
     public T[] toArray() {
         T[] result = (T[]) new Object[size];
