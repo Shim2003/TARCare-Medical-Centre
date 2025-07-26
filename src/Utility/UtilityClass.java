@@ -10,6 +10,9 @@ package Utility;
  */
 public class UtilityClass {
 
+    //Constant
+    public static final String DATE_FORMAT = "dd/MM/yyyy";
+    
     public static String truncate(String str, int maxLength) {
         if (str.length() <= maxLength) {
             return str;
