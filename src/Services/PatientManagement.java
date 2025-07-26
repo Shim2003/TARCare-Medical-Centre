@@ -38,10 +38,11 @@ public class PatientManagement {
             System.out.println("1. Register New Patient");
             System.out.println("2. Update Profile Info");
             System.out.println("3. Display Personal Info");
-            System.out.println("4. Display Personal Info");
-            System.out.println("5. Exit");
+            System.out.println("4. Display All Patient");
+            System.out.println("5. Remove Patient");
+            System.out.println("6. Exit");
 
-            System.out.print("Enter your choice (1-5): ");
+            System.out.print("Enter your choice (1-6): ");
 
             int choice = -1;
 
@@ -49,7 +50,7 @@ public class PatientManagement {
                 choice = scanner.nextInt();
                 scanner.nextLine(); // Clear buffer
             } catch (InputMismatchException e) {
-                System.out.println("Invalid input. Please enter an integer between 1 and 5.");
+                System.out.println("Invalid input. Please enter an integer between 1 and 6.");
                 scanner.nextLine(); // Clear buffer
                 continue;
             }
@@ -73,13 +74,16 @@ public class PatientManagement {
                     displayPersonalInfo();
                     break;
                 case 4:
-                    displayPersonalInfo();
+                    displayAll();
                     break;
                 case 5:
+                    remove();
+                    break;
+                case 6:
                     System.out.println("Exiting program. Goodbye!");
                     return;
                 default:
-                    System.out.println("Invalid choice. Please select from 1 to 4.");
+                    System.out.println("Invalid choice. Please select from 1 to 6.");
             }
         }
     }
@@ -218,7 +222,7 @@ public class PatientManagement {
         System.out.println("Registration Date: " + sdf.format(patient.getRegistrationDate()));
     }
 
-    public static void removePatient() {
+    public static void remove() {
         System.out.print("Enter the Identity Number of the patient to remove: ");
         String identityNumber = scanner.nextLine();
 
@@ -243,5 +247,42 @@ public class PatientManagement {
         }
     }
 
-    //Test
+    public static void displayAll() {
+        if (patientList.isEmpty()) {
+            System.out.println("No patients registered yet.");
+            return;
+        }
+
+        System.out.println("\n------------------------------------------------------------ PATIENT LIST ------------------------------------------------------------");
+        System.out.printf("| %-5s | %-20s | %-15s | %-10s | %-6s | %-15s | %-25s |\n",
+                "ID", "Full Name", "Identity No", "Birth Date", "Gender", "Contact", "Email");
+        System.out.println("-------------------------------------------------------------------------------------------------------------------------------");
+
+        for (int i = 0; i < patientList.size(); i++) {
+            Patient p = patientList.get(i);
+            System.out.printf("| %-5s | %-20s | %-15s | %-10s | %-6s | %-15s | %-25s |\n",
+                    p.getPatientID(),
+                    truncate(p.getFullName(), 20),
+                    p.getIdentityNumber(),
+                    sdf.format(p.getDateOfBirth()),
+                    String.valueOf(p.getGender()),
+                    p.getContactNumber(),
+                    truncate(p.getEmail(), 25));
+        }
+
+        System.out.println("-------------------------------------------------------------------------------------------------------------------------------");
+    }
+
+    private static String truncate(String str, int maxLength) {
+        if (str.length() <= maxLength) {
+            return str;
+        } else {
+            return str.substring(0, maxLength - 3) + "...";
+        }
+    }
+
+    public static DynamicList<Patient> getPatientList() {
+
+        return patientList;
+    }
 }
