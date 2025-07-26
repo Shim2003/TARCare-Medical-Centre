@@ -24,7 +24,7 @@ public class DynamicList<T> implements MyList<T> {
         }
         data = (T[]) new Object[initialCapacity];
         size = 0;
-    }
+    }   
 
     @Override
     public void add(T item) {
