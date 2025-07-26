@@ -9,7 +9,7 @@ import java.util.function.Predicate;
 
 /**
  *
- * @author jecsh
+ * @author shim
  */
 public interface MyList<T> {
     void add(T item);
