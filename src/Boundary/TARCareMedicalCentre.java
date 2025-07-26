@@ -4,6 +4,7 @@
  */
 package Boundary;
 
+import Boundary.ConsultationUI;
 /**
  *
  * @author jecsh
@@ -15,6 +16,8 @@ public class TARCareMedicalCentre {
      */
     public static void main(String[] args) {
         // TODO code application logic here
+        ConsultationUI ui = new ConsultationUI();
+        ui.run();
     }
     
 }

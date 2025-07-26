@@ -35,6 +35,30 @@ public class Consultation {
     public LocalDateTime getConsultationDate() { return consultationDate; }
     public String getSymptoms() { return symptoms; }
     public String getDiagnosis() { return diagnosis; }
+    
+    public void setConsultationId(String consultationId) {
+        this.consultationId = consultationId;
+    }
+
+    public void setPatientId(String patientId) {
+        this.patientId = patientId;
+    }
+
+    public void setDoctorId(String doctorId) {
+        this.doctorId = doctorId;
+    }
+
+    public void setConsultationDate(LocalDateTime consultationDate) {
+        this.consultationDate = consultationDate;
+    }
+
+    public void setSymptoms(String symptoms) {
+        this.symptoms = symptoms;
+    }
+
+    public void setDiagnosis(String diagnosis) {
+        this.diagnosis = diagnosis;
+    }
 
     @Override
     public String toString() {
