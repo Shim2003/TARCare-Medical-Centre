@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package Services;
+package Control;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;
@@ -11,6 +11,7 @@ import Entity.Patient;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import Utility.UtilityClass;
 
 /**
  *
@@ -262,23 +263,15 @@ public class PatientManagement {
             Patient p = patientList.get(i);
             System.out.printf("| %-5s | %-20s | %-15s | %-10s | %-6s | %-15s | %-25s |\n",
                     p.getPatientID(),
-                    truncate(p.getFullName(), 20),
+                    UtilityClass.truncate(p.getFullName(), 20),
                     p.getIdentityNumber(),
                     sdf.format(p.getDateOfBirth()),
                     String.valueOf(p.getGender()),
                     p.getContactNumber(),
-                    truncate(p.getEmail(), 25));
+                    UtilityClass.truncate(p.getEmail(), 25));
         }
 
         System.out.println("-------------------------------------------------------------------------------------------------------------------------------");
-    }
-
-    private static String truncate(String str, int maxLength) {
-        if (str.length() <= maxLength) {
-            return str;
-        } else {
-            return str.substring(0, maxLength - 3) + "...";
-        }
     }
 
     public static DynamicList<Patient> getPatientList() {
