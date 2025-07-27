@@ -25,4 +25,5 @@ public interface MyList<T> {
     T getLast();
     T findFirst(Predicate<T> predicate);
     boolean anyMatch(Predicate<T> predicate);
+    DynamicList<T> findAll(Predicate<T> predicate);
 }

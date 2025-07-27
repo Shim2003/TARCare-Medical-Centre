@@ -135,6 +135,7 @@ public class DynamicList<T> implements MyList<T> {
         return null;
     }
 
+    @Override
     public boolean anyMatch(Predicate<T> predicate) {
         for (int i = 0; i < size; i++) {
             if (predicate.test(data[i])) {
@@ -142,6 +143,17 @@ public class DynamicList<T> implements MyList<T> {
             }
         }
         return false;
+    }
+
+    @Override
+    public DynamicList<T> findAll(Predicate<T> predicate) {
+        DynamicList<T> result = new DynamicList<>();
+        for (int i = 0; i < size; i++) {
+            if (predicate.test(data[i])) {
+                result.add(data[i]);
+            }
+        }
+        return result;
     }
 
     @SuppressWarnings("unchecked")

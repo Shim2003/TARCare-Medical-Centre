@@ -15,9 +15,11 @@ public class UtilityClass {
     public static final String DATE_FORMAT = "dd/MM/yyyy";
     
     //Status
+    public static final String statusFree = "Free";
     public static final String statusWaiting = "Waiting";
-    public static final String statusReady = "Ready";
+    public static final String statusConsulting = "Consulting";
     public static final String statusCompleted = "Completed";
+    public static final String workingStatusOff = "Off";
     
     public static String truncate(String str, int maxLength) {
         if (str.length() <= maxLength) {

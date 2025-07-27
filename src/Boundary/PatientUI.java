@@ -23,7 +23,6 @@ public class PatientUI {
     private static final Scanner scanner = new Scanner(System.in);
     private static final PatientManagement patientControl = new PatientManagement();
     private static final UtilityClass utility = new UtilityClass();
-    private static final QueueUI queue = new QueueUI();
 
     private static final SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
@@ -62,13 +61,15 @@ public class PatientUI {
     public static void adminMenu() {
         while (true) {
             System.out.println("\n--- Admin Patient Management Menu ---");
+            QueueUI.displayCurrentQueue();
             System.out.println("1. Register New Patient");
             System.out.println("2. Update Patient Profile");
             System.out.println("3. Search Patient by Identity Number");
             System.out.println("4. Display All Patients");
             System.out.println("5. Remove Patient");
             System.out.println("6. Generate Patient Report");
-            System.out.println("7. Back to Role Selection");
+            System.out.println("7. Get Next Queue Patient");
+            System.out.println("8. Back to Role Selection");
 
             System.out.print("Enter your choice (1-7): ");
             String choice = scanner.nextLine();
@@ -93,6 +94,8 @@ public class PatientUI {
 //                    generateReport(); // Optional: implement this
                     break;
                 case "7":
+                    QueueUI.getNextInQueue();
+                case "8":
                     return;
                 default:
                     System.out.println("Invalid choice. Please enter 1-7.");
@@ -103,6 +106,7 @@ public class PatientUI {
     public static void patientMenu() {
         while (true) {
             System.out.println("\n--- Patient Menu ---");
+            QueueUI.displayCurrentQueue();
             System.out.println("1. Queue for consultation");
             System.out.println("2. View My Profile");
             System.out.println("3. Update My Profile");
@@ -113,7 +117,7 @@ public class PatientUI {
 
             switch (choice) {
                 case "1":
-                    displayPatientInfo();  // You may prompt them to enter IC
+                    QueueUI.startQueue();  // You may prompt them to enter IC
                     break;
                 case "2":
                     displayPatientInfo();  // You may prompt them to enter IC
@@ -133,6 +137,8 @@ public class PatientUI {
         Scanner scanner = new Scanner(System.in);
         try {
 
+            System.out.println("\n\n\n== Register as new Patient ==");
+            
             System.out.print("Enter Full Name: ");
             String fullName = scanner.nextLine();
 
@@ -168,7 +174,7 @@ public class PatientUI {
                 System.out.println("Failed to register patient.");
             }
 
-            System.out.println("Press Enter to return to the main menu...");
+            System.out.println("Press Enter to return to continue...");
             scanner.nextLine();  // waits for user input
 
         } catch (ParseException e) {

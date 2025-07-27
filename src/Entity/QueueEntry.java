@@ -56,7 +56,8 @@ public class QueueEntry {
 
     @Override
     public String toString() {
-        return "QueueEntry{" + "queueNumber=" + queueNumber + ", status=" + status + ", checkInTime=" + checkInTime + ", patientId=" + patientId + '}';
+        String patientName = Control.PatientManagement.getPatientNameById(this.getPatientId());
+        return String.format("Queue #%d | Name: %s | Status: %s", queueNumber, patientName, status);
     }
     
 }

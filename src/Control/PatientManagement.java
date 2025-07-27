@@ -48,22 +48,22 @@ public class PatientManagement {
         }
 
         switch (choice) {
-            case 1 :
+            case 1:
                 patient.setFullName(newValue);
                 break;
-            case 2 :
+            case 2:
                 patient.setContactNumber(newValue);
                 break;
-            case 3 :
+            case 3:
                 patient.setEmail(newValue);
                 break;
-            case 4 :
+            case 4:
                 patient.setAddress(newValue);
                 break;
-            case 5 :
+            case 5:
                 patient.setEmergencyContact(newValue);
                 break;
-            default : {
+            default: {
                 return false;
             }
         }
@@ -96,4 +96,10 @@ public class PatientManagement {
     public boolean isIdentityNumberExists(String identityNumber) {
         return patientList.anyMatch(p -> p.getIdentityNumber().equalsIgnoreCase(identityNumber));
     }
+
+    public static String getPatientNameById(String patientId) {
+        Patient p = patientList.findFirst(x -> x.getPatientID().equals(patientId));
+        return (p != null) ? p.getFullName() : "Unknown";
+    }
+
 }
