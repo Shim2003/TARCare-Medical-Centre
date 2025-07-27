@@ -16,64 +16,115 @@ import java.util.Scanner;
 
 /**
  *
- * @author user
+ * @author Lee Wei Hao
  */
 public class PatientUI {
 
     private static final Scanner scanner = new Scanner(System.in);
     private static final PatientManagement patientControl = new PatientManagement();
     private static final UtilityClass utility = new UtilityClass();
+    private static final QueueUI queue = new QueueUI();
 
     private static final SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
     public static void main(String[] args) {
-        menu();
+        mainMenu();
     }
 
-    public static void menu() {
+    public static void mainMenu() {
+        System.out.println("--- Welcome to TAR UMT Clinic Management System ---");
+
         while (true) {
-            System.out.println("\n--- Patient Management Menu ---");
-            System.out.println("1. Register New Patient");
-            System.out.println("2. Update Profile Info");
-            System.out.println("3. Display Personal Info");
-            System.out.println("4. Display All Patient");
-            System.out.println("5. Remove Patient");
-            System.out.println("6. Exit");
+            System.out.println("\nSelect User Role:");
+            System.out.println("1. Admin");
+            System.out.println("2. Patient");
+            System.out.println("3. Exit");
 
-            System.out.print("Enter your choice (1-6): ");
-
-            int choice = -1;
-
-            try {
-                choice = scanner.nextInt();
-                scanner.nextLine(); // Clear buffer
-            } catch (InputMismatchException e) {
-                System.out.println("Invalid input. Please enter an integer between 1 and 6.");
-                scanner.nextLine(); // Clear buffer
-                continue;
-            }
+            System.out.print("Enter your choice (1-3): ");
+            String choice = scanner.nextLine();
 
             switch (choice) {
-                case 1:
-                    addPatient();
+                case "1":
+                    adminMenu();
                     break;
-                case 2:
-                    updatePatient();
+                case "2":
+                    patientMenu();
                     break;
-                case 3:
-                    displayPatientInfo();
-                    break;
-                case 4:
-                    displayAll();
-                    break;
-                case 5:
-                    removePatient();
-                    break;
-                case 6:
-                    System.out.println("Exiting program. Goodbye!");
+                case "3":
+                    System.out.println("Exiting system. Goodbye!");
                     return;
                 default:
-                    System.out.println("Invalid choice. Please select from 1 to 6.");
+                    System.out.println("Invalid choice. Please enter 1-3.");
+            }
+        }
+    }
+
+    public static void adminMenu() {
+        while (true) {
+            System.out.println("\n--- Admin Patient Management Menu ---");
+            System.out.println("1. Register New Patient");
+            System.out.println("2. Update Patient Profile");
+            System.out.println("3. Search Patient by Identity Number");
+            System.out.println("4. Display All Patients");
+            System.out.println("5. Remove Patient");
+            System.out.println("6. Generate Patient Report");
+            System.out.println("7. Back to Role Selection");
+
+            System.out.print("Enter your choice (1-7): ");
+            String choice = scanner.nextLine();
+
+            switch (choice) {
+                case "1":
+                    addPatient();
+                    break;
+                case "2":
+                    updatePatient();
+                    break;
+                case "3":
+                    displayPatientInfo();
+                    break;
+                case "4":
+                    displayAll();
+                    break;
+                case "5":
+                    removePatient();
+                    break;
+                case "6":
+//                    generateReport(); // Optional: implement this
+                    break;
+                case "7":
+                    return;
+                default:
+                    System.out.println("Invalid choice. Please enter 1-7.");
+            }
+        }
+    }
+
+    public static void patientMenu() {
+        while (true) {
+            System.out.println("\n--- Patient Menu ---");
+            System.out.println("1. Queue for consultation");
+            System.out.println("2. View My Profile");
+            System.out.println("3. Update My Profile");
+            System.out.println("4. Back to Role Selection");
+
+            System.out.print("Enter your choice (1-4): ");
+            String choice = scanner.nextLine();
+
+            switch (choice) {
+                case "1":
+                    displayPatientInfo();  // You may prompt them to enter IC
+                    break;
+                case "2":
+                    displayPatientInfo();  // You may prompt them to enter IC
+                    break;
+                case "3":
+                    updatePatient();       // You may validate identity before allowing edit
+                    break;
+                case "4":
+                    return;
+                default:
+                    System.out.println("Invalid choice. Please enter 1-3.");
             }
         }
     }
@@ -113,7 +164,12 @@ public class PatientUI {
 
             if (patientControl.add(p)) {
                 System.out.println("Patient registered successfully.");
+            } else {
+                System.out.println("Failed to register patient.");
             }
+
+            System.out.println("Press Enter to return to the main menu...");
+            scanner.nextLine();  // waits for user input
 
         } catch (ParseException e) {
             System.out.println("Invalid date format! Please use " + utility.DATE_FORMAT + ".");
@@ -237,20 +293,19 @@ public class PatientUI {
                 break;
         }
     }
-    
+
     public static void removeAllPatients() {
-    System.out.print("Are you sure you want to remove all patients? (Y/N): ");
-    char confirm = scanner.nextLine().toUpperCase().charAt(0);
+        System.out.print("Are you sure you want to remove all patients? (Y/N): ");
+        char confirm = scanner.nextLine().toUpperCase().charAt(0);
 
-    if (confirm == 'Y') {
-        patientControl.clearAll(); // You must implement this method in PatientManagement
-        System.out.println("All patients have been removed.");
-    } else {
-        System.out.println("Removal of all patients cancelled.");
+        if (confirm == 'Y') {
+            patientControl.clearAll(); // You must implement this method in PatientManagement
+            System.out.println("All patients have been removed.");
+        } else {
+            System.out.println("Removal of all patients cancelled.");
+        }
     }
-}
 
-    
     public static void removeSpecificPatient() {
         System.out.print("Enter the Identity Number of the patient to remove: ");
         String identityNumber = scanner.nextLine();

@@ -25,8 +25,6 @@ public class Patient {
     private String address;
     private String emergencyContact;
     private Date registrationDate;
-    private int queueNumber;
-    private String queueStatus;
     
     // Constructor
     public Patient(){
@@ -69,7 +67,7 @@ public class Patient {
         return "Patient{" + "patientID=" + patientID + ", fullName=" + fullName + ", identityNumber=" + identityNumber + 
                 ", dateOfBirth=" + dateOfBirth + ", gender=" + gender + ", contactNumber=" + contactNumber + 
                 ", email=" + email + ", address=" + address + ", emergencyContact=" + emergencyContact +
-                ", registrationDate=" + registrationDate + ", queueNumber=" + queueNumber + ", Queue status=" + queueStatus + '}';
+                ", registrationDate=" + registrationDate + '}';
     }
 
     public String getContactNumber() {
@@ -94,14 +92,6 @@ public class Patient {
 
     public Date getRegistrationDate() {
         return registrationDate;
-    }
-
-    public int getQueueNumber() {
-        return queueNumber;
-    }
-
-    public String getQueueStatus() {
-        return queueStatus;
     }
 
     public void setPatientID(String patientID) {
@@ -138,14 +128,6 @@ public class Patient {
 
     public void setRegistrationDate(Date registrationDate) {
         this.registrationDate = registrationDate;
-    }
-
-    public void setQueueNumber(int queueNumber) {
-        this.queueNumber = queueNumber;
-    }
-
-    public void setQueueStatus(String queueStatus) {
-        this.queueStatus = queueStatus;
     }
 
     public void setIdentityNumber(String identityNumber) {

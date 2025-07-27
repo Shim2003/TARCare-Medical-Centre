@@ -24,7 +24,7 @@ public class DynamicList<T> implements MyList<T> {
         }
         data = (T[]) new Object[initialCapacity];
         size = 0;
-    }   
+    }
 
     @Override
     public void add(T item) {
@@ -133,6 +133,15 @@ public class DynamicList<T> implements MyList<T> {
             }
         }
         return null;
+    }
+
+    public boolean anyMatch(Predicate<T> predicate) {
+        for (int i = 0; i < size; i++) {
+            if (predicate.test(data[i])) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @SuppressWarnings("unchecked")

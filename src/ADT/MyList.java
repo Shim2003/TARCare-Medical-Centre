@@ -24,4 +24,5 @@ public interface MyList<T> {
     T getFirst();
     T getLast();
     T findFirst(Predicate<T> predicate);
+    boolean anyMatch(Predicate<T> predicate);
 }

@@ -48,17 +48,22 @@ public class PatientManagement {
         }
 
         switch (choice) {
-            case 1 ->
+            case 1 :
                 patient.setFullName(newValue);
-            case 2 ->
+                break;
+            case 2 :
                 patient.setContactNumber(newValue);
-            case 3 ->
+                break;
+            case 3 :
                 patient.setEmail(newValue);
-            case 4 ->
+                break;
+            case 4 :
                 patient.setAddress(newValue);
-            case 5 ->
+                break;
+            case 5 :
                 patient.setEmergencyContact(newValue);
-            default -> {
+                break;
+            default : {
                 return false;
             }
         }
@@ -83,8 +88,12 @@ public class PatientManagement {
 
         return patientList;
     }
-    
-    public static void clearAll(){
+
+    public static void clearAll() {
         patientList.clear();
+    }
+
+    public boolean isIdentityNumberExists(String identityNumber) {
+        return patientList.anyMatch(p -> p.getIdentityNumber().equalsIgnoreCase(identityNumber));
     }
 }
