@@ -11,7 +11,13 @@ package Utility;
 public class UtilityClass {
 
     //Constant
+    //General
     public static final String DATE_FORMAT = "dd/MM/yyyy";
+    
+    //Status
+    public static final String statusWaiting = "Waiting";
+    public static final String statusReady = "Ready";
+    public static final String statusCompleted = "Completed";
     
     public static String truncate(String str, int maxLength) {
         if (str.length() <= maxLength) {
