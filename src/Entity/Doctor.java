@@ -14,8 +14,6 @@ public class Doctor {
     
     private String doctorID;
     private String name;
-    private String specialistID;
-    private String specialistName;
     private Date dateOfBirth;
     private char gender;
     private String contactNumber;
@@ -36,23 +34,6 @@ public class Doctor {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getSpecialistID() {
-        return specialistID;
-    }
-
-    public void setSpecialistID(String specialistID) {
-        this.specialistID = specialistID;
-    }
-
-
-    public String getSpecialistName() {
-        return specialistName;
-    }
-
-    public void setSpecialistName(String specialistName) {
-        this.specialistName = specialistName;
     }
 
     public Date getDateOfBirth() {
@@ -95,11 +76,9 @@ public class Doctor {
         this.workingStatus = workingStatus;
     }
 
-    public Doctor(String doctorID, String name, String specialistID, String specialistName, Date dateOfBirth, char gender, String contactNumber, String email, String workingStatus) {
+    public Doctor(String doctorID, String name, Date dateOfBirth, char gender, String contactNumber, String email, String workingStatus) {
         this.doctorID = doctorID;
         this.name = name;
-        this.specialistID = specialistID;
-        this.specialistName = specialistName;
         this.dateOfBirth = dateOfBirth;
         this.gender = gender;
         this.contactNumber = contactNumber;
@@ -109,6 +88,6 @@ public class Doctor {
     
     @Override
     public String toString() {
-        return "Doctor{" + "doctorID=" + doctorID + ", name=" + name + ", specialistID=" + specialistID + ", specialistName=" + specialistName + ", dateOfBirth=" + dateOfBirth + ", gender=" + gender + ", contactNumber=" + contactNumber + ", email=" + email + ", workingStatus=" + workingStatus + '}';
+        return "Doctor{" + "doctorID=" + doctorID + ", name=" + name + ", dateOfBirth=" + dateOfBirth + ", gender=" + gender + ", contactNumber=" + contactNumber + ", email=" + email + ", workingStatus=" + workingStatus + '}';
     }
 }
