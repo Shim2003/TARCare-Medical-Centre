@@ -4,27 +4,27 @@
  */
 package Control;
 
-/**
- *
- * @author jecsh
- */
 import ADT.DynamicList;
 import ADT.MyList;
 import Entity.Medicine;
+import Entity.MedicalTreatmentItem;
+import Entity.Prescription;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.function.Predicate;
 
 public class PharmacyService {
-
     private final MyList<Medicine> medicines;
+    private final MyList<Prescription> prescriptionQueue;
     private final SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-
+    
     public PharmacyService() {
         this.medicines = new DynamicList<>();
+        this.prescriptionQueue = new DynamicList<>();
     }
-
+    
+    // Medicine management methods
     public boolean addMedicine(Medicine m) {
         if (findById(m.getMedicineID()) != null) {
             return false; // duplicate id
@@ -32,7 +32,7 @@ public class PharmacyService {
         medicines.add(m);
         return true;
     }
-
+    
     public boolean updateMedicine(String id, Medicine newData) {
         int idx = indexOfId(id);
         if (idx == -1) return false;
@@ -40,26 +40,30 @@ public class PharmacyService {
         medicines.add(idx, newData);
         return true;
     }
-
+    
     public boolean deleteMedicine(String id) {
         int idx = indexOfId(id);
         if (idx == -1) return false;
         medicines.remove(idx);
         return true;
     }
-
+    
     public Medicine findById(String id) {
         return medicines.findFirst(m -> m.getMedicineID().equalsIgnoreCase(id));
     }
-
+    
+    public Medicine findByName(String name) {
+        return medicines.findFirst(m -> m.getMedicineName().equalsIgnoreCase(name));
+    }
+    
     public MyList<Medicine> getAll() {
         return medicines;
     }
-
+    
     public Date parseDate(String s) throws ParseException {
         return df.parse(s);
     }
-
+    
     private int indexOfId(String id) {
         for (int i = 0; i < medicines.size(); i++) {
             if (medicines.get(i).getMedicineID().equalsIgnoreCase(id)) {
@@ -68,8 +72,66 @@ public class PharmacyService {
         }
         return -1;
     }
-
-    // Optional: generic search
+    
+    // Prescription queue management
+    public void addToQueue(Prescription prescription) {
+        prescriptionQueue.add(prescription);
+    }
+    
+    public Prescription getNextInQueue() {
+        if (prescriptionQueue.size() > 0) {
+            return prescriptionQueue.get(0);
+        }
+        return null;
+    }
+    
+    public Prescription getQueueAt(int index) {
+        if (index >= 0 && index < prescriptionQueue.size()) {
+            return prescriptionQueue.get(index);
+        }
+        return null;
+    }
+    
+    public int getQueueSize() {
+        return prescriptionQueue.size();
+    }
+    
+    // Process prescription and update stock
+    public boolean processPrescription() {
+        if (prescriptionQueue.size() == 0) {
+            return false;
+        }
+        
+        Prescription prescription = prescriptionQueue.get(0);
+        
+        // Check if all medicines are available in required quantities
+        for (int i = 0; i < prescription.getMedicineItems().size(); i++) {
+            MedicalTreatmentItem item = prescription.getMedicineItems().get(i);
+            Medicine medicine = findByName(item.getMedicineName());
+            
+            if (medicine == null || medicine.getQuantity() < item.getQuantityNeeded()) {
+                return false; // Cannot process due to insufficient stock
+            }
+        }
+        
+        // Distribute medicines and update stock
+        for (int i = 0; i < prescription.getMedicineItems().size(); i++) {
+            MedicalTreatmentItem item = prescription.getMedicineItems().get(i);
+            Medicine medicine = findByName(item.getMedicineName());
+            
+            // Update stock
+            int newQuantity = medicine.getQuantity() - item.getQuantityNeeded();
+            medicine.setQuantity(newQuantity);
+        }
+        
+        // Mark prescription as completed and remove from queue
+        prescription.setStatus("COMPLETED");
+        prescriptionQueue.remove(0);
+        
+        return true;
+    }
+    
+    // Search functionality
     public Medicine findFirst(Predicate<Medicine> predicate) {
         return medicines.findFirst(predicate);
     }
