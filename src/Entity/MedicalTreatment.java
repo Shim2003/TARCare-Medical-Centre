@@ -1,22 +1,27 @@
 package Entity;
+
+import java.util.Date;
+
 public class MedicalTreatment {
     private String treatmentId;
+    private String diagnosisId;
     private String patientId;
     private String doctorId;
-    private String treatmentName;
-    private String treatmentDescription;
-    private String treatmentStatus;
     private String treatmentType;
+    private String treatmentDescription;
+    private final Date treatmentDate;
+    private String treatmentStatus;
     private String treatmentDuration;
     private String medicalTreatmentAdvise;
 
-    public MedicalTreatment(String treatmentId, String patientId, String doctorId, String treatmentName, 
-    String treatmentDescription, String treatmentStatus, String treatmentType, String treatmentDuration, String medicalTreatmentAdvise) {
+    public MedicalTreatment(String treatmentId, String diagnosisId, String patientId, String doctorId, String treatmentType, 
+    String treatmentDescription, Date treatmentDate, String treatmentStatus, String treatmentDuration, String medicalTreatmentAdvise) {
         this.treatmentId = treatmentId;
+        this.diagnosisId = diagnosisId;
         this.patientId = patientId;
         this.doctorId = doctorId;
-        this.treatmentName = treatmentName;
         this.treatmentDescription = treatmentDescription;
+        this.treatmentDate = treatmentDate;
         this.treatmentStatus = treatmentStatus;
         this.treatmentType = treatmentType;
         this.treatmentDuration = treatmentDuration;
@@ -27,16 +32,16 @@ public class MedicalTreatment {
         return treatmentId;
     }
 
+    public String getDiagnosisId() {
+        return diagnosisId;
+    }
+
     public String getPatientId() {
         return patientId;
     }
 
     public String getDoctorId() {
         return doctorId;
-    }
-
-    public String getTreatmentName() {
-        return treatmentName;
     }
 
     public String getTreatmentDescription() {
@@ -59,6 +64,10 @@ public class MedicalTreatment {
         this.treatmentId = treatmentId;
     }
 
+    public void setDiagnosisId(String diagnosisId) {
+        this.diagnosisId = diagnosisId;
+    }
+
     public void setPatientId(String patientId) {
         this.patientId = patientId;
     }
@@ -67,14 +76,10 @@ public class MedicalTreatment {
         this.doctorId = doctorId;
     }
 
-    public void setTreatmentName(String treatmentName) {
-        this.treatmentName = treatmentName;
-    }
-
     public void setTreatmentDescription(String treatmentDescription) {
         this.treatmentDescription = treatmentDescription;
     }
-
+    
     public void setTreatmentStatus(String treatmentStatus) {
         this.treatmentStatus = treatmentStatus;
     }
@@ -92,9 +97,14 @@ public class MedicalTreatment {
     }
 
     public String toString() {
-        return "Treatment ID: " + treatmentId + ", Patient ID: " + patientId + ", Doctor ID: " + doctorId + 
-        ", Treatment Name: " + treatmentName + ", Treatment Description: " + treatmentDescription + ", Treatment Status: " + 
-        treatmentStatus + ", Treatment Type: " + treatmentType + ", Treatment Duration: " + 
-        treatmentDuration + ", Medical Treatment Advise: " + medicalTreatmentAdvise;
+        return 
+        "Treatment ID: " + treatmentId + 
+        ", Diagnosis ID: " + diagnosisId +
+        ", Treatment Description: " + treatmentDescription + 
+        ", Treatment Date: " + treatmentDate +
+        ", Treatment Status: " + treatmentStatus + 
+        ", Treatment Type: " + treatmentType + 
+        ", Treatment Duration: " + treatmentDuration +
+        ", Medical Treatment Advise: " + medicalTreatmentAdvise;
     }
 }

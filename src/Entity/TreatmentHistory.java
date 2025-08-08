@@ -13,7 +13,6 @@ public class TreatmentHistory {
     private String treatmentOutcome; // Successful, Partial, Failed, Ongoing
     private String status; // Active, Completed, Cancelled
     private String notes;
-    private Date createdAt;
 
     public TreatmentHistory(String historyId, String treatmentId, String diagnosisId, String patientId, 
                           String doctorId, Date treatmentDate, Date followUpDate, String treatmentOutcome, 
@@ -28,7 +27,21 @@ public class TreatmentHistory {
         this.treatmentOutcome = treatmentOutcome;
         this.status = status;
         this.notes = notes;
-        this.createdAt = new Date();
+    }
+
+    public TreatmentHistory(String historyId, String treatmentId, String diagnosisId, String patientId, 
+                          String doctorId, Date treatmentDate, Date followUpDate, String treatmentOutcome, 
+                          String status) {
+        this.historyId = historyId;
+        this.treatmentId = treatmentId;
+        this.diagnosisId = diagnosisId;
+        this.patientId = patientId;
+        this.doctorId = doctorId;
+        this.treatmentDate = treatmentDate;
+        this.followUpDate = followUpDate;
+        this.treatmentOutcome = treatmentOutcome;
+        this.status = status;
+        this.notes = "";
     }
 
     // Getters
@@ -42,7 +55,6 @@ public class TreatmentHistory {
     public String getTreatmentOutcome() { return treatmentOutcome; }
     public String getStatus() { return status; }
     public String getNotes() { return notes; }
-    public Date getCreatedAt() { return createdAt; }
 
     // Setters
     public void setHistoryId(String historyId) { this.historyId = historyId; }
@@ -55,7 +67,6 @@ public class TreatmentHistory {
     public void setTreatmentOutcome(String treatmentOutcome) { this.treatmentOutcome = treatmentOutcome; }
     public void setStatus(String status) { this.status = status; }
     public void setNotes(String notes) { this.notes = notes; }
-    public void setCreatedAt(Date createdAt) { this.createdAt = createdAt; }
 
     @Override
     public String toString() {
@@ -70,7 +81,6 @@ public class TreatmentHistory {
                 ", treatmentOutcome='" + treatmentOutcome + '\'' +
                 ", status='" + status + '\'' +
                 ", notes='" + notes + '\'' +
-                ", createdAt=" + createdAt +
                 '}';
     }
 } 

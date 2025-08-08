@@ -1,20 +1,21 @@
 package Entity;
 
 import java.util.Date;
+import ADT.DynamicList;
 
 public class Diagnosis {
     private String diagnosisId;
     private String patientId;
     private String doctorId;
     private Date diagnosisDate;
-    private String symptoms;
+    private DynamicList<String> symptoms;
     private String diagnosisDescription;
     private String severityLevel; // Low, Medium, High, Critical
     private String recommendations;
     private String notes;
 
     public Diagnosis(String diagnosisId, String patientId, String doctorId, Date diagnosisDate, 
-                    String symptoms, String diagnosisDescription, String severityLevel, 
+                    DynamicList<String> symptoms, String diagnosisDescription, String severityLevel, 
                     String recommendations, String notes) {
         this.diagnosisId = diagnosisId;
         this.patientId = patientId;
@@ -32,7 +33,7 @@ public class Diagnosis {
     public String getPatientId() { return patientId; }
     public String getDoctorId() { return doctorId; }
     public Date getDiagnosisDate() { return diagnosisDate; }
-    public String getSymptoms() { return symptoms; }
+    public DynamicList<String> getSymptoms() { return symptoms; }
     public String getDiagnosisDescription() { return diagnosisDescription; }
     public String getSeverityLevel() { return severityLevel; }
     public String getRecommendations() { return recommendations; }
@@ -43,7 +44,7 @@ public class Diagnosis {
     public void setPatientId(String patientId) { this.patientId = patientId; }
     public void setDoctorId(String doctorId) { this.doctorId = doctorId; }
     public void setDiagnosisDate(Date diagnosisDate) { this.diagnosisDate = diagnosisDate; }
-    public void setSymptoms(String symptoms) { this.symptoms = symptoms; }
+    public void setSymptoms(DynamicList<String> symptoms) { this.symptoms = symptoms; }
     public void setDiagnosisDescription(String diagnosisDescription) { this.diagnosisDescription = diagnosisDescription; }
     public void setSeverityLevel(String severityLevel) { this.severityLevel = severityLevel; }
     public void setRecommendations(String recommendations) { this.recommendations = recommendations; }
