@@ -156,6 +156,24 @@ public class DynamicList<T> implements MyList<T> {
         return result;
     }
 
+    @Override
+    public void replace(int index, T newItem) {
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
+        }
+        data[index] = newItem;
+    }
+
+    @Override
+    public int findIndex(Predicate<T> predicate) {
+        for (int i = 0; i < size; i++) {
+            if (predicate.test(data[i])) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     @SuppressWarnings("unchecked")
     private void ensureCapacity() {
         if (size == data.length) {
