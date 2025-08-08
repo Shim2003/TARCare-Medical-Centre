@@ -4,81 +4,142 @@
  */
 package Control;
 
-import java.util.InputMismatchException;
 import java.util.Scanner;
+import Entity.QueueEntry;
 import ADT.DynamicList;
 import Entity.Patient;
 import Entity.Consultation;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.time.LocalDateTime;
-
+import java.util.Queue;
+import Boundary.PatientUI;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 /**
  *
  * @author leekeezhan
  */
 public class ConsultationManagement {
-    private DynamicList<Patient> queue = new DynamicList<>();
-    private DynamicList<Consultation> consultationHistory = new DynamicList<>();
+    
+    private static DynamicList<Patient> completedPatients = new DynamicList<>();
+    private DynamicList<Consultation> scheduledConsultations = new DynamicList<>();
+    
+    public void addPatientToQueue(String patientId) {
+        QueueEntry entry = QueueControl.addInQueue(patientId);
 
-    private int consultationCounter = 1001;
-
-    // 1️⃣ 病人加入队列
-    public void enqueuePatient(Patient p) {
-        p.setQueueNumber(queue.size() + 1); // 排号 = 队列长度 + 1
-        p.setQueueStatus("Waiting");
-        queue.add(p);
+        if (entry != null) {
+            System.out.println("Patient added to consultation queue: " + patientId);
+        } else {
+            System.out.println("Failed to add patient to queue.");
+        }
     }
-
-    // 2️⃣ 查看当前排队人数
-    public int getQueueSize() {
-        return queue.size();
-    }
-
-    // 3️⃣ 获取当前等待的病人（peek）
-    public Patient getNextPatient() {
-        if (queue.isEmpty()) return null;
-        return queue.getFirst();
-    }
-
-    // 4️⃣ 开始 consultation（并出队）
-    public Consultation startConsultation(String doctorId, String symptoms) {
-        if (queue.isEmpty()) return null;
-
-        Patient patient = queue.remove(0);
-        patient.setQueueStatus("Consulted");
-
-        String consultationId = "C" + consultationCounter++;
-        Consultation c = new Consultation(
-            consultationId,
-            patient.getPatientID(),
-            doctorId,
-            LocalDateTime.now(),
-            symptoms,
-            ""
-        );
-        consultationHistory.add(c);
-        return c;
-    }
-
-    // 5️⃣ 结束 consultation（填诊断）
-    public boolean endConsultation(String consultationId, String diagnosis) {
-        for (int i = 0; i < consultationHistory.size(); i++) {
-            Consultation c = consultationHistory.get(i);
-            if (c.getConsultationId().equalsIgnoreCase(consultationId)) {
-                c.setDiagnosis(diagnosis);
-                return true;
+    
+    // 查看队列
+    public void viewQueue() {
+        if (QueueControl.getQueueList().isEmpty()) {
+            System.out.println("No patients in queue.");
+        } else {
+            System.out.println("\n--- Current Queue ---");
+            for (int i = 0; i < QueueControl.getQueueList().size(); i++) {
+                QueueEntry qe = QueueControl.getQueueList().get(i);
+                System.out.println((i + 1) + ". " + qe.getPatientId() + " - " + qe.getStatus());
             }
         }
-        return false;
     }
 
-    // 6️⃣ 打印全部历史记录
-    public void printConsultationHistory() {
-        for (int i = 0; i < consultationHistory.size(); i++) {
-            System.out.println(consultationHistory.get(i));
+    // 开始下一位咨询
+    public void startNextConsultation() {
+        if (!QueueControl.isFullConsulting()) {
+            QueueEntry next = QueueControl.getNextInQueue();
+            if (next != null) {
+                System.out.println("Started consultation for Patient ID: " + next.getPatientId());
+            } else {
+                System.out.println("No patients waiting in queue.");
+            }
+        }
+    }
+
+    public void viewCurrentConsulting() {
+        var consultingList = QueueControl.getQueueListByStatus(Utility.UtilityClass.statusConsulting);
+        if (consultingList.isEmpty()) {
+            System.out.println("No patients currently consulting.");
+        } else {
+            System.out.println("\n--- Consulting Patients ---");
+            for (int i = 0; i < consultingList.size(); i++) {
+                QueueEntry qe = consultingList.get(i);
+                System.out.println((i + 1) + ". " + qe.getPatientId());
+            }
+        }
+    }
+
+    // 结束咨询并保存病人信息
+    public void endConsultation(String patientId) {
+        if (QueueControl.markAsCompleted(patientId)) {
+            System.out.println("Consultation ended for Patient ID: " + patientId);
+
+            // 找到Patient对象 (假设PatientManagement有该方法)
+            Patient patient = PatientManagement.findPatientById(patientId);
+            if (patient != null) {
+                completedPatients.add(patient);
+                System.out.println("Patient info saved to completed consultations.");
+            } else {
+                System.out.println("Warning: Patient data not found to save.");
+            }
+        }
+    }
+    
+    // 预约下一次咨询
+    public void scheduleNextConsultation(String consultationId, String patientId, String doctorId, String dateTimeStr, String symptoms) {
+        // 检查病人是否存在
+        Patient patient = PatientManagement.findPatientById(patientId);
+        if (patient == null) {
+            System.out.println("Patient not found. Cannot schedule consultation.");
+            return;
+        }
+
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+            LocalDateTime dateTime = LocalDateTime.parse(dateTimeStr, formatter);
+
+            Consultation newConsultation = new Consultation(
+                consultationId,
+                patientId,
+                doctorId,
+                dateTime,
+                symptoms,
+                ""  // 诊断可以先空着，之后填写
+            );
+
+            scheduledConsultations.add(newConsultation);
+            System.out.println("Consultation scheduled for Patient " + patientId + " at " + dateTimeStr);
+        } catch (DateTimeParseException e) {
+            System.out.println("Invalid date/time format. Please use 'yyyy-MM-dd HH:mm'.");
+        }
+    }
+    
+    // 查看所有预约consultations
+    public void viewScheduledConsultations() {
+        if (scheduledConsultations.isEmpty()) {
+            System.out.println("No scheduled consultations.");
+            return;
+        }
+        System.out.println("\n--- Scheduled Consultations ---");
+        for (int i = 0; i < scheduledConsultations.size(); i++) {
+            System.out.println((i + 1) + ". " + scheduledConsultations.get(i).toString());
+        }
+    }
+
+
+    // 你可以加个方法查看所有完成咨询的病人
+    public void viewCompletedPatients() {
+        if (completedPatients.isEmpty()) {
+            System.out.println("No patients have completed consultation yet.");
+            return;
+        }
+        System.out.println("\n--- Completed Consultation Patients ---");
+        for (int i = 0; i < completedPatients.size(); i++) {
+            Patient p = completedPatients.get(i);
+            System.out.println((i + 1) + ". " + p.getPatientID() + " - " + p.getFullName());
         }
     }
 }
-

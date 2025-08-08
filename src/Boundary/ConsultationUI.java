@@ -4,116 +4,62 @@
  */
 package Boundary;
 
-import Entity.Patient;
-import Entity.Consultation;
 import Control.ConsultationManagement;
-
-import java.util.Date;
 import java.util.Scanner;
 
-/**
- *
- * @author leekeezhan
- */
 public class ConsultationUI {
-    private ConsultationManagement consultationControl = new ConsultationManagement();
-    private Scanner sc = new Scanner(System.in);
+
+    private final ConsultationManagement consultationManagement = new ConsultationManagement();
+    private final Scanner sc = new Scanner(System.in);
 
     public void run() {
-        int choice;
-        do {
-            System.out.println("\n--- Consultation Management Menu ---");
-            System.out.println("1. Add Patient to Queue");
-            System.out.println("2. View Next Patient");
-            System.out.println("3. Start Consultation");
-            System.out.println("4. End Consultation");
-            System.out.println("5. View Consultation History");
-            System.out.println("0. Exit");
-            System.out.print("Enter your choice: ");
-            choice = sc.nextInt();
-            sc.nextLine(); // clear buffer
+    int choice;
+    do {
+        System.out.println("\n=== Consultation Module ===");
+        System.out.println("1. Add Patient to Queue");
+        System.out.println("2. View Queue");
+        System.out.println("3. Start Next Consultation");
+        System.out.println("4. View Current Consulting Patients");
+        System.out.println("5. End Consultation");
+        System.out.println("6. View Completed Consultations");  // 新增选项
+        System.out.println("0. Back to Main Menu");
+        System.out.print("Enter choice: ");
+        choice = sc.nextInt();
+        sc.nextLine(); // 清除换行符
 
-            switch (choice) {
-                case 1:
-                    addPatient();
-                    break;
-                case 2:
-                    viewNextPatient();
-                    break;
-                case 3:
-                    startConsultation();
-                    break;
-                case 4:
-                    endConsultation();
-                    break;
-                case 5:
-                    consultationControl.printConsultationHistory();
-                    break;
-                case 0:
-                    System.out.println("Exiting system...");
-                    break;
-                default:
-                    System.out.println("Invalid choice!");
+        switch (choice) {
+            case 1 -> {
+                System.out.print("Enter Patient ID: ");
+                String patientId = sc.nextLine();
+                consultationManagement.addPatientToQueue(patientId);
             }
-        } while (choice != 0);
-    }
+            case 2 -> consultationManagement.viewQueue();
+            case 3 -> consultationManagement.startNextConsultation();
+            case 4 -> consultationManagement.viewCurrentConsulting();
+            case 5 -> {
+                System.out.print("Enter Patient ID to end consultation: ");
+                String id = sc.nextLine();
+                consultationManagement.endConsultation(id);
+            }
+            case 6 -> consultationManagement.viewCompletedPatients();  // 新增调用
+            case 7 -> {
+                System.out.print("Enter Consultation ID: ");
+                String consultationId = sc.nextLine();
+                System.out.print("Enter Patient ID: ");
+                String patientId = sc.nextLine();
+                System.out.print("Enter Doctor ID: ");
+                String doctorId = sc.nextLine();
+                System.out.print("Enter appointment date and time (yyyy-MM-dd HH:mm): ");
+                String dateTimeStr = sc.nextLine();
+                System.out.print("Enter symptoms (optional): ");
+                String symptoms = sc.nextLine();
 
-    private void addPatient() {
-        System.out.print("Full Name: ");
-        String name = sc.nextLine();
-        System.out.print("IC Number: ");
-        String ic = sc.nextLine();
-        System.out.print("Gender (M/F): ");
-        char gender = sc.nextLine().charAt(0);
-        System.out.print("Contact Number: ");
-        String contact = sc.nextLine();
-        System.out.print("Email: ");
-        String email = sc.nextLine();
-        System.out.print("Address: ");
-        String address = sc.nextLine();
-        System.out.print("Emergency Contact: ");
-        String emergency = sc.nextLine();
-
-        Patient p = new Patient(name, ic, new Date(), gender, contact, email, address, emergency, new Date());
-        consultationControl.enqueuePatient(p);
-        System.out.println("Patient added to queue with ID: " + p.getPatientID());
-    }
-
-    private void viewNextPatient() {
-        Patient p = consultationControl.getNextPatient();
-        if (p == null) {
-            System.out.println("Queue is empty.");
-        } else {
-            System.out.println("Next in queue: " + p.getPatientID() + " - " + p.getFullName());
+                consultationManagement.scheduleNextConsultation(consultationId, patientId, doctorId, dateTimeStr, symptoms);
+            }
+            case 8 -> consultationManagement.viewScheduledConsultations();
+            case 0 -> System.out.println("Returning to Main Menu...");
+            default -> System.out.println("Invalid choice.");
         }
-    }
-
-    private void startConsultation() {
-        System.out.print("Doctor ID: ");
-        String doctorId = sc.nextLine();
-        System.out.print("Symptoms: ");
-        String symptoms = sc.nextLine();
-
-        Consultation c = consultationControl.startConsultation(doctorId, symptoms);
-        if (c != null) {
-            System.out.println("Consultation started for patient " + c.getPatientId());
-            System.out.println("Consultation ID: " + c.getConsultationId());
-        } else {
-            System.out.println("No patients in queue.");
-        }
-    }
-
-    private void endConsultation() {
-        System.out.print("Consultation ID: ");
-        String consultId = sc.nextLine();
-        System.out.print("Diagnosis: ");
-        String diagnosis = sc.nextLine();
-
-        boolean success = consultationControl.endConsultation(consultId, diagnosis);
-        if (success) {
-            System.out.println("Consultation ended and diagnosis recorded.");
-        } else {
-            System.out.println("Consultation ID not found.");
-        }
-    }
+    } while (choice != 0);
+}
 }
