@@ -19,25 +19,23 @@ public class QueueUI {
 
     public static void startQueue() {
 
-        System.out.print("Enter your Identity Number to join the queue: ");
-        String identityNumber = scanner.nextLine();
+        System.out.print("Enter your Patient ID to join the queue: ");
+        String patientId = scanner.nextLine();
 
-        if (identityNumber == null || identityNumber.trim().isEmpty()) {
+        if (patientId == null || patientId.trim().isEmpty()) {
             System.out.println("Invalid input. Please enter a valid Identity Number.");
             return;
         }
 
-        QueueEntry newQueue = QueueControl.addInQueue(identityNumber);
+        QueueEntry newQueue = QueueControl.addInQueue(patientId);
 
         if (newQueue != null) {
-            System.out.println("You have successfully joined the queue. Your queue number is: " + newQueue.getQueueNumber());
+            System.out.println("You have successfully joined the queue.");
+            System.out.println("Queue Details");
+            System.out.println(newQueue.toString());
         } else {
             System.out.println("You have unsuccessfully joined the queue.");
         }
-
-        DynamicList<QueueEntry> queueList = QueueControl.getQueueList();
-        System.out.println("You have successfully joined the queue. Your queue number is : " + queueList.getLast().getQueueNumber());
-        System.out.println(queueList.getLast().toString());
 
     }
 
@@ -64,9 +62,9 @@ public class QueueUI {
     }
 
     public static void displayCurrentQueue() {
-        System.out.println("\n--- Current Patient Being Served ---");
+        System.out.println("--- Current Patient Being Served ---");
 
-        QueueEntry current = QueueControl.currentQueue();
+        QueueEntry current = QueueControl.currentConsulting();
 
         if (current != null) {
             String queueNum = "Current Queue Number: " + current.getQueueNumber();
@@ -123,6 +121,21 @@ public class QueueUI {
             for (int i = 0; i < filteredList.size(); i++) {
                 System.out.println(filteredList.get(i).toString());
             }
+        }
+
+    }
+
+    public static void cancelQueue() {
+
+        System.out.print("Enter your Patient ID to cancel your queue entry: ");
+        String patientId = scanner.nextLine();
+
+        boolean removed = Control.QueueControl.removeFromQueue(patientId);
+
+        if (removed) {
+            System.out.println("Your queue entry has been successfully cancelled.");
+        } else {
+            System.out.println("No queue entry found with the given Identity Number.");
         }
 
     }

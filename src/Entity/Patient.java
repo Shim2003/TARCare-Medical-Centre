@@ -25,13 +25,13 @@ public class Patient {
     private String address;
     private String emergencyContact;
     private Date registrationDate;
-    
+
     // Constructor
-    public Patient(){
+    public Patient() {
         this.patientID = "P" + idCounter++;
     }
-    
-    public Patient(String fullName,String identityNumber, Date dateOfBirth, char gender,
+
+    public Patient(String fullName, String identityNumber, Date dateOfBirth, char gender,
             String contactNumber, String email, String address, String emergencyContact,
             Date registrationDate) {
         this.patientID = "P" + idCounter++;
@@ -44,6 +44,20 @@ public class Patient {
         this.address = address;
         this.emergencyContact = emergencyContact;
         this.registrationDate = registrationDate;
+    }
+
+    // Copy constructor
+    public Patient(Patient other) {
+        this.patientID = other.patientID;
+        this.fullName = other.fullName;
+        this.identityNumber = other.identityNumber;
+        this.dateOfBirth = other.dateOfBirth;
+        this.gender = other.gender;
+        this.contactNumber = other.contactNumber;
+        this.email = other.email;
+        this.address = other.address;
+        this.emergencyContact = other.emergencyContact;
+        this.registrationDate = other.registrationDate;
     }
 
     public String getPatientID() {
@@ -64,10 +78,10 @@ public class Patient {
 
     @Override
     public String toString() {
-        return "Patient{" + "patientID=" + patientID + ", fullName=" + fullName + ", identityNumber=" + identityNumber + 
-                ", dateOfBirth=" + dateOfBirth + ", gender=" + gender + ", contactNumber=" + contactNumber + 
-                ", email=" + email + ", address=" + address + ", emergencyContact=" + emergencyContact +
-                ", registrationDate=" + registrationDate + '}';
+        return "Patient{" + "patientID=" + patientID + ", fullName=" + fullName + ", identityNumber=" + identityNumber
+                + ", dateOfBirth=" + dateOfBirth + ", gender=" + gender + ", contactNumber=" + contactNumber
+                + ", email=" + email + ", address=" + address + ", emergencyContact=" + emergencyContact
+                + ", registrationDate=" + registrationDate + '}';
     }
 
     public String getContactNumber() {
@@ -132,5 +146,9 @@ public class Patient {
 
     public void setIdentityNumber(String identityNumber) {
         this.identityNumber = identityNumber;
+    }
+
+    public Patient clone() {
+        return new Patient(this);
     }
 }

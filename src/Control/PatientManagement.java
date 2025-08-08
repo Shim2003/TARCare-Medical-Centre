@@ -4,14 +4,11 @@
  */
 package Control;
 
-import java.util.InputMismatchException;
-import java.util.Scanner;
 import ADT.DynamicList;
 import Entity.Patient;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import Utility.UtilityClass;
 
 /**
  *
@@ -25,9 +22,26 @@ public class PatientManagement {
     // Constant
     public static final String DATE_FORMAT = "dd/MM/yyyy";
 
-    // Declare global scanner
-    private static final Scanner scanner = new Scanner(System.in);
-    private static final SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+    public static void addSamplePatients() {
+        SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
+        try {
+            Patient p1 = new Patient("Alice Tan", "A123456789", sdf.parse("01/01/1990"), 'F',
+                    "0123456789", "alice@example.com", "123 Jalan ABC, Kuala Lumpur", "01122334455", new Date());
+
+            Patient p2 = new Patient("Bob Lim", "B987654321", sdf.parse("15/05/1985"), 'M',
+                    "0198765432", "bob@example.com", "456 Jalan XYZ, Penang", "01233445566", new Date());
+
+            Patient p3 = new Patient("Charlie Wong", "C111222333", sdf.parse("20/12/1975"), 'M',
+                    "0171122334", "charlie@example.com", "789 Jalan DEF, Johor", "01344556677", new Date());
+
+            add(p1);
+            add(p2);
+            add(p3);
+
+        } catch (ParseException e) {
+            System.out.println("Error parsing date in sample data.");
+        }
+    }
 
     //Register as new patient
     public static boolean add(Patient p) {
@@ -41,37 +55,43 @@ public class PatientManagement {
 
     }
 
-    public static boolean update(Patient patient, int choice, String newValue) {
+    public static boolean update(String patientId, int choice, String newValue) {
 
-        if (patient == null) {
+        int index = patientList.findIndex(p -> p.getPatientID().equals(patientId));
+
+        if (index == -1) {
             return false;
         }
 
+        Patient patientToUpdate = patientList.get(index).clone();
+
         switch (choice) {
             case 1:
-                patient.setFullName(newValue);
+                patientToUpdate.setFullName(newValue);
                 break;
             case 2:
-                patient.setContactNumber(newValue);
+                patientToUpdate.setContactNumber(newValue);
                 break;
             case 3:
-                patient.setEmail(newValue);
+                patientToUpdate.setEmail(newValue);
                 break;
             case 4:
-                patient.setAddress(newValue);
+                patientToUpdate.setAddress(newValue);
                 break;
             case 5:
-                patient.setEmergencyContact(newValue);
+                patientToUpdate.setEmergencyContact(newValue);
                 break;
             default: {
                 return false;
             }
         }
+
+        patientList.replace(index, patientToUpdate);
         return true;
     }
 
-    public static Patient findPatientByIdentity(String identityNumber) {
-        return patientList.findFirst(p -> p.getIdentityNumber().equalsIgnoreCase(identityNumber));
+    public static Patient findPatientById(String patientId) {
+        return patientList.findFirst(p -> p.getPatientID().equalsIgnoreCase(patientId));
     }
 
     public static void remove(char confirm, Patient p) {
@@ -93,8 +113,8 @@ public class PatientManagement {
         patientList.clear();
     }
 
-    public boolean isIdentityNumberExists(String identityNumber) {
-        return patientList.anyMatch(p -> p.getIdentityNumber().equalsIgnoreCase(identityNumber));
+    public boolean isPatientExists(String patientId) {
+        return patientList.anyMatch(p -> p.getPatientID().equalsIgnoreCase(patientId));
     }
 
     public static String getPatientNameById(String patientId) {

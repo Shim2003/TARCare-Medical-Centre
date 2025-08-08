@@ -21,12 +21,12 @@ import java.util.Scanner;
 public class PatientUI {
 
     private static final Scanner scanner = new Scanner(System.in);
-    private static final PatientManagement patientControl = new PatientManagement();
     private static final UtilityClass utility = new UtilityClass();
 
     private static final SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
     public static void main(String[] args) {
+        PatientManagement.addSamplePatients();
         mainMenu();
     }
 
@@ -69,9 +69,10 @@ public class PatientUI {
             System.out.println("5. Remove Patient");
             System.out.println("6. Generate Patient Report");
             System.out.println("7. Get Next Queue Patient");
-            System.out.println("8. Back to Role Selection");
+            System.out.println("8. Display Queue By Status");
+            System.out.println("9. Back to Role Selection");
 
-            System.out.print("Enter your choice (1-7): ");
+            System.out.print("Enter your choice (1-9): ");
             String choice = scanner.nextLine();
 
             switch (choice) {
@@ -95,7 +96,11 @@ public class PatientUI {
                     break;
                 case "7":
                     QueueUI.getNextInQueue();
+                    break;
                 case "8":
+                    QueueUI.displayQueueByStatus();
+                    return;
+                case "9":
                     return;
                 default:
                     System.out.println("Invalid choice. Please enter 1-7.");
@@ -108,9 +113,10 @@ public class PatientUI {
             System.out.println("\n--- Patient Menu ---");
             QueueUI.displayCurrentQueue();
             System.out.println("1. Queue for consultation");
-            System.out.println("2. View My Profile");
-            System.out.println("3. Update My Profile");
-            System.out.println("4. Back to Role Selection");
+            System.out.println("2. Register Patient");
+            System.out.println("3. View My Profile");
+            System.out.println("4. Update My Profile");
+            System.out.println("5. Back to Role Selection");
 
             System.out.print("Enter your choice (1-4): ");
             String choice = scanner.nextLine();
@@ -120,12 +126,15 @@ public class PatientUI {
                     QueueUI.startQueue();  // You may prompt them to enter IC
                     break;
                 case "2":
-                    displayPatientInfo();  // You may prompt them to enter IC
+                    addPatient();  // You may prompt them to enter IC
                     break;
                 case "3":
-                    updatePatient();       // You may validate identity before allowing edit
+                    displayPatientInfo();  // You may prompt them to enter IC
                     break;
                 case "4":
+                    updatePatient();       // You may validate identity before allowing edit
+                    break;
+                case "5":
                     return;
                 default:
                     System.out.println("Invalid choice. Please enter 1-3.");
@@ -134,11 +143,10 @@ public class PatientUI {
     }
 
     public static void addPatient() {
-        Scanner scanner = new Scanner(System.in);
         try {
 
             System.out.println("\n\n\n== Register as new Patient ==");
-            
+
             System.out.print("Enter Full Name: ");
             String fullName = scanner.nextLine();
 
@@ -168,8 +176,9 @@ public class PatientUI {
 
             Patient p = new Patient(fullName, identityNumber, dateOfBirth, gender, contactNumber, email, address, emergencyContact, registrationDate);
 
-            if (patientControl.add(p)) {
+            if (PatientManagement.add(p)) {
                 System.out.println("Patient registered successfully.");
+                System.out.println("Patient ID : " + p.getPatientID());
             } else {
                 System.out.println("Failed to register patient.");
             }
@@ -185,17 +194,17 @@ public class PatientUI {
     }
 
     public static void updatePatient() {
-        System.out.print("Enter the Identity Number of the patient to update: ");
-        String identityNumber = scanner.nextLine();
+        System.out.print("Enter the Patient ID of the patient to update: ");
+        String patientId = scanner.nextLine();
 
-        Patient patient = patientControl.findPatientByIdentity(identityNumber); // service layer
+        Patient existingPatient = PatientManagement.findPatientById(patientId); // service layer
 
-        if (patient == null) {
+        if (existingPatient == null) {
             System.out.println("Patient not found.");
             return;
         }
 
-        System.out.println("Patient Found: " + patient.getFullName());
+        System.out.println("Patient Found: " + existingPatient.getFullName());
 
         int choice = -1;
         while (choice < 1 || choice > 6) {
@@ -229,7 +238,7 @@ public class PatientUI {
         System.out.print("Enter new value: ");
         String newValue = scanner.nextLine();
 
-        boolean updated = patientControl.update(patient, choice, newValue);
+        boolean updated = PatientManagement.update(patientId, choice, newValue);
 
         if (updated) {
             System.out.println("Patient information updated successfully.");
@@ -241,10 +250,10 @@ public class PatientUI {
 
     public static void displayPatientInfo() {
 
-        System.out.print("Enter the Identity Number to display info: ");
-        String identityNumber = scanner.nextLine();
+        System.out.print("Enter the Patient Id to display info: ");
+        String patientId = scanner.nextLine();
 
-        Patient patient = patientControl.findPatientByIdentity(identityNumber);
+        Patient patient = PatientManagement.findPatientById(patientId);
 
         if (patient == null) {
             System.out.println("Patient not found.");
@@ -305,7 +314,7 @@ public class PatientUI {
         char confirm = scanner.nextLine().toUpperCase().charAt(0);
 
         if (confirm == 'Y') {
-            patientControl.clearAll(); // You must implement this method in PatientManagement
+            PatientManagement.clearAll(); // You must implement this method in PatientManagement
             System.out.println("All patients have been removed.");
         } else {
             System.out.println("Removal of all patients cancelled.");
@@ -314,9 +323,9 @@ public class PatientUI {
 
     public static void removeSpecificPatient() {
         System.out.print("Enter the Identity Number of the patient to remove: ");
-        String identityNumber = scanner.nextLine();
+        String patientId = scanner.nextLine();
 
-        Patient patient = patientControl.findPatientByIdentity(identityNumber);
+        Patient patient = PatientManagement.findPatientById(patientId);
         if (patient == null) {
             System.out.println("Patient not found.");
             return;
@@ -325,7 +334,7 @@ public class PatientUI {
         System.out.print("Are you sure you want to remove this patient? (Y/N): ");
         char confirm = scanner.nextLine().toUpperCase().charAt(0);
         if (confirm == 'Y') {
-            patientControl.remove(confirm, patient);
+            PatientManagement.remove(confirm, patient);
         } else {
             System.out.println("Removal cancelled.");
         }
@@ -333,7 +342,7 @@ public class PatientUI {
 
     public static void displayAll() {
 
-        DynamicList<Patient> patientList = patientControl.getPatientList();
+        DynamicList<Patient> patientList = PatientManagement.getPatientList();
 
         if (patientList.isEmpty()) {
             System.out.println("No patients registered yet.");
