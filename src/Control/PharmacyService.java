@@ -96,7 +96,7 @@ public class PharmacyService {
         return prescriptionQueue.size();
     }
     
-    // Process prescription and update stock
+    // Updated process prescription method using calculated quantities
     public boolean processPrescription() {
         if (prescriptionQueue.size() == 0) {
             return false;
@@ -108,8 +108,9 @@ public class PharmacyService {
         for (int i = 0; i < prescription.getMedicineItems().size(); i++) {
             MedicalTreatmentItem item = prescription.getMedicineItems().get(i);
             Medicine medicine = findByName(item.getMedicineName());
+            int quantityNeeded = item.calculateQuantityNeeded();
             
-            if (medicine == null || medicine.getQuantity() < item.getQuantityNeeded()) {
+            if (medicine == null || medicine.getQuantity() < quantityNeeded) {
                 return false; // Cannot process due to insufficient stock
             }
         }
@@ -118,9 +119,10 @@ public class PharmacyService {
         for (int i = 0; i < prescription.getMedicineItems().size(); i++) {
             MedicalTreatmentItem item = prescription.getMedicineItems().get(i);
             Medicine medicine = findByName(item.getMedicineName());
+            int quantityNeeded = item.calculateQuantityNeeded();
             
-            // Update stock
-            int newQuantity = medicine.getQuantity() - item.getQuantityNeeded();
+            // Update stock using calculated quantity
+            int newQuantity = medicine.getQuantity() - quantityNeeded;
             medicine.setQuantity(newQuantity);
         }
         
@@ -129,6 +131,37 @@ public class PharmacyService {
         prescriptionQueue.remove(0);
         
         return true;
+    }
+    
+    // Method to check stock availability for a prescription
+    public boolean checkStockAvailability(Prescription prescription) {
+        for (int i = 0; i < prescription.getMedicineItems().size(); i++) {
+            MedicalTreatmentItem item = prescription.getMedicineItems().get(i);
+            Medicine medicine = findByName(item.getMedicineName());
+            int quantityNeeded = item.calculateQuantityNeeded();
+            
+            if (medicine == null || medicine.getQuantity() < quantityNeeded) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    // Method to get total cost for a prescription
+    public double calculatePrescriptionCost(Prescription prescription) {
+        double totalCost = 0.0;
+        
+        for (int i = 0; i < prescription.getMedicineItems().size(); i++) {
+            MedicalTreatmentItem item = prescription.getMedicineItems().get(i);
+            Medicine medicine = findByName(item.getMedicineName());
+            
+            if (medicine != null) {
+                int quantityNeeded = item.calculateQuantityNeeded();
+                totalCost += medicine.getPrice() * quantityNeeded;
+            }
+        }
+        
+        return totalCost;
     }
     
     // Search functionality

@@ -3,14 +3,13 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package Entity;
-
 import ADT.DynamicList;
 import ADT.MyList;
 
 public class Prescription {
     private String prescriptionID;
     private Patient patient;
-    private MyList<MedicalTreatmentItem> medicineItems; // Modified to use treatment items
+    private MyList<MedicalTreatmentItem> medicineItems;
     private String status; // PENDING, PROCESSING, COMPLETED
     private String doctorId;
     
@@ -27,12 +26,19 @@ public class Prescription {
         this.status = "PENDING";
     }
     
-    // Add medicine item to prescription
+    // Updated method - removed quantityNeeded parameter since it's now calculated
     public void addMedicineItem(String medicineName, String dosage, String frequency, 
-                               String duration, String method, int quantityNeeded) {
+                               String duration, String method) {
         MedicalTreatmentItem item = new MedicalTreatmentItem(medicineName, dosage, frequency, 
-                                                           duration, method, quantityNeeded);
+                                                           duration, method);
         medicineItems.add(item);
+    }
+    
+    // Overloaded method for backward compatibility with existing code
+    public void addMedicineItem(String medicineName, String dosage, String frequency, 
+                               String duration, String method, int ignoredQuantity) {
+        // The quantity parameter is ignored since we calculate it from dosage info
+        addMedicineItem(medicineName, dosage, frequency, duration, method);
     }
     
     // Getters and Setters

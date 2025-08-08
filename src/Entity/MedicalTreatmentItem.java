@@ -10,18 +10,67 @@ public class MedicalTreatmentItem {
     private String frequency;
     private String duration;
     private String method;
-    private int quantityNeeded;
     
     public MedicalTreatmentItem() {}
     
     public MedicalTreatmentItem(String medicineName, String dosage, String frequency, 
-                              String duration, String method, int quantityNeeded) {
+                              String duration, String method) {
         this.medicineName = medicineName;
         this.dosage = dosage;
         this.frequency = frequency;
         this.duration = duration;
         this.method = method;
-        this.quantityNeeded = quantityNeeded;
+    }
+    
+    // Method to calculate quantity needed based on dosage, frequency, and duration
+    public int calculateQuantityNeeded() {
+        try {
+            // Extract numeric values from strings
+            int dosageAmount = extractNumericValue(dosage);
+            int frequencyPerDay = extractNumericValue(frequency);
+            int durationDays = extractNumericValue(duration);
+            
+            // Calculate total quantity needed
+            return dosageAmount * frequencyPerDay * durationDays;
+        } catch (Exception e) {
+            // Default to 1 if parsing fails
+            System.err.println("Warning: Could not parse dosage information for " + medicineName + 
+                             ". Using default quantity of 1.");
+            return 1;
+        }
+    }
+    
+    // Helper method to extract numeric values from strings like "2 tablets", "3x/day", "7 days"
+    private int extractNumericValue(String text) {
+        if (text == null || text.trim().isEmpty()) {
+            return 1;
+        }
+        
+        // Remove common text and extract first number found
+        String cleanText = text.toLowerCase()
+                              .replace("tablets", "")
+                              .replace("tablet", "")
+                              .replace("capsules", "")
+                              .replace("capsule", "")
+                              .replace("ml", "")
+                              .replace("x/day", "")
+                              .replace("/day", "")
+                              .replace("times", "")
+                              .replace("day", "")
+                              .replace("days", "")
+                              .trim();
+        
+        // Extract first number
+        StringBuilder number = new StringBuilder();
+        for (char c : cleanText.toCharArray()) {
+            if (Character.isDigit(c)) {
+                number.append(c);
+            } else if (number.length() > 0) {
+                break; // Stop at first non-digit after finding digits
+            }
+        }
+        
+        return number.length() > 0 ? Integer.parseInt(number.toString()) : 1;
     }
     
     // Getters and Setters
@@ -40,9 +89,6 @@ public class MedicalTreatmentItem {
     public String getMethod() { return method; }
     public void setMethod(String method) { this.method = method; }
     
-    public int getQuantityNeeded() { return quantityNeeded; }
-    public void setQuantityNeeded(int quantityNeeded) { this.quantityNeeded = quantityNeeded; }
-    
     @Override
     public String toString() {
         return "MedicalTreatmentItem{" +
@@ -51,7 +97,7 @@ public class MedicalTreatmentItem {
                ", frequency='" + frequency + '\'' +
                ", duration='" + duration + '\'' +
                ", method='" + method + '\'' +
-               ", quantityNeeded=" + quantityNeeded +
+               ", calculatedQuantity=" + calculateQuantityNeeded() +
                '}';
     }
 }

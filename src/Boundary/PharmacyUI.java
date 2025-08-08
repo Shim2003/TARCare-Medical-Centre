@@ -23,14 +23,14 @@ public class PharmacyUI {
         
         try {
             // Initialize medicine inventory
-            service.addMedicine(new Medicine("M001", "Paracetamol", 100, "Analgesic", 10.90, "China", service.parseDate("31/12/2030")));
-            service.addMedicine(new Medicine("M002", "Aspirin", 50, "Analgesic", 12.50, "Bayer", service.parseDate("15/11/2029")));
-            service.addMedicine(new Medicine("M003", "Amoxicillin", 200, "Antibiotic", 25.00, "Pfizer", service.parseDate("01/07/2031")));
-            service.addMedicine(new Medicine("M004", "Vitamin C", 150, "Supplement", 5.20, "Blackmores", service.parseDate("10/05/2028")));
-            service.addMedicine(new Medicine("M005", "Benadryl Cough Syrup", 80, "Cold & Flu", 18.75, "Johnson", service.parseDate("20/03/2032")));
-            service.addMedicine(new Medicine("M006", "ORS Sachet", 300, "Electrolyte", 2.50, "Cipla", service.parseDate("15/08/2029")));
-            service.addMedicine(new Medicine("M007", "Hydrocortisone Cream", 40, "Topical", 15.60, "GSK", service.parseDate("30/06/2030")));
-            service.addMedicine(new Medicine("M008", "Omeprazole", 120, "Antacid", 22.30, "AstraZeneca", service.parseDate("12/09/2031")));
+            service.addMedicine(new Medicine("M001", "Paracetamol", 100, "Analgesic", 0.25, "China", service.parseDate("31/12/2030")));
+            service.addMedicine(new Medicine("M002", "Aspirin", 50, "Analgesic", 1.00, "Bayer", service.parseDate("15/11/2029")));
+            service.addMedicine(new Medicine("M003", "Amoxicillin", 200, "Antibiotic", 1.50, "Pfizer", service.parseDate("01/07/2031")));
+            service.addMedicine(new Medicine("M004", "Vitamin C", 150, "Supplement", 0.8, "Blackmores", service.parseDate("10/05/2028")));
+            service.addMedicine(new Medicine("M005", "Benadryl Cough Syrup", 80, "Cold & Flu", 0.30, "Johnson", service.parseDate("20/03/2032")));
+            service.addMedicine(new Medicine("M006", "ORS Sachet", 300, "Electrolyte", 1.20, "Cipla", service.parseDate("15/08/2029")));
+            service.addMedicine(new Medicine("M007", "Hydrocortisone Cream", 40, "Topical", 4.00, "GSK", service.parseDate("30/06/2030")));
+            service.addMedicine(new Medicine("M008", "Omeprazole", 120, "Antacid", 1.75, "AstraZeneca", service.parseDate("12/09/2031")));
             
             // Initialize sample prescription queue (hardcoded patients)
             initializeSampleQueue();
@@ -77,10 +77,11 @@ public class PharmacyUI {
                                           "123-456-7890", "john@email.com", 
                                           "123 Main St", "456-789-0123",
                                           new Date());
-            
+
             Prescription prescription1 = new Prescription("RX001", patient1, "DR001");
-            prescription1.addMedicineItem("Paracetamol", "1 tablet", "3x/day after meals", "for 5 days", "Oral", 15);
-            prescription1.addMedicineItem("Amoxicillin", "1 capsule", "3x/day", "for 7 days", "Oral", 21);
+            // Updated calls - removed quantityNeeded parameter (it's now calculated)
+            prescription1.addMedicineItem("Paracetamol", "1 tablet", "3x/day after meals", "5 days", "Oral");
+            prescription1.addMedicineItem("Amoxicillin", "1 capsule", "3x/day", "7 days", "Oral");
             service.addToQueue(prescription1);
 
             Patient patient2 = new Patient("Jane Smith", "987654321098",
@@ -88,10 +89,10 @@ public class PharmacyUI {
                                           "987-654-3210", "jane@email.com",
                                           "456 Oak Ave", "321-654-9870",
                                           new Date());
-            
+
             Prescription prescription2 = new Prescription("RX002", patient2, "DR002");
-            prescription2.addMedicineItem("Benadryl Cough Syrup", "10ml", "2x/day", "for 5 days", "Oral", 1);
-            prescription2.addMedicineItem("ORS Sachet", "1 sachet", "after each loose stool", "as needed", "dissolve in water", 10);
+            prescription2.addMedicineItem("Benadryl Cough Syrup", "10ml", "2x/day", "5 days", "Oral");
+            prescription2.addMedicineItem("ORS Sachet", "1 sachet", "after each loose stool", "as needed", "dissolve in water");
             service.addToQueue(prescription2);
 
             Patient patient3 = new Patient("Bob Johnson", "555123456789",
@@ -99,10 +100,10 @@ public class PharmacyUI {
                                           "555-123-4567", "bob@email.com",
                                           "789 Pine St", "654-321-0987",
                                           new Date());
-            
+
             Prescription prescription3 = new Prescription("RX003", patient3, "DR003");
-            prescription3.addMedicineItem("Hydrocortisone Cream", "Apply thin layer", "2 times a day", "7 days", "Topical", 1);
-            prescription3.addMedicineItem("Omeprazole", "1 capsule", "Before breakfast", "7 days", "Oral", 7);
+            prescription3.addMedicineItem("Hydrocortisone Cream", "Apply thin layer", "2 times a day", "7 days", "Topical");
+            prescription3.addMedicineItem("Omeprazole", "1 capsule", "Before breakfast", "7 days", "Oral");
             service.addToQueue(prescription3);
         } catch (Exception e) {
             System.err.println("Error initializing sample queue: " + e.getMessage());
@@ -168,7 +169,7 @@ public class PharmacyUI {
             System.out.println("No prescriptions in queue.");
             return;
         }
-        
+
         for (int i = 0; i < service.getQueueSize(); i++) {
             Prescription p = service.getQueueAt(i);
             System.out.println("=== Queue Position " + (i + 1) + " ===");
@@ -185,7 +186,7 @@ public class PharmacyUI {
                                  " | Frequency: " + item.getFrequency() +
                                  " | Duration: " + item.getDuration() +
                                  " | Method: " + item.getMethod() +
-                                 " | Quantity needed: " + item.getQuantityNeeded());
+                                 " | Calculated Quantity: " + item.calculateQuantityNeeded());
             }
             System.out.println();
         }
@@ -203,34 +204,37 @@ public class PharmacyUI {
         System.out.println("Processing prescription for: " + nextPrescription.getPatient().getFullName());
         System.out.println("Prescription ID: " + nextPrescription.getPrescriptionID());
         System.out.println("\nRequired medicines:");
-        
+
         boolean canProcess = true;
         double totalCost = 0.0;
-        
-        // Check stock availability
+
+        // Check stock availability using calculated quantities
         for (int i = 0; i < nextPrescription.getMedicineItems().size(); i++) {
             MedicalTreatmentItem item = nextPrescription.getMedicineItems().get(i);
             Medicine medicine = service.findByName(item.getMedicineName());
-            
+            int quantityNeeded = item.calculateQuantityNeeded();
+
             if (medicine == null) {
                 System.out.println("[X] " + item.getMedicineName() + " - MEDICINE NOT FOUND");
                 canProcess = false;
-            } else if (medicine.getQuantity() < item.getQuantityNeeded()) {
+            } else if (medicine.getQuantity() < quantityNeeded) {
                 System.out.println("[X] " + item.getMedicineName() + 
                                  " - INSUFFICIENT STOCK (Available: " + medicine.getQuantity() + 
-                                 ", Needed: " + item.getQuantityNeeded() + ")");
+                                 ", Calculated Need: " + quantityNeeded + ")");
                 canProcess = false;
             } else {
-                double itemCost = medicine.getPrice() * item.getQuantityNeeded();
+                double itemCost = medicine.getPrice() * quantityNeeded;
                 totalCost += itemCost;
                 System.out.println("[OK] " + item.getMedicineName() + 
-                                 " - Available (Needed: " + item.getQuantityNeeded() + 
+                                 " - Available (Calculated Need: " + quantityNeeded + 
                                  ", Cost: $" + String.format("%.2f", itemCost) + ")");
+                System.out.println("     Prescription: " + item.getDosage() + ", " + 
+                                 item.getFrequency() + " for " + item.getDuration());
             }
         }
-        
+
         System.out.println("\nTotal cost: $" + String.format("%.2f", totalCost));
-        
+
         if (!canProcess) {
             System.out.println("\n[X] Cannot process prescription due to stock issues.");
             System.out.print("Press Enter to continue...");
@@ -240,15 +244,15 @@ public class PharmacyUI {
 
         System.out.print("\nProceed with distribution? (y/n): ");
         String confirm = sc.nextLine().trim().toLowerCase();
-        
+
         if (confirm.equals("y") || confirm.equals("yes")) {
             // Distribute medicines and update stock
             boolean success = service.processPrescription();
-            
+
             if (success) {
                 System.out.println("[SUCCESS] Prescription processed successfully!");
                 System.out.println("[$] Total amount charged: $" + String.format("%.2f", totalCost));
-                System.out.println("[INFO] Medicine stock has been updated.");
+                System.out.println("[INFO] Medicine stock has been updated based on calculated quantities.");
                 System.out.println("[PATIENT] Patient " + nextPrescription.getPatient().getFullName() + " can collect medicines.");
             } else {
                 System.out.println("[ERROR] Failed to process prescription.");
@@ -256,7 +260,7 @@ public class PharmacyUI {
         } else {
             System.out.println("Prescription processing cancelled.");
         }
-        
+
         System.out.print("Press Enter to continue...");
         sc.nextLine();
     }
