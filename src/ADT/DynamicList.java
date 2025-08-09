@@ -185,6 +185,18 @@ public class DynamicList<T> implements MyList<T> {
         }
     }
 
+    @Override
+    public boolean removeIf(Predicate<T> predicate) {
+        boolean removed = false;
+        for (int i = size - 1; i >= 0; i--) {  // Iterate backwards to avoid index shifting issues
+            if (predicate.test(data[i])) {
+                remove(i);
+                removed = true;
+            }
+        }
+        return removed;
+    }
+
     @SuppressWarnings("unchecked")
     public T[] toArray() {
         T[] result = (T[]) new Object[size];

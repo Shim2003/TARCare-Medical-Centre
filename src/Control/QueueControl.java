@@ -34,11 +34,9 @@ public class QueueControl {
                 return null;
             }
 
-            for (int i = 0; i < queueList.size(); i++) {
-                if (queueList.get(i).getPatientId().equals(p.getPatientID())) {
-                    System.out.println("You are already in the queue.");
-                    return null;
-                }
+            if (queueList.anyMatch(qe -> qe.getPatientId().equals(p.getPatientID()))) {
+                System.out.println("You are already in the queue.");
+                return null;
             }
 
             QueueEntry newQueue = new QueueEntry(p.getPatientID());
@@ -53,33 +51,26 @@ public class QueueControl {
 
     public static QueueEntry getNextInQueue() {
 
-        for (int i = 0; i < queueList.size(); i++) {
-            QueueEntry qe = queueList.get(i);
-            if (qe.getStatus().equals(Utility.UtilityClass.statusWaiting)) {
-                qe.setStatus(Utility.UtilityClass.statusConsulting);
-                return qe;
-            }
-        }
+        QueueEntry waiting = queueList.findFirst(qe
+                -> qe.getStatus().equals(Utility.UtilityClass.statusWaiting));
 
+        if (waiting != null) {
+            waiting.setStatus(Utility.UtilityClass.statusConsulting);
+            return waiting;
+        }
         return null;
+
     }
 
     public static boolean isFullConsulting() {
-        int consultingCount = 0;
-        DynamicList<QueueEntry> queueList = Control.QueueControl.getQueueList();
+        DynamicList<QueueEntry> consulting = queueList.findAll(qe
+                -> qe.getStatus().equals(Utility.UtilityClass.statusConsulting));
 
-        for (int i = 0; i < queueList.size(); i++) {
-            if (queueList.get(i).getStatus().equals(Utility.UtilityClass.statusConsulting)) {
-                consultingCount++;
-            }
-        }
-
-        if (consultingCount >= 3) {
-            System.out.println("Maximum number of patients being served at the same time is reached.");
+        // Full
+        if (consulting.size() >= 3) {
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     public static DynamicList<QueueEntry> getQueueList() {
@@ -87,13 +78,8 @@ public class QueueControl {
     }
 
     public static QueueEntry currentConsulting() {
-        for (int i = 0; i < queueList.size(); i++) {
-            QueueEntry qe = queueList.get(i);
-            if (qe.getStatus().equals(Utility.UtilityClass.statusConsulting)) {
-                return qe; // Return the one being served now
-            }
-        }
-        return null; // No one is being served
+        return queueList.findFirst(qe
+                -> qe.getStatus().equals(Utility.UtilityClass.statusConsulting));
     }
 
     public static boolean markAsCompleted(String patientId) {
@@ -116,27 +102,39 @@ public class QueueControl {
         return queueList.findAll(entry -> entry.getStatus().equalsIgnoreCase(status));
     }
 
-    public static boolean removeFromQueue(String patientId) {
-        boolean isSuccessful = false;
+    public static boolean removeFromQueue(String queueId) {
 
-        if (patientId == null || patientId.trim().isEmpty()) {
+        if (queueId == null || queueId.trim().isEmpty()) {
             System.out.println("Invalid input. Please enter a valid Patient ID.");
-            return isSuccessful;
+            return false;
         }
 
-        for (int i = 0; i < queueList.size(); i++) {
+        int id = Integer.parseInt(queueId);
+        int index = queueList.findIndex(queue -> queue.getQueueNumber() == id);
 
-            QueueEntry queue = queueList.get(i);
-
-            if (queue.getPatientId().equalsIgnoreCase(patientId)) {
-
-                queueList.remove(i);
-                isSuccessful = true;
-            }
-
+        if (index != -1) {
+            queueList.remove(index);
+            return true;
         }
 
-        return isSuccessful;
+        return false;
+    }
+
+    public static boolean removeByStatus(String selectedStatus) {
+
+        DynamicList<QueueEntry> recordsToRemove = QueueControl.getQueueListByStatus(selectedStatus);
+
+        if (recordsToRemove.isEmpty()) {
+            System.out.println("No queue records found with status: " + selectedStatus);
+            return false;
+        }
+
+        return queueList.removeIf(entry -> entry.getStatus().equalsIgnoreCase(selectedStatus));
+
+    }
+
+    public static void clearAllQueueRecords() {
+        queueList.clear();
     }
 
 }

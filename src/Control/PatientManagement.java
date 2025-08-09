@@ -43,7 +43,6 @@ public class PatientManagement {
         }
     }
 
-    //Register as new patient
     public static boolean add(Patient p) {
 
         if (p != null) {

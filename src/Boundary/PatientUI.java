@@ -44,10 +44,10 @@ public class PatientUI {
 
             switch (choice) {
                 case "1":
-                    adminMenu();
+                    adminMainMenu();
                     break;
                 case "2":
-                    patientMenu();
+                    patientMainMenu();
                     break;
                 case "3":
                     System.out.println("Exiting system. Goodbye!");
@@ -58,21 +58,70 @@ public class PatientUI {
         }
     }
 
-    public static void adminMenu() {
+    public static void adminMainMenu() {
+        while (true) {
+            System.out.println("\n--- Admin Main Menu ---");
+            QueueUI.displayCurrentQueue();
+            System.out.println("1. Patient Management");
+            System.out.println("2. Queue Management");
+            System.out.println("3. Back to Role Selection");
+
+            System.out.print("Enter your choice (1-3): ");
+            String choice = scanner.nextLine();
+
+            switch (choice) {
+                case "1":
+                    adminUserMenu();
+                    break;
+                case "2":
+                    QueueUI.adminQueueMenu();
+                    break;
+                case "3":
+                    return;
+                default:
+                    System.out.println("Invalid choice. Please enter 1-3.");
+            }
+        }
+    }
+
+    public static void patientMainMenu() {
+        while (true) {
+            System.out.println("\n--- Patient Main Menu ---");
+            QueueUI.displayCurrentQueue();
+            System.out.println("1. Patient Profile Management");
+            System.out.println("2. Queue Management");
+            System.out.println("3. Back to Role Selection");
+
+            System.out.print("Enter your choice (1-3): ");
+            String choice = scanner.nextLine();
+
+            switch (choice) {
+                case "1":
+                    patientUserMenu();
+                    break;
+                case "2":
+                    QueueUI.patientQueueMenu();
+                    break;
+                case "3":
+                    return;
+                default:
+                    System.out.println("Invalid choice. Please enter 1-3.");
+            }
+        }
+    }
+
+    public static void adminUserMenu() {
         while (true) {
             System.out.println("\n--- Admin Patient Management Menu ---");
-            QueueUI.displayCurrentQueue();
             System.out.println("1. Register New Patient");
             System.out.println("2. Update Patient Profile");
             System.out.println("3. Search Patient by Identity Number");
             System.out.println("4. Display All Patients");
             System.out.println("5. Remove Patient");
             System.out.println("6. Generate Patient Report");
-            System.out.println("7. Get Next Queue Patient");
-            System.out.println("8. Display Queue By Status");
-            System.out.println("9. Back to Role Selection");
+            System.out.println("7. Back to Admin Main Menu");
 
-            System.out.print("Enter your choice (1-9): ");
+            System.out.print("Enter your choice (1-7): ");
             String choice = scanner.nextLine();
 
             switch (choice) {
@@ -92,15 +141,9 @@ public class PatientUI {
                     removePatient();
                     break;
                 case "6":
-//                    generateReport(); // Optional: implement this
+                    generateDemographicsReport();
                     break;
                 case "7":
-                    QueueUI.getNextInQueue();
-                    break;
-                case "8":
-                    QueueUI.displayQueueByStatus();
-                    return;
-                case "9":
                     return;
                 default:
                     System.out.println("Invalid choice. Please enter 1-7.");
@@ -108,36 +151,31 @@ public class PatientUI {
         }
     }
 
-    public static void patientMenu() {
+    public static void patientUserMenu() {
         while (true) {
-            System.out.println("\n--- Patient Menu ---");
-            QueueUI.displayCurrentQueue();
-            System.out.println("1. Queue for consultation");
-            System.out.println("2. Register Patient");
-            System.out.println("3. View My Profile");
-            System.out.println("4. Update My Profile");
-            System.out.println("5. Back to Role Selection");
+            System.out.println("\n--- Patient Profile Management Menu ---");
+            System.out.println("1. Register as New Patient");
+            System.out.println("2. View My Profile");
+            System.out.println("3. Update My Profile");
+            System.out.println("4. Back to Patient Main Menu");
 
             System.out.print("Enter your choice (1-4): ");
             String choice = scanner.nextLine();
 
             switch (choice) {
                 case "1":
-                    QueueUI.startQueue();  // You may prompt them to enter IC
+                    addPatient();
                     break;
                 case "2":
-                    addPatient();  // You may prompt them to enter IC
-                    break;
-                case "3":
                     displayPatientInfo();  // You may prompt them to enter IC
                     break;
-                case "4":
+                case "3":
                     updatePatient();       // You may validate identity before allowing edit
                     break;
-                case "5":
+                case "4":
                     return;
                 default:
-                    System.out.println("Invalid choice. Please enter 1-3.");
+                    System.out.println("Invalid choice. Please enter 1-4.");
             }
         }
     }
@@ -367,5 +405,195 @@ public class PatientUI {
         }
 
         System.out.println("-------------------------------------------------------------------------------------------------------------------------------");
+    }
+
+    public static void generateDemographicsReport() {
+        while (true) {
+            System.out.println("\n" + "=".repeat(50));
+            System.out.println("           PATIENT DEMOGRAPHICS REPORT");
+            System.out.println("=".repeat(50));
+            System.out.println("1. Total Registered Patients");
+            System.out.println("2. Gender Distribution");
+            System.out.println("3. Back to Admin Menu");
+
+            System.out.print("Enter your choice (1-3): ");
+            String choice = scanner.nextLine();
+
+            switch (choice) {
+                case "1":
+                    generateTotalPatientsReport();
+                    break;
+                case "2":
+                    generateGenderDistributionReport();
+                    break;
+                case "3":
+                    return;
+                default:
+                    System.out.println("Invalid choice. Please enter 1-3.");
+            }
+        }
+    }
+
+    public static void generateGenderDistributionReport() {
+        DynamicList<Patient> patientList = PatientManagement.getPatientList();
+
+        if (patientList.isEmpty()) {
+            System.out.println("\n" + "=".repeat(50));
+            System.out.println("           GENDER DISTRIBUTION REPORT");
+            System.out.println("=".repeat(50));
+            System.out.println("No patients registered yet. Cannot generate report.");
+            System.out.println("=".repeat(50));
+            System.out.println("\nPress Enter to continue...");
+            scanner.nextLine();
+            return;
+        }
+
+        // Count gender distribution
+        int maleCount = 0;
+        int femaleCount = 0;
+        int totalPatients = patientList.size();
+
+        for (int i = 0; i < patientList.size(); i++) {
+            Patient patient = patientList.get(i);
+            char gender = patient.getGender();
+
+            if (gender == 'M' || gender == 'm') {
+                maleCount++;
+            } else if (gender == 'F' || gender == 'f') {
+                femaleCount++;
+            }
+        }
+
+        // Calculate percentages
+        double malePercentage = totalPatients > 0 ? (double) maleCount / totalPatients * 100 : 0;
+        double femalePercentage = totalPatients > 0 ? (double) femaleCount / totalPatients * 100 : 0;
+
+        // Display the report
+        System.out.println("\n" + "=".repeat(60));
+        System.out.println("             GENDER DISTRIBUTION REPORT");
+        System.out.println("=".repeat(60));
+
+        System.out.printf("Total Patients Analyzed: %d\n", totalPatients);
+        System.out.println("-".repeat(60));
+
+        System.out.println("GENDER BREAKDOWN:");
+        System.out.printf("%-15s: %3d patients (%.1f%%)\n", "Male", maleCount, malePercentage);
+        System.out.printf("%-15s: %3d patients (%.1f%%)\n", "Female", femaleCount, femalePercentage);
+
+        // Visual representation
+        System.out.println("\nVISUAL REPRESENTATION:");
+        System.out.print("Male   [");
+        int maleBarLength = (int) (malePercentage / 2); // Scale down for display
+        for (int i = 0; i < maleBarLength; i++) {
+            System.out.print("#");
+        }
+        System.out.printf("] %.1f%%\n", malePercentage);
+
+        System.out.print("Female [");
+        int femaleBarLength = (int) (femalePercentage / 2); // Scale down for display
+        for (int i = 0; i < femaleBarLength; i++) {
+            System.out.print("█");
+        }
+        System.out.printf("] %.1f%%\n", femalePercentage);
+
+        System.out.println("=".repeat(60));
+
+        System.out.println("\nPress Enter to continue...");
+        scanner.nextLine();
+    }
+
+    public static void generateTotalPatientsReport() {
+        DynamicList<Patient> patientList = PatientManagement.getPatientList();
+        int totalPatients = patientList.size();
+
+        if (totalPatients == 0) {
+            System.out.println("\n" + "=".repeat(50));
+            System.out.println("           TOTAL REGISTERED PATIENTS");
+            System.out.println("=".repeat(50));
+            System.out.println("No patients registered yet.");
+            System.out.println("=".repeat(50));
+            System.out.println("\nPress Enter to continue...");
+            scanner.nextLine();
+            return;
+        }
+
+        int patientsPerPage = 10;
+        int totalPages = (int) Math.ceil((double) totalPatients / patientsPerPage);
+        int currentPage = 1;
+
+        while (true) {
+            // Display current page
+            displayPatientPage(patientList, currentPage, patientsPerPage, totalPages, totalPatients);
+
+            // Navigation menu
+            System.out.println("\nNavigation Options:");
+            if (currentPage > 1) {
+                System.out.print("P - Previous Page | ");
+            }
+            if (currentPage < totalPages) {
+                System.out.print("N - Next Page | ");
+            }
+            System.out.println("B - Back to Demographics Menu");
+
+            System.out.print("Enter your choice: ");
+            String choice = scanner.nextLine().toUpperCase();
+
+            switch (choice) {
+                case "P":
+                    if (currentPage > 1) {
+                        currentPage--;
+                    } else {
+                        System.out.println("Already on the first page.");
+                    }
+                    break;
+                case "N":
+                    if (currentPage < totalPages) {
+                        currentPage++;
+                    } else {
+                        System.out.println("Already on the last page.");
+                    }
+                    break;
+                case "B":
+                    return;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+
+    private static void displayPatientPage(DynamicList<Patient> patientList, int currentPage,
+            int patientsPerPage, int totalPages, int totalPatients) {
+        System.out.println("\n" + "=".repeat(86));
+        System.out.printf("                    TOTAL REGISTERED PATIENTS (Page %d of %d)\n", currentPage, totalPages);
+        System.out.println("=".repeat(86));
+        System.out.printf("Total Patients: %d\n", totalPatients);
+        System.out.println("-".repeat(86));
+
+        // Calculate start and end indices for current page
+        int startIndex = (currentPage - 1) * patientsPerPage;
+        int endIndex = Math.min(startIndex + patientsPerPage, totalPatients);
+
+        // Display table header
+        System.out.printf("| %-3s | %-8s | %-20s | %-15s | %-6s | %-15s |\n",
+                "No.", "ID", "Full Name", "Identity No", "Gender", "Contact");
+        System.out.println("|" + "-".repeat(5) + "|" + "-".repeat(10) + "|" + "-".repeat(22) + "|"
+                + "-".repeat(17) + "|" + "-".repeat(8) + "|" + "-".repeat(17) + "|");
+
+        // Display patients for current page
+        for (int i = startIndex; i < endIndex; i++) {
+            Patient p = patientList.get(i);
+            int displayNumber = i + 1;
+
+            System.out.printf("| %-3d | %-8s | %-20s | %-15s | %-6s | %-15s |\n",
+                    displayNumber,
+                    p.getPatientID(),
+                    UtilityClass.truncate(p.getFullName(), 20),
+                    p.getIdentityNumber(),
+                    String.valueOf(p.getGender()),
+                    p.getContactNumber());
+        }
+
+        System.out.println("-".repeat(86));
+        System.out.printf("Showing patients %d-%d of %d\n", startIndex + 1, endIndex, totalPatients);
     }
 }

@@ -28,4 +28,5 @@ public interface MyList<T> {
     DynamicList<T> findAll(Predicate<T> predicate);
     void replace(int index, T newItem);
     int findIndex(Predicate<T> predicate);
+    boolean removeIf(Predicate<T> predicate);
 }
