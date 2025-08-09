@@ -6,6 +6,10 @@ package Control;
 
 import ADT.DynamicList;
 import Entity.Doctor;
+import Utility.UtilityClass;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  *
@@ -19,9 +23,38 @@ public class DoctorManagement {
     // Constant
     public static final String DATE_FORMAT = "dd/MM/yyyy";
 
-    //Add doctor
-    public static void addDoctor(Doctor doctor) {
-        doctorList.add(doctor);
+    //Register as new doctor
+    public static boolean add(Doctor d) {
+        
+        if (d != null) {
+            doctorList.add(d);
+            return true;
+        }
+        
+        return false;
+    }
+    
+    public static void addSampleDoctor() {
+        SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
+        try {
+            Doctor d1 = new Doctor("D001", "Lee Wee Teck", sdf.parse("01/01/1990"), 'M',
+                    "0123456789", "leewt@example.com", UtilityClass.statusFree);
+            
+            Doctor d2 = new Doctor("D002", "Lee Chong Wei", sdf.parse("02/01/1985"), 'M',
+                    "0123456780", "chongwei@example.com", UtilityClass.statusFree);
+             
+            Doctor d3 = new Doctor("D003", "Aaron Chia Teng Feng", sdf.parse("15/11/1997"), 'M',
+                    "0123666789", "aaron@example.com", UtilityClass.statusFree);
+
+            add(d1);
+            add(d2);
+            add(d3);
+            System.out.println("Doctors loaded: " + doctorList.size()); // DEBUG
+
+
+        } catch (ParseException e) {
+            System.out.println("Error parsing date in sample data.");
+        }
     }
 
     //remove
