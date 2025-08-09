@@ -7,7 +7,6 @@ package Control;
 import ADT.DynamicList;
 import Entity.Diagnosis;
 import Entity.MedicalTreatment;
-import Entity.MedicalTreatmentItem;
 import Entity.TreatmentHistory;
 
 /**
@@ -21,7 +20,6 @@ public class MedicalTreatmentManagement {
     private static final DynamicList<Diagnosis> diagnosisList = new DynamicList<>();
     private static final DynamicList<MedicalTreatment> treatmentList = new DynamicList<>();
     private static final DynamicList<TreatmentHistory> treatmentHistoryList = new DynamicList<>();
-    private static final DynamicList<MedicalTreatmentItem> medicineList = new DynamicList<>();
     
     // Create a new symptom list for the specific diagnosis or patient
     public static DynamicList<String> addSymptoms(DynamicList<String> symptomInput) {
@@ -79,18 +77,5 @@ public class MedicalTreatmentManagement {
         return result;
     }
 
-    public static boolean addMedicineList(String medicineName, String dosage, String frequency, 
-                                           String duration, String method) {
-        if (medicineName != null && !medicineName.isEmpty() && dosage != null && !dosage.isEmpty() &&
-            frequency != null && !frequency.isEmpty() && duration != null && !duration.isEmpty() &&
-            method != null && !method.isEmpty()) {
-
-            MedicalTreatmentItem item = new MedicalTreatmentItem(medicineName, dosage, frequency, 
-                                                                 duration, method);
-            medicineList.add(item);
-            System.out.println("Medicine item added successfully");
-            return true;
-        }
-        return false;
-    }
+    
 }

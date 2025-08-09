@@ -25,6 +25,7 @@ public class MedicalTreatmentUI {
     private static final  DynamicList<Diagnosis> diagnosisList = new DynamicList<>();
     private static final DynamicList<MedicalTreatment> treatmentList = new DynamicList<>();
     private static final DynamicList<TreatmentHistory> historyList = new DynamicList<>();
+    private static final DynamicList<MedicalTreatmentItem> medicineList = new DynamicList<>();
 
     // ID counters
     private static int diagnosisIdCounter = 1001;
@@ -180,64 +181,55 @@ public class MedicalTreatmentUI {
                 System.out.println("Diagnosis ID not found.");
             }
 
-            System.out.print("Enter Treatment Type (Medication/Surgery/Therapy): ");
-            String treatmentType = scanner.nextLine();
-
+            DynamicList<MedicalTreatmentItem> medicineList = new DynamicList<>();
             int i = 1;
-            DynamicList<String> medicineList = new DynamicList<>();
             // if it is medication, ask for the medicine name and for many day(s)
-            if (treatmentType.toLowerCase().equals("medication")) {
                 
-                //the doctor have to enter a list of medicine and its details, 
-                //if doctor enter a "x" means that enough for medicine
-                while (true) { 
-                    System.out.println("Medicine" + "[ " + i + " ] ");
+            //the doctor have to enter a list of medicine and its details, 
+            //if doctor enter a "x" means that enough for medicine
+            while (true) { 
+                System.out.println("Medicine" + "[ " + i + " ] ");
 
-                    System.out.print("Medicine Name:");
-                    String medicineName = scanner.nextLine();
-                    if (medicineName.equals("x")) {
-                        break;
-                    }
-
-                    System.out.print("Dosage: ");
-                    String dosage = scanner.nextLine();
-                    if (medicineName.equals("x")) {
-                        break;
-                    }
-
-                    System.out.print("Frequency: ");
-                    String frequency = scanner.nextLine();
-                    if (medicineName.equals("x")) {
-                        break;
-                    }
-
-                    System.out.print("Duration: ");
-                    String duration = scanner.nextLine();
-                    if (medicineName.equals("x")) {
-                        break;
-                    }
-
-                    System.out.print("Method: ");
-                    String method = scanner.nextLine();
-                    if (medicineName.equals("x")) {
-                        break;
-                    }
-
-                    //put the medicine details into the medicineList
-                    MedicalTreatmentManagement.addMedicineList(medicineName, dosage, frequency, 
-                        duration, method);
+                System.out.print("Medicine Name:");
+                String medicineName = scanner.nextLine();
+                if (medicineName.equals("x")) {
+                    break;
                 }
-            }
 
-            System.out.print("Enter Treatment Description: ");
-            String treatmentDescription = scanner.nextLine();
+                System.out.print("Dosage: ");
+                String dosage = scanner.nextLine();
+                if (dosage.equals("x")) {
+                    break;
+                }
+
+                System.out.print("Frequency: ");
+                String frequency = scanner.nextLine();
+                if (frequency.equals("x")) {
+                    break;
+                }
+
+                System.out.print("Duration: ");
+                String duration = scanner.nextLine();
+                if (duration.equals("x")) {
+                    break;
+                }
+
+                System.out.print("Method: ");
+                String method = scanner.nextLine();
+                if (method.equals("x")) {
+                    break;
+                }
+
+                //put the medicine details into the medicineList
+                MedicalTreatmentItem item = new MedicalTreatmentItem(medicineName, dosage, frequency, 
+                    duration, method);
+                    medicineList.add(item);
+                    i++;
+            }
 
             // Get the treatment date automatically(use the format in the utility class)
             System.out.println("Treatment Date: " + sdf.format(new Date()));
             Date treatmentDate = new Date();
-
-            System.out.print("Enter Treatment Duration: ");
-            String treatmentDuration = scanner.nextLine();
 
             System.out.print("Enter Medical Treatment Advice(s): ");
             String treatmentAdvice = scanner.nextLine();
@@ -247,8 +239,8 @@ public class MedicalTreatmentUI {
 
             // Create a new MedicalTreatment object
             MedicalTreatment treatment = new MedicalTreatment(treatmentId, diagnosisId, 
-            diagnosis.getPatientId(), diagnosis.getDoctorId(),treatmentType, treatmentDescription, 
-            treatmentDate,"Active", treatmentDuration, treatmentAdvice);
+            diagnosis.getPatientId(), diagnosis.getDoctorId(), 
+            treatmentDate,"Active", treatmentAdvice, medicineList);
 
             // Add the new MedicalTreatment object to the treatmentList
             MedicalTreatmentManagement.addMedicalTreatment(treatment);
@@ -452,33 +444,6 @@ public class MedicalTreatmentUI {
         System.out.println("Active Treatments: " + activeCount);
         System.out.println("Completed Treatments: " + completedCount);
         System.out.println("Cancelled Treatments: " + cancelledCount);
-        
-        // Treatment types breakdown
-        System.out.println("\nTreatment Types Breakdown:");
-        int medicationCount = 0, surgeryCount = 0, therapyCount = 0, otherCount = 0;
-        
-        for (int i = 0; i < treatmentList.size(); i++) {
-            MedicalTreatment treatment = treatmentList.get(i);
-            switch (treatment.getTreatmentType()) {
-                case "Medication":
-                    medicationCount++;
-                    break;
-                case "Surgery":
-                    surgeryCount++;
-                    break;
-                case "Therapy":
-                    therapyCount++;
-                    break;
-                default:
-                    otherCount++;
-                    break;
-            }
-        }
-        
-        System.out.println("Medication: " + medicationCount);
-        System.out.println("Surgery: " + surgeryCount);
-        System.out.println("Therapy: " + therapyCount);
-        System.out.println("Other: " + otherCount);
     }
 
     // Generate diagnosis statistics report
@@ -537,19 +502,6 @@ public class MedicalTreatmentUI {
             System.out.println("No diagnoses found.");
         }
         
-        // Find all treatments for this patient
-        System.out.println("\nTreatments:");
-        boolean foundTreatment = false;
-        for (int i = 0; i < treatmentList.size(); i++) {
-            MedicalTreatment treatment = treatmentList.get(i);
-            if (treatment.getPatientId().equals(patientId)) {
-                foundTreatment = true;
-                System.out.println("- " + treatment.getTreatmentType() + " (" + treatment.getTreatmentStatus() + ")");
-            }
-        }
-        
-        if (!foundTreatment) {
-            System.out.println("No treatments found.");
-        }
+        // Print out the medicine list for this patient
     }
 }
