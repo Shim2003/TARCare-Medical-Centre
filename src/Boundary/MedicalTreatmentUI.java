@@ -25,7 +25,6 @@ public class MedicalTreatmentUI {
     private static final  DynamicList<Diagnosis> diagnosisList = new DynamicList<>();
     private static final DynamicList<MedicalTreatment> treatmentList = new DynamicList<>();
     private static final DynamicList<TreatmentHistory> historyList = new DynamicList<>();
-    private static final DynamicList<MedicalTreatmentItem> medicineList = new DynamicList<>();
 
     // ID counters
     private static int diagnosisIdCounter = 1001;
@@ -57,26 +56,22 @@ public class MedicalTreatmentUI {
                 scanner.nextLine(); //Clear buffer
                 
                 switch (choice) {
-                    case 1 -> {
-                        break;
-                    }
-                    case 2 -> {
-                        break;
-                    }
-                    case 3 -> {
-                        break;
-                    }
-                    case 4 -> {
-                        break;
-                    }
-                    case 5 -> {
-                        break;
-                    }
-                    case 6 -> {
-                        break;
-                    }
+                    case 1 -> 
+                        addDiagnosis();
+                    case 2 -> 
+                        createTreatment();
+                    case 3 -> 
+                        viewDiagnosisDetails();
+                    case 4 -> 
+                        viewPatientTreatmentHistory();
+                    case 5 -> 
+                        updateTreatmentStatus();
+                    case 6 -> 
+                        generateTreatmentReports();
                     case 7 -> {
-                        break;
+                        System.out.println("Exiting to Main Menu...");
+                        scanner.close(); // Close the scanner before exiting
+                        return; // Exit to main menu
                     }
                     default -> {
                         System.out.println("Invalid Choice. Please enter again from 1 to 7.");
@@ -84,6 +79,7 @@ public class MedicalTreatmentUI {
                 }
             } catch(Exception e) {
                 System.out.println("Invalid Input. Please enter a number.");
+                //clear buffer
                 scanner.nextLine();
             }
         }
@@ -154,8 +150,8 @@ public class MedicalTreatmentUI {
 
             // Create a new Diagnosis object
             Diagnosis diagnosis = new Diagnosis(diagnosisId, patientId, doctorId, new Date(),
-                symptomsList, diagnosisDescription,
-                severityLevel, recommendations, additionalNotes);
+                symptomsList, diagnosisDescription, severityLevel, recommendations, 
+                additionalNotes);
 
             // Add the new Diagnosis object to the diagnosisList
             MedicalTreatmentManagement.addDiagnosis(diagnosis);
@@ -429,15 +425,16 @@ public class MedicalTreatmentUI {
         for (int i = 0; i < treatmentList.size(); i++) {
             MedicalTreatment treatment = treatmentList.get(i);
             switch (treatment.getTreatmentStatus()) {
-                case "Active":
+                case "Active"->
                     activeCount++;
-                    break;
-                case "Completed":
+                case "Completed"->
                     completedCount++;
-                    break;
-                case "Cancelled":
+                case "Cancelled"->
                     cancelledCount++;
-                    break;
+                default -> {
+                    System.out.println("Unknown treatment status: " + treatment.getTreatmentStatus());
+                    return;
+                }
             }
         }
         
@@ -456,18 +453,14 @@ public class MedicalTreatmentUI {
         for (int i = 0; i < diagnosisList.size(); i++) {
             Diagnosis diagnosis = diagnosisList.get(i);
             switch (diagnosis.getSeverityLevel()) {
-                case "Low":
+                case "Low"->
                     lowCount++;
-                    break;
-                case "Medium":
+                case "Medium"->
                     mediumCount++;
-                    break;
-                case "High":
+                case "High"->
                     highCount++;
-                    break;
-                case "Critical":
+                case "Critical"->
                     criticalCount++;
-                    break;
             }
         }
         
@@ -503,5 +496,29 @@ public class MedicalTreatmentUI {
         }
         
         // Print out the medicine list for this patient
+        System.out.println("\nMedicines:");
+        boolean foundMedicine = false;
+        for (int i = 0; i < treatmentList.size(); i++) {
+            MedicalTreatment treatment = treatmentList.get(i);
+            if (treatment.getPatientId().equals(patientId)) {
+                DynamicList<MedicalTreatmentItem> medicines = treatment.getMedicineList();
+                if (medicines != null && medicines.size() > 0) {
+                    foundMedicine = true;
+                    for (int j = 0; j < medicines.size(); j++) {
+                        MedicalTreatmentItem item = medicines.get(j);
+                        System.out.printf("%-25s %-15s %-20s %-15s %-20s\n",
+                            item.getMedicineName(),
+                            item.getDosage(),
+                            item.getFrequency(),
+                            item.getDuration(),
+                            item.getMethod()
+                        );
+                    }
+                }
+            }
+        }
+        if (!foundMedicine) {
+            System.out.println("No medicines found.");
+        }
     }
 }
