@@ -4,6 +4,10 @@ import ADT.DynamicList;
 import java.util.Date;
 
 public class MedicalTreatment {
+
+    // ID counter
+    private static int treatmentIdCounter = 1001;
+
     private String treatmentId;
     private String consultationId;
     private String patientId;
@@ -13,10 +17,20 @@ public class MedicalTreatment {
     private String medicalTreatmentAdvise;
     private DynamicList<MedicalTreatmentItem> medicineList;
 
-    public MedicalTreatment(String treatmentId, String consultationId, String patientId,
+    // Constructor
+    public MedicalTreatment() {
+        this.treatmentId = "TRMT" + treatmentIdCounter++;
+        this.treatmentDate = new Date();
+        this.medicineList = new DynamicList<>();
+    }
+
+    public MedicalTreatment(String consultationId, String patientId,
     String doctorId, Date treatmentDate, String treatmentStatus, String medicalTreatmentAdvise,
     DynamicList<MedicalTreatmentItem> medicineList) {
-        this.treatmentId = treatmentId;
+        this.treatmentId = "TRMT" + treatmentIdCounter++;
+        this.consultationId = consultationId;
+        this.patientId = patientId;
+        this.doctorId = doctorId;
         this.treatmentDate = treatmentDate;
         this.treatmentStatus = treatmentStatus;
         this.medicalTreatmentAdvise = medicalTreatmentAdvise;
