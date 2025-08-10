@@ -18,7 +18,7 @@ public class Doctor {
     private char gender;
     private String contactNumber;
     private String email;
-    private String workingStatus;  //Free, Waiting, Consulting, Completed
+    private String workingStatus;  //Free, Consulting, Off
 
     public String getDoctorID() {
         return doctorID;

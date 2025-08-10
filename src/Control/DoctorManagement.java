@@ -6,9 +6,13 @@ package Control;
 
 import ADT.DynamicList;
 import Entity.Doctor;
+import Entity.Schedule;
 import Utility.UtilityClass;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Date;
 
 /**
@@ -45,11 +49,24 @@ public class DoctorManagement {
              
             Doctor d3 = new Doctor("D003", "Aaron Chia Teng Feng", sdf.parse("15/11/1997"), 'M',
                     "0123666789", "aaron@example.com", UtilityClass.statusFree);
+            
+            Doctor d4 = new Doctor("D004", "Soh Wooi Yik", sdf.parse("27/03/1998"), 'M',
+                    "0123666789", "wooiyik@example.com", UtilityClass.statusConsulting);
+            
+            Doctor d5 = new Doctor("D005", "Lee Zii Jia", sdf.parse("05/03/1998"), 'M',
+                    "0123666789", "lzj@example.com", UtilityClass.workingStatusOff);
 
             add(d1);
             add(d2);
             add(d3);
+            add(d4);
+            add(d5);
             System.out.println("Doctors loaded: " + doctorList.size()); // DEBUG
+            
+            // 🔹 Once doctors are added, update each doctor's working status
+            for (int i = 0; i < doctorList.size(); i++) {
+                updateWorkingStatus(doctorList.get(i));
+            }
 
 
         } catch (ParseException e) {
@@ -70,13 +87,8 @@ public class DoctorManagement {
     }
 
     //Read
-    public static void printAllDoctors() {
-
-        Doctor[] doctors = doctorList.toArray();
-
-        for (Doctor d : doctors) {
-            System.out.println(d); // You may override toString() in Doctor for clean output
-        }
+    public static DynamicList getAllDoctors() {
+        return doctorList;
     }
 
     //update
@@ -100,5 +112,65 @@ public class DoctorManagement {
     public static int getDoctorCount() {
         return doctorList.size();
     }
+    
+    public static DynamicList<Doctor> getFreeDoctors() {
+        DynamicList<Doctor> freeDoctors = new DynamicList<>();
 
+        for (int i = 0; i < doctorList.size(); i++) {
+            Doctor doctor = doctorList.get(i);
+            if (doctor.getWorkingStatus().equals(UtilityClass.statusFree)) {
+                freeDoctors.add(doctor);
+            }
+        }
+
+        return freeDoctors;
+    }
+    
+   
+    public static boolean areAllDoctorsBusy() {
+        // If list is empty, we can treat it as "not all busy"
+        if (doctorList.isEmpty()) {
+            return false;
+        }
+
+        // Check if every doctor has status != statusFree
+        for (int i = 0; i < doctorList.size(); i++) {
+            Doctor doctor = doctorList.get(i);
+            if (doctor.getWorkingStatus().equals(UtilityClass.statusFree)) {
+                return false; // Found at least one free doctor
+            }
+        }
+        return true; // All doctors are busy
+    }
+    
+    public static void updateWorkingStatus(Doctor doctor) {
+        LocalDate today = LocalDate.now();
+        LocalTime now = LocalTime.now();
+        DayOfWeek currentDay = today.getDayOfWeek();
+
+        boolean isWorkingNow = false;
+
+        DynamicList<Schedule> schedules = ScheduleManagement.findSchedulesByDoctorId(doctor.getDoctorID());
+
+        for (int i = 0; i < schedules.size(); i++) {
+            Schedule s = schedules.get(i);
+            if (s.getDayOfWeek().equals(currentDay)
+                    && !now.isBefore(s.getStartTime())
+                    && !now.isAfter(s.getEndTime())) {
+                isWorkingNow = true;
+                break;
+            }
+        }
+
+        if (isWorkingNow) {
+            doctor.setWorkingStatus(UtilityClass.statusFree);  // free means available for appointment
+        } else {
+            doctor.setWorkingStatus(UtilityClass.workingStatusOff);
+        }
+    }
+    
+    
+
+    
+    
 }

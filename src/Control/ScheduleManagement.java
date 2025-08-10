@@ -70,6 +70,12 @@ public static void addSampleSchedules() {
         LocalTime.of(13, 0), LocalTime.of(17, 0)));
     addSchedule(new Schedule("S003", "D001", DayOfWeek.WEDNESDAY, 
         LocalTime.of(9, 0), LocalTime.of(12, 0)));
+    addSchedule(new Schedule("S004", "D001", DayOfWeek.MONDAY, 
+        LocalTime.of(9, 30), LocalTime.of(12, 30)));
+    addSchedule(new Schedule("S005", "D005", DayOfWeek.SUNDAY, 
+        LocalTime.of(9, 30), LocalTime.of(23, 45)));
+    addSchedule(new Schedule("S005", "D004", DayOfWeek.SUNDAY, 
+        LocalTime.of(9, 30), LocalTime.of(23, 45)));
 }
 
 
