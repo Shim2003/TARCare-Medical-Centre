@@ -72,7 +72,7 @@ public class QueueUI {
             }
         }
     }
-    
+
     public static void startQueue() {
 
         System.out.print("Enter your Patient ID to join the queue: ");
@@ -93,6 +93,9 @@ public class QueueUI {
             System.out.println("You have unsuccessfully joined the queue.");
         }
 
+        System.out.println("Press Enter to continue...");
+        scanner.nextLine();  // waits for user input
+
     }
 
     public static void getNextInQueue() {
@@ -112,8 +115,8 @@ public class QueueUI {
             }
         }
 
-        System.out.println("Enter any key to continue...");
-        scanner.nextLine();
+        System.out.println("Press Enter to continue...");
+        scanner.nextLine();  // waits for user input
 
     }
 
@@ -165,6 +168,8 @@ public class QueueUI {
                 break;
             default:
                 System.out.println("Invalid choice. Returning to main menu.");
+                System.out.println("Press Enter to continue...");
+                scanner.nextLine();  // waits for user input
                 return;
         }
 
@@ -178,6 +183,9 @@ public class QueueUI {
                 System.out.println(filteredList.get(i).toString());
             }
         }
+
+        System.out.println("Press Enter to continue...");
+        scanner.nextLine();  // waits for user input
 
     }
 
@@ -193,6 +201,9 @@ public class QueueUI {
         } else {
             System.out.println("No queue entry found with the given Identity Number.");
         }
+
+        System.out.println("Press Enter to continue...");
+        scanner.nextLine();  // waits for user input
 
     }
 
@@ -232,6 +243,8 @@ public class QueueUI {
                 break;
             case 4:
                 System.out.println("Operation cancelled.");
+                System.out.println("Press Enter to continue...");
+                scanner.nextLine();  // waits for user input
                 break;
         }
     }
@@ -249,6 +262,9 @@ public class QueueUI {
             System.out.println("Removal cancelled. Please check on the Patient Id");
             return;
         }
+
+        System.out.println("Press Enter to continue...");
+        scanner.nextLine();  // waits for user input
     }
 
     private static void removeQueueRecordsByStatus() {
@@ -283,6 +299,9 @@ public class QueueUI {
             System.out.println("No queue entry found with the given Identity Number.");
         }
 
+        System.out.println("Press Enter to continue...");
+        scanner.nextLine();  // waits for user input
+
     }
 
     private static void removeAllQueueRecords() {
@@ -298,11 +317,11 @@ public class QueueUI {
         System.out.print("Are you sure you want to remove ALL queue records? This action cannot be undone. (Y/N): ");
 
         char confirm = scanner.nextLine().toUpperCase().charAt(0);
-        
+
         if (confirm == 'Y') {
             System.out.print("Please type 'CONFIRM' to proceed with removing all records: ");
             String confirmation = scanner.nextLine();
-            
+
             if ("CONFIRM".equals(confirmation)) {
                 int totalRecords = allRecords.size();
                 QueueControl.clearAllQueueRecords();
@@ -313,6 +332,9 @@ public class QueueUI {
         } else {
             System.out.println("Removal of all queue records cancelled.");
         }
-        
+
+        System.out.println("Press Enter to continue...");
+        scanner.nextLine();  // waits for user input
+
     }
 }

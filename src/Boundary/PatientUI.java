@@ -9,9 +9,7 @@ import Control.PatientManagement;
 import Utility.UtilityClass;
 import Entity.Patient;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.InputMismatchException;
 import java.util.Scanner;
 
 /**
@@ -21,9 +19,6 @@ import java.util.Scanner;
 public class PatientUI {
 
     private static final Scanner scanner = new Scanner(System.in);
-    private static final UtilityClass utility = new UtilityClass();
-
-    private static final SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
     public static void main(String[] args) {
         PatientManagement.addSamplePatients();
@@ -181,53 +176,52 @@ public class PatientUI {
     }
 
     public static void addPatient() {
-        try {
 
-            System.out.println("\n\n\n== Register as new Patient ==");
+        System.out.println("\n\n\n== Register as new Patient ==");
 
-            System.out.print("Enter Full Name: ");
-            String fullName = scanner.nextLine();
+        System.out.print("Enter Full Name: ");
+        String fullName = scanner.nextLine();
 
-            System.out.print("Enter Identity Number: ");
-            String identityNumber = scanner.nextLine();
+        System.out.print("Enter Identity Number: ");
+        String identityNumber = scanner.nextLine();
 
-            System.out.print("Enter Date of Birth (" + utility.DATE_FORMAT + "): ");
-            String dobInput = scanner.nextLine();
-            Date dateOfBirth = sdf.parse(dobInput);
+        System.out.print("Enter Date of Birth (" + UtilityClass.DATE_FORMAT + "): ");
+        String dobInput = scanner.nextLine();
+        Date dateOfBirth = UtilityClass.parseDate(dobInput);
 
-            System.out.print("Enter Gender (M/F): ");
-            char gender = scanner.nextLine().toUpperCase().charAt(0);
-
-            System.out.print("Enter Contact Number: ");
-            String contactNumber = scanner.nextLine();
-
-            System.out.print("Enter Email: ");
-            String email = scanner.nextLine();
-
-            System.out.print("Enter Address: ");
-            String address = scanner.nextLine();
-
-            System.out.print("Enter Emergency Contact: ");
-            String emergencyContact = scanner.nextLine();
-
-            Date registrationDate = new Date(); // current date
-
-            Patient p = new Patient(fullName, identityNumber, dateOfBirth, gender, contactNumber, email, address, emergencyContact, registrationDate);
-
-            if (PatientManagement.add(p)) {
-                System.out.println("Patient registered successfully.");
-                System.out.println("Patient ID : " + p.getPatientID());
-            } else {
-                System.out.println("Failed to register patient.");
-            }
-
-            System.out.println("Press Enter to return to continue...");
-            scanner.nextLine();  // waits for user input
-
-        } catch (ParseException e) {
-            System.out.println("Invalid date format! Please use " + utility.DATE_FORMAT + ".");
-
+        if (dateOfBirth == null) {
+            System.out.println("Invalid date format! Please use " + UtilityClass.DATE_FORMAT + ".");
+            return; // Exit the method early
         }
+
+        System.out.print("Enter Gender (M/F): ");
+        char gender = scanner.nextLine().toUpperCase().charAt(0);
+
+        System.out.print("Enter Contact Number: ");
+        String contactNumber = scanner.nextLine();
+
+        System.out.print("Enter Email: ");
+        String email = scanner.nextLine();
+
+        System.out.print("Enter Address: ");
+        String address = scanner.nextLine();
+
+        System.out.print("Enter Emergency Contact: ");
+        String emergencyContact = scanner.nextLine();
+
+        Date registrationDate = new Date(); // current date
+
+        Patient p = new Patient(fullName, identityNumber, dateOfBirth, gender, contactNumber, email, address, emergencyContact, registrationDate);
+
+        if (PatientManagement.add(p)) {
+            System.out.println("Patient registered successfully.");
+            System.out.println("Patient ID : " + p.getPatientID());
+        } else {
+            System.out.println("Failed to register patient.");
+        }
+
+        System.out.println("Press Enter to return to continue...");
+        scanner.nextLine();  // waits for user input
 
     }
 
@@ -284,6 +278,9 @@ public class PatientUI {
             System.out.println("Update failed. Invalid choice.");
         }
 
+        System.out.println("Press Enter to continue...");
+        scanner.nextLine();  // waits for user input
+
     }
 
     public static void displayPatientInfo() {
@@ -301,13 +298,16 @@ public class PatientUI {
         System.out.println("\n--- Patient Details ---");
         System.out.println("Full Name: " + patient.getFullName());
         System.out.println("Identity Number: " + patient.getIdentityNumber());
-        System.out.println("Date of Birth: " + sdf.format(patient.getDateOfBirth()));
+        System.out.println("Date of Birth: " + UtilityClass.formatDate(patient.getDateOfBirth()));
         System.out.println("Gender: " + patient.getGender());
         System.out.println("Contact Number: " + patient.getContactNumber());
         System.out.println("Email: " + patient.getEmail());
         System.out.println("Address: " + patient.getAddress());
         System.out.println("Emergency Contact: " + patient.getEmergencyContact());
-        System.out.println("Registration Date: " + sdf.format(patient.getRegistrationDate()));
+        System.out.println("Registration Date: " + UtilityClass.formatDate(patient.getRegistrationDate()));
+
+        System.out.println("Press Enter to continue...");
+        scanner.nextLine();  // waits for user input
 
     }
 
@@ -343,6 +343,8 @@ public class PatientUI {
                 break;
             case 3:
                 System.out.println("Operation cancelled.");
+                System.out.println("Press Enter to continue...");
+                scanner.nextLine();  // waits for user input
                 break;
         }
     }
@@ -357,6 +359,9 @@ public class PatientUI {
         } else {
             System.out.println("Removal of all patients cancelled.");
         }
+
+        System.out.println("Press Enter to continue...");
+        scanner.nextLine();  // waits for user input
     }
 
     public static void removeSpecificPatient() {
@@ -376,6 +381,9 @@ public class PatientUI {
         } else {
             System.out.println("Removal cancelled.");
         }
+
+        System.out.println("Press Enter to continue...");
+        scanner.nextLine();  // waits for user input
     }
 
     public static void displayAll() {
@@ -398,13 +406,15 @@ public class PatientUI {
                     p.getPatientID(),
                     UtilityClass.truncate(p.getFullName(), 20),
                     p.getIdentityNumber(),
-                    sdf.format(p.getDateOfBirth()),
+                    UtilityClass.formatDate(p.getDateOfBirth()),
                     String.valueOf(p.getGender()),
                     p.getContactNumber(),
                     UtilityClass.truncate(p.getEmail(), 25));
         }
 
         System.out.println("-------------------------------------------------------------------------------------------------------------------------------");
+        System.out.println("Press Enter to continue...");
+        scanner.nextLine();  // waits for user input
     }
 
     public static void generateDemographicsReport() {
@@ -492,7 +502,7 @@ public class PatientUI {
         System.out.print("Female [");
         int femaleBarLength = (int) (femalePercentage / 2); // Scale down for display
         for (int i = 0; i < femaleBarLength; i++) {
-            System.out.print("█");
+            System.out.print("#");
         }
         System.out.printf("] %.1f%%\n", femalePercentage);
 

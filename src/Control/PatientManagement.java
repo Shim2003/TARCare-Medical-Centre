@@ -6,6 +6,7 @@ package Control;
 
 import ADT.DynamicList;
 import Entity.Patient;
+import Utility.UtilityClass;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -19,11 +20,8 @@ public class PatientManagement {
     // list to store patient details
     private static DynamicList<Patient> patientList = new DynamicList<>();
 
-    // Constant
-    public static final String DATE_FORMAT = "dd/MM/yyyy";
-
     public static void addSamplePatients() {
-        SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
+        SimpleDateFormat sdf = new SimpleDateFormat(UtilityClass.DATE_FORMAT);
         try {
             Patient p1 = new Patient("Alice Tan", "A123456789", sdf.parse("01/01/1990"), 'F',
                     "0123456789", "alice@example.com", "123 Jalan ABC, Kuala Lumpur", "01122334455", new Date());
@@ -112,7 +110,7 @@ public class PatientManagement {
         patientList.clear();
     }
 
-    public boolean isPatientExists(String patientId) {
+    public static boolean isPatientExists(String patientId) {
         return patientList.anyMatch(p -> p.getPatientID().equalsIgnoreCase(patientId));
     }
 

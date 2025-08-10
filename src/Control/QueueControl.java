@@ -16,18 +16,17 @@ import Entity.QueueEntry;
 public class QueueControl {
 
     private static DynamicList<QueueEntry> queueList = new DynamicList<>();
-    private static final PatientManagement patientControl = new PatientManagement();
-    private static final PatientUI patientUi = new PatientUI();
 
     public static QueueEntry addInQueue(String patientId) {
 
         if (patientId != null) {
 
-            if (!patientControl.isPatientExists(patientId)) {
-                patientUi.addPatient();
+            if (!PatientManagement.isPatientExists(patientId)) {
+                System.out.println("Patient ID not found... Please register first...");
+                return null;
             }
 
-            Patient p = patientControl.findPatientById(patientId);
+            Patient p = PatientManagement.findPatientById(patientId);
 
             if (p == null) {
                 System.out.println("Error: Patient could not be found.");
@@ -42,7 +41,7 @@ public class QueueControl {
             QueueEntry newQueue = new QueueEntry(p.getPatientID());
             queueList.add(newQueue);
 
-            return queueList.getLast();
+            return newQueue;
         }
 
         return null;
