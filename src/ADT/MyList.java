@@ -1,5 +1,6 @@
 package ADT;
 
+import java.util.Iterator;
 import java.util.function.Predicate;
 
 /*
@@ -29,4 +30,5 @@ public interface MyList<T> {
     void replace(int index, T newItem);
     int findIndex(Predicate<T> predicate);
     boolean removeIf(Predicate<T> predicate);
+    Iterator<T> iterator();
 }
