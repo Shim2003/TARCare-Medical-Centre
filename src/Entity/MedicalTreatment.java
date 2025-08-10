@@ -5,7 +5,7 @@ import java.util.Date;
 
 public class MedicalTreatment {
     private String treatmentId;
-    private String diagnosisId;
+    private String consultationId;
     private String patientId;
     private String doctorId;
     private final Date treatmentDate;
@@ -13,13 +13,10 @@ public class MedicalTreatment {
     private String medicalTreatmentAdvise;
     private DynamicList<MedicalTreatmentItem> medicineList;
 
-    public MedicalTreatment(String treatmentId, String diagnosisId, String patientId, 
+    public MedicalTreatment(String treatmentId, String consultationId, String patientId,
     String doctorId, Date treatmentDate, String treatmentStatus, String medicalTreatmentAdvise,
     DynamicList<MedicalTreatmentItem> medicineList) {
         this.treatmentId = treatmentId;
-        this.diagnosisId = diagnosisId;
-        this.patientId = patientId;
-        this.doctorId = doctorId;
         this.treatmentDate = treatmentDate;
         this.treatmentStatus = treatmentStatus;
         this.medicalTreatmentAdvise = medicalTreatmentAdvise;
@@ -30,8 +27,8 @@ public class MedicalTreatment {
         return treatmentId;
     }
 
-    public String getDiagnosisId() {
-        return diagnosisId;
+    public String getConsultationId() {
+        return consultationId;
     }
 
     public String getPatientId() {
@@ -54,12 +51,16 @@ public class MedicalTreatment {
         return medicineList;
     }
 
+    public Date getTreatmentDate() {
+        return treatmentDate;
+    }
+
     public void setTreatmentId(String treatmentId) {
         this.treatmentId = treatmentId;
     }
 
-    public void setDiagnosisId(String diagnosisId) {
-        this.diagnosisId = diagnosisId;
+    public void setConsultationId(String consultationId) {
+        this.consultationId = consultationId;
     }
 
     public void setPatientId(String patientId) {
@@ -69,7 +70,7 @@ public class MedicalTreatment {
     public void setDoctorId(String doctorId) {
         this.doctorId = doctorId;
     }
-    
+
     public void setTreatmentStatus(String treatmentStatus) {
         this.treatmentStatus = treatmentStatus;
     }
@@ -88,7 +89,7 @@ public class MedicalTreatment {
         sb.append(String.format(
             "%-20s %-20s %-20s %-20s %-20s %-15s %-30s\n",
             "Treatment ID: " + treatmentId,
-            "Diagnosis ID: " + diagnosisId,
+            "Consultation ID: " + consultationId,
             "Patient ID: " + patientId,
             "Doctor ID: " + doctorId,
             "Treatment Date: " + treatmentDate,

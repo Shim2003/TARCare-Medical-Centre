@@ -18,6 +18,7 @@ public class Consultation {
     private LocalDateTime consultationDate;
     private String symptoms;
     private String diagnosis;
+    private static Consultation currentConsultation;
 
     public Consultation(String consultationId, String patientId, String doctorId,
                         LocalDateTime consultationDate, String symptoms, String diagnosis) {
@@ -35,6 +36,7 @@ public class Consultation {
     public LocalDateTime getConsultationDate() { return consultationDate; }
     public String getSymptoms() { return symptoms; }
     public String getDiagnosis() { return diagnosis; }
+    public static Consultation getCurrentConsultation() { return currentConsultation; }
     
     public void setConsultationId(String consultationId) {
         this.consultationId = consultationId;
@@ -58,6 +60,10 @@ public class Consultation {
 
     public void setDiagnosis(String diagnosis) {
         this.diagnosis = diagnosis;
+    }
+    
+    public static void setCurrentConsultation(Consultation consultation) {
+        currentConsultation = consultation;
     }
 
     @Override
