@@ -5,7 +5,6 @@
 package Control;
 
 import ADT.DynamicList;
-import Entity.Diagnosis;
 import Entity.MedicalTreatment;
 import Entity.TreatmentHistory;
 
@@ -17,33 +16,8 @@ import Entity.TreatmentHistory;
 public class MedicalTreatmentManagement {
     
     //list to store medical treatment details
-    private static final DynamicList<Diagnosis> diagnosisList = new DynamicList<>();
     private static final DynamicList<MedicalTreatment> treatmentList = new DynamicList<>();
     private static final DynamicList<TreatmentHistory> treatmentHistoryList = new DynamicList<>();
-    
-    // Create a new symptom list for the specific diagnosis or patient
-    public static DynamicList<String> addSymptoms(DynamicList<String> symptomInput) {
-        DynamicList<String> symptoms = new DynamicList<>();
-        if (symptomInput != null && !symptomInput.isEmpty()) {
-            for (int i = 0; i < symptomInput.size(); i++) {
-                symptoms.add(symptomInput.get(i));
-            }
-        }
-        return symptoms;
-    }
-
-    // Create a new diagnosis
-    public static boolean addDiagnosis(Diagnosis diagnosis) {
-        if (diagnosis != null) {
-            diagnosisList.add(diagnosis);
-            return true;
-        }
-        return false;
-    }
-
-    public static Diagnosis getDiagnosisListById(String diagnosisId) {
-        return diagnosisList.findFirst(d -> d.getDiagnosisId().equals(diagnosisId));
-    }
 
     //create a new medical treatment
     public static boolean addMedicalTreatment(MedicalTreatment treatment) {
@@ -67,6 +41,11 @@ public class MedicalTreatmentManagement {
         return treatmentHistoryList.findFirst(th -> th.getPatientId().equals(patientId));
     }
 
+    // display treatment history by patient ID
+    public static DynamicList<TreatmentHistory> getTreatmentHistoryByPatientIdList(String patientId) {
+        return treatmentHistoryList.findAll(th -> th.getPatientId().equals(patientId));
+    }
+
     public static TreatmentHistory getTreatmentHistoryById(String treatmentId) {
         TreatmentHistory result = treatmentHistoryList.findFirst(th -> th.getTreatmentId().equals(treatmentId));
         if (result == null) {
@@ -77,5 +56,7 @@ public class MedicalTreatmentManagement {
         return result;
     }
 
-    
+    public static DynamicList<MedicalTreatment> getTreatmentList() {
+        return treatmentList;
+    }
 }

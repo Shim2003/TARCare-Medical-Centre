@@ -6,7 +6,6 @@ package Boundary;
 
 import ADT.DynamicList;
 import Control.MedicalTreatmentManagement;
-import Control.PatientManagement;
 import Entity.*;
 import Utility.UtilityClass;
 import java.text.SimpleDateFormat;
@@ -21,13 +20,7 @@ public class MedicalTreatmentUI {
     
     private static final Scanner scanner = new Scanner(System.in);
 
-    // Collections to store data
-    private static final  DynamicList<Diagnosis> diagnosisList = new DynamicList<>();
-    private static final DynamicList<MedicalTreatment> treatmentList = new DynamicList<>();
-    private static final DynamicList<TreatmentHistory> historyList = new DynamicList<>();
-
     // ID counters
-    private static int diagnosisIdCounter = 1001;
     private static int treatmentIdCounter = 2001;
     private static int historyIdCounter = 3001;
 
@@ -41,15 +34,13 @@ public class MedicalTreatmentUI {
     public static void MedicalTreatmentMenu() {
         while(true) {
             System.out.println("\n=== Medical Treatment Management System ===");
-            System.out.println("1. Add New Diagnosis");
-            System.out.println("2. Create Medical Treatment");
-            System.out.println("3. View Diagnosis Details");
-            System.out.println("4. View Patient Treatment History");
-            System.out.println("5. Update Treatment Status");
-            System.out.println("6. Generate Treatment Reports");
-            System.out.println("7. Exit to Main Menu");
+            System.out.println("1. Create Medical Treatment");
+            System.out.println("2. View Patient Treatment History");
+            System.out.println("3. Update Treatment Status");
+            System.out.println("4. Generate Treatment Reports");
+            System.out.println("5. Exit to Main Menu");
             
-            System.out.print("Enter your choice (1-7): ");
+            System.out.print("Enter your choice (1-5): ");
             
             try{
                 int choice = scanner.nextInt();
@@ -57,24 +48,20 @@ public class MedicalTreatmentUI {
                 
                 switch (choice) {
                     case 1 -> 
-                        addDiagnosis();
-                    case 2 -> 
                         createTreatment();
-                    case 3 -> 
-                        viewDiagnosisDetails();
-                    case 4 -> 
+                    case 2 -> 
                         viewPatientTreatmentHistory();
-                    case 5 -> 
+                    case 3 -> 
                         updateTreatmentStatus();
-                    case 6 -> 
+                    case 4 -> 
                         generateTreatmentReports();
-                    case 7 -> {
+                    case 5 -> {
                         System.out.println("Exiting to Main Menu...");
                         scanner.close(); // Close the scanner before exiting
                         return; // Exit to main menu
                     }
                     default -> {
-                        System.out.println("Invalid Choice. Please enter again from 1 to 7.");
+                        System.out.println("Invalid Choice. Please enter again from 1 to 5.");
                     }
                 }
             } catch(Exception e) {
@@ -84,98 +71,15 @@ public class MedicalTreatmentUI {
             }
         }
     }
-    
-    public static void addDiagnosis() {
-        String patientId = null;
-        try {
-            System.out.println("\n=== Add New Diagnosis ===");
-            
-            while(true) {
-                System.out.println("Enter Patient ID: ");
-                patientId = scanner.nextLine();
-                
-                if (patientId == null || patientId.trim().isEmpty()) {
-                    System.out.println("Patient ID cannot be empty. Please try again.");
-                    continue;
-                }
-                
-                // Check if patient exists in the system
-                // Assuming a method findPatientById exists in PatientManagement class
-                if (PatientManagement.findPatientById(patientId) == null) {
-                    System.out.println("No such Patient ID found. Please try again.");
-                    continue;
-                }
-                
-                break;
-            }
-            
-            System.out.println("Enter Doctor ID: ");
-            String doctorId = scanner.nextLine();
-            
-            // Create a diagnosis array for doctor to write the symptoms while if the doctor enter with an empty value then end the loop
-            DynamicList<String> symptomsInput = new DynamicList<>();
-            int i = 1;
-            while (true) {
-                System.out.println("Enter Patient's Symptoms (Press Enter to finish): ");
-                System.out.print("[" + i + "] ");
-                String symptom = scanner.nextLine();
-                if (symptom.isEmpty()) {
-                    break;
-                } else {
-                    symptomsInput.add(symptom);
-                    i++;
-                }
-            }
-            DynamicList<String> symptomsList = MedicalTreatmentManagement.addSymptoms(symptomsInput);
-            
-            System.out.println("Enter Diagnosis Description: ");
-            String diagnosisDescription = scanner.nextLine();
-
-            System.out.println("Severity Level");
-            System.out.println("1. Low");
-            System.out.println("2. Medium");
-            System.out.println("3. High");
-            System.out.println("4. Critical");
-            System.out.print("Select Severity Level (1-4): ");
-            String severityLevel = scanner.nextLine();
-
-            System.out.println("Enter Recommendations: ");
-            String recommendations = scanner.nextLine();
-
-            System.out.println("Additional Notes: ");
-            String additionalNotes = scanner.nextLine();
-
-            //Generate Diagnosis ID
-            String diagnosisId = "D" + diagnosisIdCounter++;
-
-            // Create a new Diagnosis object
-            Diagnosis diagnosis = new Diagnosis(diagnosisId, patientId, doctorId, new Date(),
-                symptomsList, diagnosisDescription, severityLevel, recommendations, 
-                additionalNotes);
-
-            // Add the new Diagnosis object to the diagnosisList
-            MedicalTreatmentManagement.addDiagnosis(diagnosis);
-
-        } catch (Exception c) {
-            System.out.println("Invalid Input. Please select again.");
-        }
-    }
 
     public static void createTreatment() {
+
         try {
             System.out.println("\n=== Create Medical Treatment ===");
 
 
-            System.out.println("Enter Diagnosis ID: ");
+            System.out.print("Enter Diagnosis ID: ");
             String diagnosisId = scanner.nextLine();
-
-            //Find the diagnosis ID
-            Diagnosis diagnosis = diagnosisList.findFirst(
-                d -> d.getDiagnosisId().equals(diagnosisId));
-
-            if (diagnosis == null) {
-                System.out.println("Diagnosis ID not found.");
-            }
 
             DynamicList<MedicalTreatmentItem> medicineList = new DynamicList<>();
             int i = 1;
@@ -184,7 +88,7 @@ public class MedicalTreatmentUI {
             //the doctor have to enter a list of medicine and its details, 
             //if doctor enter a "x" means that enough for medicine
             while (true) { 
-                System.out.println("Medicine" + "[ " + i + " ] ");
+                System.out.print("Medicine" + "[ " + i + " ] ");
 
                 System.out.print("Medicine Name:");
                 String medicineName = scanner.nextLine();
@@ -233,9 +137,13 @@ public class MedicalTreatmentUI {
             // Generate Treatment ID
             String treatmentId = "T" + treatmentIdCounter++;
 
+            Consultation currentConsultation = Consultation.getCurrentConsultation();
+            String consultationId = currentConsultation.getConsultationId();
+            String patientId = currentConsultation.getPatientId();
+            String doctorId = currentConsultation.getDoctorId();
+
             // Create a new MedicalTreatment object
-            MedicalTreatment treatment = new MedicalTreatment(treatmentId, diagnosisId, 
-            diagnosis.getPatientId(), diagnosis.getDoctorId(), 
+            MedicalTreatment treatment = new MedicalTreatment(treatmentId, consultationId, patientId, doctorId,
             treatmentDate,"Active", treatmentAdvice, medicineList);
 
             // Add the new MedicalTreatment object to the treatmentList
@@ -243,55 +151,16 @@ public class MedicalTreatmentUI {
 
             // Create treatment history
             String historyId = "H" + historyIdCounter++;
-            TreatmentHistory history = new TreatmentHistory(historyId, treatmentId, diagnosisId,
-            diagnosis.getPatientId(), diagnosis.getDoctorId(), treatmentDate, treatmentDate, "Ongoing",
-            "Active", "Treatment initiated");
+            TreatmentHistory history = new TreatmentHistory(historyId, treatmentId, patientId, doctorId,
+                treatmentDate, null, "Ongoing", "Active", "");
 
             // Add the new TreatmentHistory object to the historyList
-            historyList.add(history);
+            MedicalTreatmentManagement.addTreatmentHistory(history);
 
             System.out.println("Medical Treatment created successfully! Treatment ID: " + treatmentId);
         } catch (Exception e) {
             System.out.println("Invalid Input. Please select again.");
         }
-    }
-
-    //View Diagnosis Details
-    public static void viewDiagnosisDetails() {
-        System.out.println("\n=== Diagnosis Details ===");
-        if (diagnosisList.isEmpty()) {
-            System.out.println("No diagnoses record currently.");
-            //back to main menu
-            return;
-        } 
-        System.out.print("Enter Diagnosis ID: ");
-        String diagnosisId = scanner.nextLine();
-
-        // Find the diagnosis in the diagnosisList
-        if (diagnosisId == null || diagnosisId.trim().isEmpty()) {
-            System.out.println("Diagnosis ID cannot be empty. Please try again.");
-            return;
-        }
-
-        Diagnosis diagnosis = MedicalTreatmentManagement.getDiagnosisListById(diagnosisId);
-
-        if (diagnosis == null) {
-            System.out.println("No such Diagnosis ID found.");
-            //back to main menu
-            return;
-        }
-
-        System.out.println("\nDiagnosis Details");
-        System.out.println("==========================");
-        System.out.println("Diagnosis ID: " + diagnosis.getDiagnosisId());
-        System.out.println("Patient ID: " + diagnosis.getPatientId());
-        System.out.println("Doctor ID: " + diagnosis.getDoctorId());
-        System.out.println("Diagnosis Date: " + diagnosis.getDiagnosisDate());
-        System.out.println("Diagnosis Description: " + diagnosis.getDiagnosisDescription());
-        System.out.println("Symptoms: " + diagnosis.getSymptoms());
-        System.out.println("Severity Level: " + diagnosis.getSeverityLevel());
-        System.out.println("Recommendations: " + diagnosis.getRecommendations());
-        System.out.println("Notes: " + diagnosis.getNotes());
     }
 
     //View Patient Treatment History
@@ -312,24 +181,22 @@ public class MedicalTreatmentUI {
         System.out.println("\nPatient Treatment History for Patient ID: " + patientId);
         System.out.println("===================================");
 
-        for (int i = 0; i < historyList.size(); i++) {
-            TreatmentHistory history = historyList.get(i);
-            if (history.getPatientId().equals(patientId)) {
-                System.out.println("History ID: " + history.getHistoryId());
-                System.out.println("Treatment ID: " + history.getTreatmentId());
-                System.out.println("Diagnosis ID: " + history.getDiagnosisId());
-                System.out.println("Doctor ID: " + history.getDoctorId());
-                System.out.println("Treatment Date: " + history.getTreatmentDate());
-                if (history.getFollowUpDate() != null) {
-                    System.out.println("Follow-Up Date: " + history.getFollowUpDate());
-                } else {
-                    System.out.println("Follow-Up Date: Not Scheduled");
-                }
-                System.out.println("Follow-Up Date: " + history.getFollowUpDate());
-                System.out.println("Outcome: " + history.getTreatmentOutcome());
-                System.out.println("Status: " + history.getStatus());
-                System.out.println("Notes: " + history.getNotes());
-                System.out.println("-------------------------------\n");
+        //trace the patient treatment history based on the patient ID
+        DynamicList<TreatmentHistory> treatmentHistoryList = MedicalTreatmentManagement.getTreatmentHistoryByPatientIdList(patientId);
+        if (treatmentHistoryList.isEmpty()) {
+            System.out.println("No treatment history found for this patient.");
+            return;
+        } else {
+            for (int i = 0; i < treatmentHistoryList.size(); i++) {
+                System.out.println("Treatment ID: " + treatmentHistoryList.get(i).getTreatmentId());
+                System.out.println("Consultation ID: " + treatmentHistoryList.get(i).get());
+                System.out.println("Patient ID: " + treatmentHistoryList.get(i).getPatientId());
+                System.out.println("Doctor ID: " + treatmentHistoryList.get(i).getDoctorId());
+                System.out.println("Treatment Date: " + treatmentHistoryList.get(i).getTreatmentDate());
+                System.out.println("Treatment Outcome: " + treatmentHistoryList.get(i).getTreatmentOutcome());
+                System.out.println("Status: " + treatmentHistoryList.get(i).getStatus());
+                System.out.println("Notes: " + treatmentHistoryList.get(i).getNotes());
+                System.out.println("==========================");
             }
         }
     }
@@ -418,12 +285,12 @@ public class MedicalTreatmentUI {
     //Generate Treatment Reports
     public static void generateTreatmentReports() {
      System.out.println("\n=== Treatment Summary Report ===");
-        System.out.println("Total Treatments: " + treatmentList.size());
+        System.out.println("Total Treatments: " + MedicalTreatmentManagement.getTreatmentList().size());
         
         int activeCount = 0, completedCount = 0, cancelledCount = 0;
         
-        for (int i = 0; i < treatmentList.size(); i++) {
-            MedicalTreatment treatment = treatmentList.get(i);
+        for (int i = 0; i < MedicalTreatmentManagement.getTreatmentList().size(); i++) {
+            MedicalTreatment treatment = MedicalTreatmentManagement.getTreatmentList().get(i);
             switch (treatment.getTreatmentStatus()) {
                 case "Active"->
                     activeCount++;
@@ -441,84 +308,5 @@ public class MedicalTreatmentUI {
         System.out.println("Active Treatments: " + activeCount);
         System.out.println("Completed Treatments: " + completedCount);
         System.out.println("Cancelled Treatments: " + cancelledCount);
-    }
-
-    // Generate diagnosis statistics report
-    public static void generateDiagnosisStatisticsReport() {
-        System.out.println("\n=== Diagnosis Statistics Report ===");
-        System.out.println("Total Diagnoses: " + diagnosisList.size());
-        
-        int lowCount = 0, mediumCount = 0, highCount = 0, criticalCount = 0;
-        
-        for (int i = 0; i < diagnosisList.size(); i++) {
-            Diagnosis diagnosis = diagnosisList.get(i);
-            switch (diagnosis.getSeverityLevel()) {
-                case "Low"->
-                    lowCount++;
-                case "Medium"->
-                    mediumCount++;
-                case "High"->
-                    highCount++;
-                case "Critical"->
-                    criticalCount++;
-            }
-        }
-        
-        System.out.println("Low Severity: " + lowCount);
-        System.out.println("Medium Severity: " + mediumCount);
-        System.out.println("High Severity: " + highCount);
-        System.out.println("Critical Severity: " + criticalCount);
-    }
-
-    // Generate patient history report
-    public static void generatePatientHistoryReport() {
-        System.out.println("\n=== Patient Treatment History Report ===");
-        
-        System.out.print("Enter Patient ID: ");
-        String patientId = scanner.nextLine();
-        
-        System.out.println("\nPatient ID: " + patientId);
-        System.out.println("=====================================");
-        
-        // Find all diagnoses for this patient
-        System.out.println("Diagnoses:");
-        boolean foundDiagnosis = false;
-        for (int i = 0; i < diagnosisList.size(); i++) {
-            Diagnosis diagnosis = diagnosisList.get(i);
-            if (diagnosis.getPatientId().equals(patientId)) {
-                foundDiagnosis = true;
-                System.out.println("- " + diagnosis.getDiagnosisDescription() + " (" + diagnosis.getSeverityLevel() + ")");
-            }
-        }
-        
-        if (!foundDiagnosis) {
-            System.out.println("No diagnoses found.");
-        }
-        
-        // Print out the medicine list for this patient
-        System.out.println("\nMedicines:");
-        boolean foundMedicine = false;
-        for (int i = 0; i < treatmentList.size(); i++) {
-            MedicalTreatment treatment = treatmentList.get(i);
-            if (treatment.getPatientId().equals(patientId)) {
-                DynamicList<MedicalTreatmentItem> medicines = treatment.getMedicineList();
-                if (medicines != null && medicines.size() > 0) {
-                    foundMedicine = true;
-                    for (int j = 0; j < medicines.size(); j++) {
-                        MedicalTreatmentItem item = medicines.get(j);
-                        System.out.printf("%-25s %-15s %-20s %-15s %-20s\n",
-                            item.getMedicineName(),
-                            item.getDosage(),
-                            item.getFrequency(),
-                            item.getDuration(),
-                            item.getMethod()
-                        );
-                    }
-                }
-            }
-        }
-        if (!foundMedicine) {
-            System.out.println("No medicines found.");
-        }
     }
 }

@@ -6,8 +6,8 @@ package Boundary;
 
 import ADT.DynamicList;
 import Control.PatientManagement;
-import Utility.UtilityClass;
 import Entity.Patient;
+import Utility.UtilityClass;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Scanner;

@@ -19,15 +19,13 @@ public class Schedule {
     private DayOfWeek dayOfWeek;
     private LocalTime startTime;
     private LocalTime endTime;
-    private boolean isAvailable;
 
-    public Schedule(String scheduleID, String doctorID, DayOfWeek dayOfWeek, LocalTime startTime, LocalTime endTime, boolean isAvailable) {
+    public Schedule(String scheduleID, String doctorID, DayOfWeek dayOfWeek, LocalTime startTime, LocalTime endTime) {
         this.scheduleID = scheduleID;
         this.doctorID = doctorID;
         this.dayOfWeek = dayOfWeek;
         this.startTime = startTime;
         this.endTime = endTime;
-        this.isAvailable = isAvailable;
     }
 
     public String getScheduleID() {
@@ -70,18 +68,9 @@ public class Schedule {
         this.endTime = endTime;
     }
 
-    public boolean isIsAvailable() {
-        return isAvailable;
-    }
-
-    public void setIsAvailable(boolean isAvailable) {
-        this.isAvailable = isAvailable;
-    }
-    
     @Override
     public String toString() {
-        return "[" + scheduleID + "] " + doctorID + " - " + dayOfWeek + " " + startTime + "-" + endTime +
-                " (Available: " + isAvailable + ")";
+        return "Schedule{" + "scheduleID=" + scheduleID + ", doctorID=" + doctorID + ", dayOfWeek=" + dayOfWeek + ", startTime=" + startTime + ", endTime=" + endTime + '}';
     }
 
 }
