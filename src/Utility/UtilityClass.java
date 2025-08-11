@@ -7,6 +7,7 @@ package Utility;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Scanner;
 
 /**
  *
@@ -32,6 +33,8 @@ public class UtilityClass {
     private static final String highLevel = "High";
     private static final String criticalLevel = "Critical";
 
+    private static final Scanner scanner = new Scanner(System.in);
+    
     // Display the message with a maximum length
     public static String truncate(String str, int maxLength) {
         if (str.length() <= maxLength) {
@@ -60,5 +63,10 @@ public class UtilityClass {
         }
         SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
         return sdf.format(date);
+    }
+
+    public static void pressEnterToContinue() {
+        System.out.println("\nPress Enter to continue...");
+        scanner.nextLine();
     }
 }
