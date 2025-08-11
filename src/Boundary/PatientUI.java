@@ -414,7 +414,7 @@ public class PatientUI {
 
         System.out.println("-------------------------------------------------------------------------------------------------------------------------------");
         System.out.println("Press Enter to continue...");
-        scanner.nextLine();  // waits for user input
+        scanner.nextLine();
     }
 
     public static void generateDemographicsReport() {

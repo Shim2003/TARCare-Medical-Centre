@@ -49,16 +49,26 @@ public class QueueControl {
     }
 
     public static QueueEntry getNextInQueue() {
-
-        QueueEntry waiting = queueList.findFirst(qe
+        // Get all waiting patients
+        DynamicList<QueueEntry> waitingPatients = queueList.findAll(qe
                 -> qe.getStatus().equals(Utility.UtilityClass.statusWaiting));
 
-        if (waiting != null) {
-            waiting.setStatus(Utility.UtilityClass.statusConsulting);
-            return waiting;
+        if (waitingPatients.isEmpty()) {
+            return null;
         }
-        return null;
 
+        // Find the patient with the lowest queue number (next in sequence)
+        QueueEntry nextPatient = waitingPatients.get(0);
+        for (int i = 1; i < waitingPatients.size(); i++) {
+            QueueEntry current = waitingPatients.get(i);
+            if (current.getQueueNumber() < nextPatient.getQueueNumber()) {
+                nextPatient = current;
+            }
+        }
+
+        // Change status to consulting
+        nextPatient.setStatus(Utility.UtilityClass.statusConsulting);
+        return nextPatient;
     }
 
     public static boolean isFullConsulting() {

@@ -102,21 +102,39 @@ public class QueueUI {
 
         if (Control.QueueControl.isFullConsulting()) {
             System.out.println("\n\n-- Current Consulting Doctor is FULL");
-        } else {
-            System.out.println("\n\n--- Serve Next Patient ---");
-            QueueEntry next = Control.QueueControl.getNextInQueue();
-
-            if (next == null) {
-                System.out.println("No patient is queuing");
-            } else {
-                System.out.println("Patient Serving :");
-                System.out.println("-----------------");
-                System.out.println(next.toString());
-            }
+            System.out.println("Enter any key to continue...");
+            scanner.nextLine();
+            return;
         }
 
-        System.out.println("Press Enter to continue...");
-        scanner.nextLine();  // waits for user input
+        System.out.println("\n\n--- Serve Next Patient ---");
+
+        DynamicList<QueueEntry> waitingPatients = Control.QueueControl.getQueueListByStatus(Utility.UtilityClass.statusWaiting);
+
+        if (waitingPatients.isEmpty()) {
+            System.out.println("No patients are currently waiting in the queue.");
+            System.out.println("Enter any key to continue...");
+            scanner.nextLine();
+            return;
+        }
+
+        System.out.println("Current waiting patients:");
+        for (int i = 0; i < waitingPatients.size(); i++) {
+            System.out.println(waitingPatients.get(i).toString());
+        }
+
+        QueueEntry next = Control.QueueControl.getNextInQueue();
+
+        if (next == null) {
+            System.out.println("No waiting patients available.");
+        } else {
+            System.out.println("\nNext patient being served (Queue ID: " + next.getQueueNumber() + "):");
+            System.out.println("-----------------");
+            System.out.println(next.toString());
+        }
+
+        System.out.println("Enter any key to continue...");
+        scanner.nextLine();
 
     }
 
