@@ -40,10 +40,6 @@ public class DiagnosisManagement {
     public static Diagnosis getDiagnosisListById(String diagnosisId) {
         return diagnosisList.findFirst(d -> d.getDiagnosisId().equals(diagnosisId));
     }
-
-    public static DynamicList<Diagnosis> getDiagnosisList() {
-        return diagnosisList;
-    }
     
     //display the diagnosis list using the iterator
     public static void displayDiagnosisList() {
@@ -51,5 +47,37 @@ public class DiagnosisManagement {
         while (iterator.hasNext()) {
             System.out.println(iterator.next());
         }
+    }
+
+    //find diagnosis by diagnosis ID
+    public static Diagnosis findDiagnosisById(String diagnosisId) {
+        return diagnosisList.findFirst(d -> d.getDiagnosisId().equals(diagnosisId));
+    }
+
+    //update diagnosis details
+    public static boolean updateDiagnosisDetails(String diagnosisId, Diagnosis newDiagnosis) {
+        Diagnosis existingDiagnosis = findDiagnosisById(diagnosisId);
+        if (existingDiagnosis != null) {
+            existingDiagnosis.setPatientId(newDiagnosis.getPatientId());
+            existingDiagnosis.setDoctorId(newDiagnosis.getDoctorId());
+            existingDiagnosis.setDiagnosisDate(newDiagnosis.getDiagnosisDate());
+            existingDiagnosis.setSymptoms(newDiagnosis.getSymptoms());
+            existingDiagnosis.setDiagnosisDescription(newDiagnosis.getDiagnosisDescription());
+            existingDiagnosis.setSeverityLevel(newDiagnosis.getSeverityLevel());
+            existingDiagnosis.setRecommendations(newDiagnosis.getRecommendations());
+            existingDiagnosis.setNotes(newDiagnosis.getNotes());
+            return true;
+        }
+        return false;
+    }
+
+    //remove a diagnosis by ID
+    public static boolean removeDiagnosisById(String diagnosisId) {
+        return diagnosisList.removeIf(d -> d.getDiagnosisId().equals(diagnosisId));
+    }
+
+    // display the all diagnosis list based on diagnosis ID
+    public static DynamicList<Diagnosis> getDiagnosisList() {
+        return diagnosisList;
     }
 }

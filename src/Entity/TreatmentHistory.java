@@ -69,6 +69,10 @@ public class TreatmentHistory {
     public String getTreatmentAdvice() { return treatmentAdvice; }
     public String getNotes() { return notes; }
     public DynamicList<MedicalTreatmentItem> getMedicineList() { return medicineList; }
+    public String getMonth() {
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("MM");
+        return dateFormatter.format(treatmentDate);
+    }
 
     // Setters
     public void setHistoryId(String historyId) { this.historyId = historyId; }

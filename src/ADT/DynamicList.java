@@ -1,8 +1,10 @@
 package ADT;
 
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.Objects;
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
@@ -209,6 +211,7 @@ public class DynamicList<T> implements MyList<T> {
     }
 
     //Purpose: This allows DynamicList to be iterable, means can loop through it with a for-each loop
+    @Override
     public Iterator<T> iterator() {
         return new DynamicListIterator();
     }
@@ -229,105 +232,9 @@ public class DynamicList<T> implements MyList<T> {
             return data[currentIndex++];
         }
     }
-
-    //time-based operations: add an item after a delay
-    //Purpose: To allow scheduling of item addition to the list after a specified delay
-    // This can be useful for tasks that need to be deferred or executed later
-    public void scheduleAdd(T item, long delayMillis) {
-        new Thread(() -> {
-            try {
-                Thread.sleep(delayMillis);
-                add(item);
-                System.out.println("Scheduled item added: " + item);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }).start();
-    }
-
-    // Grouping operations: group items by a primary and secondary key
-    //Purpose: To group items based on two criteria, allowing for hierarchical categorization
-    public GroupedData<T> groupBy(Function<T, String> primaryGrouper, 
-                                 Function<T, String> secondaryGrouper) {
-        GroupedData<T> result = new GroupedData<>();
-        
-        for (int i = 0; i < size; i++) {
-            String primaryKey = primaryGrouper.apply(data[i]);
-            String secondaryKey = secondaryGrouper.apply(data[i]);
-            result.addItem(primaryKey, secondaryKey, data[i]);
-        }
-        
-        return result;
-    }
-
-    public static class GroupedData<T> {
-        private final DynamicList<Group<T>> groups = new DynamicList<>();
-        
-        public void addItem(String primaryKey, String secondaryKey, T item) {
-            Group<T> group = findGroup(primaryKey);
-            if (group == null) {
-                group = new Group<>(primaryKey);
-                groups.add(group);
-            }
-            group.addItem(secondaryKey, item);
-        }
-        
-        private Group<T> findGroup(String key) {
-            for (int i = 0; i < groups.size(); i++) {
-                if (groups.get(i).key.equals(key)) {
-                    return groups.get(i);
-                }
-            }
-            return null;
-        }
-        
-        public DynamicList<Group<T>> getGroups() {
-            return groups;
-        }
-    }
     
-    public static class Group<T> {
-        public final String key;
-        private final DynamicList<SubGroup<T>> subGroups = new DynamicList<>();
-        
-        public Group(String key) {
-            this.key = key;
-        }
-        
-        public void addItem(String subKey, T item) {
-            SubGroup<T> subGroup = findSubGroup(subKey);
-            if (subGroup == null) {
-                subGroup = new SubGroup<>(subKey);
-                subGroups.add(subGroup);
-            }
-            subGroup.items.add(item);
-        }
-        
-        private SubGroup<T> findSubGroup(String key) {
-            for (int i = 0; i < subGroups.size(); i++) {
-                if (subGroups.get(i).key.equals(key)) {
-                    return subGroups.get(i);
-                }
-            }
-            return null;
-        }
-        
-        public DynamicList<SubGroup<T>> getSubGroups() {
-            return subGroups;
-        }
-    }
-    
-    public static class SubGroup<T> {
-        public final String key;
-        public final DynamicList<T> items = new DynamicList<>();
-        
-        public SubGroup(String key) {
-            this.key = key;
-        }
-    }
-
     // Statistics operations: calculate count, sum, average, min, max, and standard deviation
-    //Purpose: To provide statistical analysis of the list items based on a numeric extractor function
+    // Purpose: To provide statistical analysis of the list items based on a numeric extractor function
     public ListStatistics<T> getStatistics(Function<T, Number> numericExtractor) {
         if (isEmpty()) return new ListStatistics<>(0, 0, 0, 0, 0);
         
@@ -382,5 +289,93 @@ public class DynamicList<T> implements MyList<T> {
             this.max = max;
             this.standardDeviation = stdDev;
         }
+    }
+
+    //sorting methods based on quicksort algorithm
+    public void  quickSort(Comparator<T> comparator) {
+        quickSort(0, size - 1, comparator);
+    }
+
+    private void quickSort(int low, int high, Comparator<T> comparator) {
+        if(low< high) {
+            int pi = partition(low, high, comparator);
+            quickSort(low, pi - 1, comparator);
+            quickSort(pi + 1, high, comparator);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private int partition(int low, int high, Comparator<T> comparator) {
+        T pivot = data[high];
+        int i = low - 1;
+
+        for (int j = low; j < high; j++) {
+            if(comparator.compare(data[j], pivot) <= 0) {
+                i++;
+                swap(i,j);
+            }
+        }
+        swap(i + 1, high);
+        return i + 1;
+    }
+
+    private void swap(int i, int j) {
+        T temp = data[i];
+        data[i] = data[j];
+        data[j] = temp;
+    }
+
+    /*apply the sorting method to the doctor module:
+
+    Sort by doctor name
+    doctors.quickSort(Comparator.comparing(d -> ((Doctor) d).getName()));
+
+    Sort patients by age
+    patients.quickSort(Comparator.comparing(p -> ((Patient) p).getAge()));
+
+    Sort treatments by date
+    treatments.quickSort(Comparator.comparing(t -> ((MedicalTreatment) t).getTreatmentDate()));
+    
+    Sort consultations by date
+    consultations.quickSort(Comparator.comparing(c -> ((Consultation) c).getConsultationDate()));
+
+    Sort the medicine list by name
+    medicines.quickSort(Comparator.comparing(m -> ((Medicine) m).getName()));
+
+    */
+
+   // clone method that create a deep copy of the list, save a snapshot of the current state before any modifications
+    @SuppressWarnings("unchecked")
+    @Override
+    public DynamicList<T> clone() {
+        try {
+            DynamicList<T> clonedList = (DynamicList<T>) super.clone();
+            clonedList.data = (T[]) new Object[size];
+            System.arraycopy(data, 0, clonedList.data, 0, size);
+            return clonedList;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError(); // Can never happen
+        }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof DynamicList)) return false;
+        DynamicList<?> other = (DynamicList<?>) obj;
+        if (size != other.size) return false;
+        for (int i = 0; i < size; i++) {
+            if (!Objects.equals(data[i], other.data[i])) return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 1;
+        for(int i = 0; i < size; i++) {
+            result = 31 * result + (data[i] == null ? 0 : data[i].hashCode());
+        }
+        return result;
     }
 }

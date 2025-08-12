@@ -31,6 +31,17 @@ public class Diagnosis {
     public Diagnosis() {
         this.diagnosisId = "DIAG" + diagnosisIdCounter++;
     }
+
+    // Constructor for updating existing diagnosis
+    public Diagnosis(String diagnosisId, String diagnosisDescription, String severityLevel, 
+                    String recommendations, String notes) {
+        this.diagnosisId = diagnosisId;
+        this.symptoms = symptoms;
+        this.diagnosisDescription = diagnosisDescription;
+        this.severityLevel = severityLevel;
+        this.recommendations = recommendations;
+        this.notes = notes;
+    }
     
     public Diagnosis(String patientId, String doctorId, Date diagnosisDate, 
                     DynamicList<String> symptoms, String diagnosisDescription, String severityLevel, 
@@ -99,13 +110,13 @@ public class Diagnosis {
                     StringBuilder line = new StringBuilder(">   - ");
                     for (String word : words) {
                         if (line.length() + word.length() + 1 > 63) {
-                            sb.append(String.format("%-65s >\n", line.toString()));
+                            sb.append(String.format("%-63s <\n", line.toString()));
                             line = new StringBuilder(">     ");
                         }
                         line.append(word).append(" ");
                     }
                     if (line.length() > 6) {
-                        sb.append(String.format("%-65s <\n", line.toString().trim()));
+                        sb.append(String.format("%-63s <\n", line.toString().trim()));
                     }
                 } else {
                     sb.append(String.format(">   - %-57s <\n", symptom));
@@ -135,7 +146,7 @@ public class Diagnosis {
         }
         
         sb.append("=================================================================");
-        
+        // UtilityClass.pressEnterToContinue();
         return sb.toString();
     }
     
@@ -144,13 +155,13 @@ public class Diagnosis {
         
         switch (severityLevel.toUpperCase()) {
             case "LOW":
-                return severityLevel + " ●";
+                return severityLevel + " !";
             case "MEDIUM":
-                return severityLevel + " ●●";
+                return severityLevel + " !!";
             case "HIGH":
-                return severityLevel + " ●●●";
+                return severityLevel + " !!!";
             case "CRITICAL":
-                return severityLevel + " ●●●●";
+                return severityLevel + " !!!!";
             default:
                 return severityLevel;
         }
@@ -163,18 +174,18 @@ public class Diagnosis {
         }
         
         String[] words = text.split(" ");
-        StringBuilder line = new StringBuilder("<   ");
+        StringBuilder line = new StringBuilder(">   ");
         
         for (String word : words) {
             if (line.length() + word.length() + 1 > 63) {
-                sb.append(String.format("%-65s >\n", line.toString()));
-                line = new StringBuilder("<   ");
+                sb.append(String.format("%-63s <\n", line.toString()));
+                line = new StringBuilder(">   ");
             }
             line.append(word).append(" ");
         }
         
         if (line.length() > 4) {
-            sb.append(String.format("%-65s >\n", line.toString().trim()));
+            sb.append(String.format("%-63s <\n", line.toString().trim()));
         }
     }
 }
