@@ -143,15 +143,47 @@ public class DoctorManagement {
         return true; // All doctors are busy
     }
     
+//    public static void updateWorkingStatus(Doctor doctor) {
+//        LocalDate today = LocalDate.now();
+//        LocalTime now = LocalTime.now();
+//        DayOfWeek currentDay = today.getDayOfWeek();
+//
+//        boolean isWorkingNow = false;
+//
+//        DynamicList<Schedule> schedules = ScheduleManagement.findSchedulesByDoctorId(doctor.getDoctorID());
+//
+//        for (int i = 0; i < schedules.size(); i++) {
+//            Schedule s = schedules.get(i);
+//            if (s.getDayOfWeek().equals(currentDay)
+//                    && !now.isBefore(s.getStartTime())
+//                    && !now.isAfter(s.getEndTime())) {
+//                isWorkingNow = true;
+//                break;
+//            }
+//        }
+//
+//        if (isWorkingNow) {
+//            doctor.setWorkingStatus(UtilityClass.statusFree);  // free means available for appointment
+//        } else {
+//            doctor.setWorkingStatus(UtilityClass.workingStatusOff);
+//        }
+//    }
+    
     public static void updateWorkingStatus(Doctor doctor) {
         LocalDate today = LocalDate.now();
         LocalTime now = LocalTime.now();
         DayOfWeek currentDay = today.getDayOfWeek();
 
+        // 1️⃣ Check if doctor is on leave today
+        if (LeaveManagement.isDoctorOnLeave(doctor.getDoctorID(), today)) {
+            doctor.setWorkingStatus("On Leave");  // Or a constant in UtilityClass
+            return; // No need to check schedule
+        }
+
+        // 2️⃣ Otherwise, check if doctor is working now
         boolean isWorkingNow = false;
 
         DynamicList<Schedule> schedules = ScheduleManagement.findSchedulesByDoctorId(doctor.getDoctorID());
-
         for (int i = 0; i < schedules.size(); i++) {
             Schedule s = schedules.get(i);
             if (s.getDayOfWeek().equals(currentDay)
@@ -162,12 +194,14 @@ public class DoctorManagement {
             }
         }
 
+        // 3️⃣ Set status
         if (isWorkingNow) {
-            doctor.setWorkingStatus(UtilityClass.statusFree);  // free means available for appointment
+            doctor.setWorkingStatus(UtilityClass.statusFree);  // Available for appointment
         } else {
             doctor.setWorkingStatus(UtilityClass.workingStatusOff);
         }
     }
+
     
     
 

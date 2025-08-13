@@ -66,10 +66,14 @@ public class ScheduleManagement {
 public static void addSampleSchedules() {
     addSchedule(new Schedule("S001", "D001", DayOfWeek.TUESDAY, 
         LocalTime.of(9, 0), LocalTime.of(12, 0)));
+    addSchedule(new Schedule("S010", "D001", DayOfWeek.THURSDAY, 
+        LocalTime.of(0, 0), LocalTime.of(12, 0)));
+    addSchedule(new Schedule("S011", "D003", DayOfWeek.THURSDAY, 
+        LocalTime.of(0, 0), LocalTime.of(12, 0)));
     addSchedule(new Schedule("S002", "D002", DayOfWeek.TUESDAY, 
         LocalTime.of(13, 0), LocalTime.of(17, 0)));
     addSchedule(new Schedule("S003", "D001", DayOfWeek.WEDNESDAY, 
-        LocalTime.of(9, 0), LocalTime.of(12, 0)));
+        LocalTime.of(9, 0), LocalTime.of(23, 45)));
     addSchedule(new Schedule("S004", "D001", DayOfWeek.MONDAY, 
         LocalTime.of(9, 30), LocalTime.of(12, 30)));
     addSchedule(new Schedule("S005", "D005", DayOfWeek.SUNDAY, 
