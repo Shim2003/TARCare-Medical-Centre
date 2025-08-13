@@ -5,6 +5,9 @@
 package Boundary;
 
 import Boundary.ConsultationUI;
+import Boundary.PatientUI;
+
+
 /**
  *
  * @author jecsh
