@@ -5,16 +5,15 @@
 package Control;
 
 import java.util.Scanner;
-import Entity.QueueEntry;
 import ADT.DynamicList;
+import Entity.QueueEntry;
 import Entity.Patient;
+import Entity.Doctor;
 import Entity.Consultation;
-import java.time.LocalDateTime;
-import java.util.Queue;
-import Boundary.PatientUI;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+
 /**
  *
  * @author leekeezhan
@@ -23,6 +22,7 @@ public class ConsultationManagement {
     
     private static DynamicList<Patient> completedPatients = new DynamicList<>();
     private DynamicList<Consultation> scheduledConsultations = new DynamicList<>();
+    
     
     public void addPatientToQueue(String patientId) {
         QueueEntry entry = QueueControl.addInQueue(patientId);
@@ -49,15 +49,28 @@ public class ConsultationManagement {
 
     // 开始下一位咨询
     public void startNextConsultation() {
-        if (!QueueControl.isFullConsulting()) {
-            QueueEntry next = QueueControl.getNextInQueue();
-            if (next != null) {
-                System.out.println("Started consultation for Patient ID: " + next.getPatientId());
+    Scanner scanner = new Scanner(System.in);
+
+    if (!QueueControl.isFullConsulting()) {
+        System.out.print("Please enter Doctor ID: ");
+        String doctorId = scanner.nextLine().trim();
+
+        QueueEntry next = QueueControl.getNextInQueue();
+        if (next != null) {
+            Patient patient = PatientManagement.findPatientById(next.getPatientId());
+            if (patient != null) {
+                System.out.println("Doctor ID: " + doctorId + " started consultation for Patient ID: " + next.getPatientId() + ", Name: " + patient.getFullName());
             } else {
-                System.out.println("No patients waiting in queue.");
+                System.out.println("Patient data not found.");
             }
+        } else {
+            System.out.println("No patients waiting in queue.");
         }
+    } else {
+        System.out.println("Maximum number of consultations reached.");
     }
+}
+
 
     public void viewCurrentConsulting() {
         var consultingList = QueueControl.getQueueListByStatus(Utility.UtilityClass.statusConsulting);
@@ -73,11 +86,10 @@ public class ConsultationManagement {
     }
 
     // 结束咨询并保存病人信息
-    public void endConsultation(String patientId) {
+     public void endConsultation(String patientId) {
         if (QueueControl.markAsCompleted(patientId)) {
             System.out.println("Consultation ended for Patient ID: " + patientId);
 
-            // 找到Patient对象 (假设PatientManagement有该方法)
             Patient patient = PatientManagement.findPatientById(patientId);
             if (patient != null) {
                 completedPatients.add(patient);
