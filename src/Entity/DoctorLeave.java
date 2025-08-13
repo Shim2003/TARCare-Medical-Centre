@@ -75,5 +75,4 @@ public class DoctorLeave {
         return "DoctorLeave{" + "leaveID=" + leaveID + ", doctorID=" + doctorID + ", dateFrom=" + dateFrom + ", dateTo=" + dateTo + ", reason=" + reason + '}';
     }
     
-    
 }
