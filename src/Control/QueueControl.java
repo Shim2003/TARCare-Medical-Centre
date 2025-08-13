@@ -70,6 +70,10 @@ public class QueueControl {
         nextPatient.setStatus(Utility.UtilityClass.statusConsulting);
         return nextPatient;
     }
+    
+    public static QueueEntry getQueueEntryByPatientId(String patientId) {
+        return queueList.findFirst(qe -> qe.getPatientId().equals(patientId));
+    }
 
     public static boolean isFullConsulting() {
         DynamicList<QueueEntry> consulting = queueList.findAll(qe

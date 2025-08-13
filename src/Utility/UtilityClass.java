@@ -6,6 +6,8 @@ package Utility;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Scanner;
 
@@ -19,6 +21,9 @@ public class UtilityClass {
     //General
     public static final String DATE_FORMAT = "dd/MM/yyyy";
     public static final String TIME_FORMAT = "HH:mm:ss";
+    
+    // LocalDateTime format
+    public static final String DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     //Status
     public static final String statusFree = "Free";
@@ -75,4 +80,24 @@ public class UtilityClass {
         String[] monthNames = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
         return monthNames[month - 1];
     }
+    
+    // 格式化 LocalDateTime 为字符串 "yyyy-MM-dd HH:mm:ss"
+    public static String formatLocalDateTime(LocalDateTime dateTime) {
+        if (dateTime == null) return "N/A";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATETIME_FORMAT);
+        return dateTime.format(formatter);
+    }
+
+    // 将字符串 "yyyy-MM-dd HH:mm:ss" 解析为 LocalDateTime
+    public static LocalDateTime parseLocalDateTime(String dateTimeStr) {
+        if (dateTimeStr == null || dateTimeStr.trim().isEmpty()) return null;
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATETIME_FORMAT);
+            return LocalDateTime.parse(dateTimeStr, formatter);
+        } catch (Exception e) {
+            System.err.println("Invalid datetime format: " + dateTimeStr);
+            return null;
+        }
+    }
 }
+

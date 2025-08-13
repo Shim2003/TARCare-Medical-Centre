@@ -3,7 +3,8 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package Boundary;
-
+import Control.DoctorManagement;
+import Control.ScheduleManagement;
 import Control.ConsultationManagement;
 import java.util.Scanner;
 
@@ -21,7 +22,9 @@ public class ConsultationUI {
         System.out.println("3. Start Next Consultation");
         System.out.println("4. View Current Consulting Patients");
         System.out.println("5. End Consultation");
-        System.out.println("6. View Completed Consultations");  // 新增选项
+        System.out.println("6. View Completed Consultations");
+        System.out.println("7. Schedule Appointment");
+        System.out.println("8. View All Appointments");
         System.out.println("0. Back to Main Menu");
         System.out.print("Enter choice: ");
         choice = sc.nextInt();
@@ -43,8 +46,6 @@ public class ConsultationUI {
             }
             case 6 -> consultationManagement.viewCompletedPatients();  // 新增调用
             case 7 -> {
-                System.out.print("Enter Consultation ID: ");
-                String consultationId = sc.nextLine();
                 System.out.print("Enter Patient ID: ");
                 String patientId = sc.nextLine();
                 System.out.print("Enter Doctor ID: ");
@@ -54,12 +55,19 @@ public class ConsultationUI {
                 System.out.print("Enter symptoms (optional): ");
                 String symptoms = sc.nextLine();
 
-                consultationManagement.scheduleNextConsultation(consultationId, patientId, doctorId, dateTimeStr, symptoms);
+                consultationManagement.scheduleNextAppointment(patientId, doctorId, dateTimeStr, symptoms);
             }
-            case 8 -> consultationManagement.viewScheduledConsultations();
+            case 8 -> consultationManagement.viewScheduledAppointments();
             case 0 -> System.out.println("Returning to Main Menu...");
             default -> System.out.println("Invalid choice.");
         }
     } while (choice != 0);
 }
+    public static void main(String[] args) {
+        ScheduleManagement.addSampleSchedules();
+        DoctorManagement.addSampleDoctor();
+        // TODO code application logic here
+        ConsultationUI ui = new ConsultationUI();
+        ui.run();
+    }
 }

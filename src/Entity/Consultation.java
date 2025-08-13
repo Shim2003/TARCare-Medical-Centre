@@ -15,17 +15,17 @@ public class Consultation {
     private String consultationId;
     private String patientId;
     private String doctorId;
-    private LocalDateTime consultationDate;
+    private LocalDateTime startTime;  // 新增开始时间
+    private LocalDateTime endTime;    // 新增结束时间
     private String symptoms;
     private String diagnosis;
     private static Consultation currentConsultation;
 
     public Consultation(String consultationId, String patientId, String doctorId,
-                        LocalDateTime consultationDate, String symptoms, String diagnosis) {
+                        String symptoms, String diagnosis) {
         this.consultationId = consultationId;
         this.patientId = patientId;
         this.doctorId = doctorId;
-        this.consultationDate = consultationDate;
         this.symptoms = symptoms;
         this.diagnosis = diagnosis;
     }
@@ -33,35 +33,20 @@ public class Consultation {
     public String getConsultationId() { return consultationId; }
     public String getPatientId() { return patientId; }
     public String getDoctorId() { return doctorId; }
-    public LocalDateTime getConsultationDate() { return consultationDate; }
     public String getSymptoms() { return symptoms; }
     public String getDiagnosis() { return diagnosis; }
+    public LocalDateTime getStartTime() { return startTime; }
+    public LocalDateTime getEndTime() { return endTime; }
     public static Consultation getCurrentConsultation() { return currentConsultation; }
-    
-    public void setConsultationId(String consultationId) {
-        this.consultationId = consultationId;
-    }
 
-    public void setPatientId(String patientId) {
-        this.patientId = patientId;
-    }
+    public void setConsultationId(String consultationId) { this.consultationId = consultationId; }
+    public void setPatientId(String patientId) { this.patientId = patientId; }
+    public void setDoctorId(String doctorId) { this.doctorId = doctorId; }
+    public void setSymptoms(String symptoms) { this.symptoms = symptoms; }
+    public void setDiagnosis(String diagnosis) { this.diagnosis = diagnosis; }
+    public void setStartTime(LocalDateTime startTime) { this.startTime = startTime; }
+    public void setEndTime(LocalDateTime endTime) { this.endTime = endTime; }
 
-    public void setDoctorId(String doctorId) {
-        this.doctorId = doctorId;
-    }
-
-    public void setConsultationDate(LocalDateTime consultationDate) {
-        this.consultationDate = consultationDate;
-    }
-
-    public void setSymptoms(String symptoms) {
-        this.symptoms = symptoms;
-    }
-
-    public void setDiagnosis(String diagnosis) {
-        this.diagnosis = diagnosis;
-    }
-    
     public static void setCurrentConsultation(Consultation consultation) {
         currentConsultation = consultation;
     }
@@ -71,7 +56,8 @@ public class Consultation {
         return "Consultation ID: " + consultationId +
                "\nPatient ID: " + patientId +
                "\nDoctor ID: " + doctorId +
-               "\nDate: " + consultationDate +
+               "\nStart Time: " + startTime +
+               "\nEnd Time: " + endTime +
                "\nSymptoms: " + symptoms +
                "\nDiagnosis: " + diagnosis + "\n";
     }

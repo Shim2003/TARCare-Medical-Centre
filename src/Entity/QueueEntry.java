@@ -19,6 +19,16 @@ public class QueueEntry {
     private Date checkInTime;
     private String patientId;
 
+    private String doctorId;
+
+    public String getDoctorId() {
+        return doctorId;
+    }
+
+    public void setDoctorId(String doctorId) {
+        this.doctorId = doctorId;
+    }
+    
     public QueueEntry(String patientId) {
         this.queueNumber = queueCounter++;
         this.status = "Waiting"; // default status
