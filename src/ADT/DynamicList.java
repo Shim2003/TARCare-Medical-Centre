@@ -217,6 +217,7 @@ public class DynamicList<T> implements MyList<T> {
     }
 
     private class DynamicListIterator implements Iterator<T> {
+
         private int currentIndex = 0;
 
         @Override
@@ -232,15 +233,17 @@ public class DynamicList<T> implements MyList<T> {
             return data[currentIndex++];
         }
     }
-    
+
     // Statistics operations: calculate count, sum, average, min, max, and standard deviation
     // Purpose: To provide statistical analysis of the list items based on a numeric extractor function
     public ListStatistics<T> getStatistics(Function<T, Number> numericExtractor) {
-        if (isEmpty()) return new ListStatistics<>(0, 0, 0, 0, 0);
-        
+        if (isEmpty()) {
+            return new ListStatistics<>(0, 0, 0, 0, 0);
+        }
+
         double sum = 0, min = Double.MAX_VALUE, max = Double.MIN_VALUE;
         int count = 0;
-        
+
         for (int i = 0; i < size; i++) {
             Number value = numericExtractor.apply(data[i]);
             if (value != null) {
@@ -251,10 +254,10 @@ public class DynamicList<T> implements MyList<T> {
                 count++;
             }
         }
-        
+
         double average = count > 0 ? sum / count : 0;
         double variance = 0;
-        
+
         if (count > 1) {
             for (int i = 0; i < size; i++) {
                 Number value = numericExtractor.apply(data[i]);
@@ -265,22 +268,23 @@ public class DynamicList<T> implements MyList<T> {
             }
             variance /= count - 1;
         }
-        
+
         return new ListStatistics<>(count, sum, average, min, max, Math.sqrt(variance));
     }
 
     public static class ListStatistics<T> {
+
         public final int count;
         public final double sum;
         public final double average;
         public final double min;
         public final double max;
         public final double standardDeviation;
-        
+
         public ListStatistics(double count, double sum, double average, double min, double max) {
             this(count, sum, average, min, max, 0);
         }
-        
+
         public ListStatistics(double count, double sum, double average, double min, double max, double stdDev) {
             this.count = (int) count;
             this.sum = sum;
@@ -292,12 +296,12 @@ public class DynamicList<T> implements MyList<T> {
     }
 
     //sorting methods based on quicksort algorithm
-    public void  quickSort(Comparator<T> comparator) {
+    public void quickSort(Comparator<T> comparator) {
         quickSort(0, size - 1, comparator);
     }
 
     private void quickSort(int low, int high, Comparator<T> comparator) {
-        if(low< high) {
+        if (low < high) {
             int pi = partition(low, high, comparator);
             quickSort(low, pi - 1, comparator);
             quickSort(pi + 1, high, comparator);
@@ -310,9 +314,9 @@ public class DynamicList<T> implements MyList<T> {
         int i = low - 1;
 
         for (int j = low; j < high; j++) {
-            if(comparator.compare(data[j], pivot) <= 0) {
+            if (comparator.compare(data[j], pivot) <= 0) {
                 i++;
-                swap(i,j);
+                swap(i, j);
             }
         }
         swap(i + 1, high);
@@ -342,30 +346,37 @@ public class DynamicList<T> implements MyList<T> {
     Sort the medicine list by name
     medicines.quickSort(Comparator.comparing(m -> ((Medicine) m).getName()));
 
-    */
-
-   // clone method that create a deep copy of the list, save a snapshot of the current state before any modifications
+     */
+    // clone method that create a deep copy of the list, save a snapshot of the current state before any modifications
     @SuppressWarnings("unchecked")
     @Override
     public DynamicList<T> clone() {
-        try {
-            DynamicList<T> clonedList = (DynamicList<T>) super.clone();
-            clonedList.data = (T[]) new Object[size];
-            System.arraycopy(data, 0, clonedList.data, 0, size);
-            return clonedList;
-        } catch (CloneNotSupportedException e) {
-            throw new AssertionError(); // Can never happen
+        DynamicList<T> clonedList = new DynamicList<>(this.data.length);
+
+        // Copy all elements
+        for (int i = 0; i < this.size; i++) {
+            clonedList.add(this.data[i]);
         }
+
+        return clonedList;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (!(obj instanceof DynamicList)) return false;
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof DynamicList)) {
+            return false;
+        }
         DynamicList<?> other = (DynamicList<?>) obj;
-        if (size != other.size) return false;
+        if (size != other.size) {
+            return false;
+        }
         for (int i = 0; i < size; i++) {
-            if (!Objects.equals(data[i], other.data[i])) return false;
+            if (!Objects.equals(data[i], other.data[i])) {
+                return false;
+            }
         }
         return true;
     }
@@ -373,7 +384,7 @@ public class DynamicList<T> implements MyList<T> {
     @Override
     public int hashCode() {
         int result = 1;
-        for(int i = 0; i < size; i++) {
+        for (int i = 0; i < size; i++) {
             result = 31 * result + (data[i] == null ? 0 : data[i].hashCode());
         }
         return result;
