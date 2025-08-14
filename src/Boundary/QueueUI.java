@@ -7,6 +7,7 @@ package Boundary;
 import ADT.DynamicList;
 import Control.QueueControl;
 import Entity.QueueEntry;
+import Utility.UtilityClass;
 import java.util.Scanner;
 
 /**
@@ -93,8 +94,7 @@ public class QueueUI {
             System.out.println("You have unsuccessfully joined the queue.");
         }
 
-        System.out.println("Press Enter to continue...");
-        scanner.nextLine();  // waits for user input
+        UtilityClass.pressEnterToContinue();
 
     }
 
@@ -102,8 +102,7 @@ public class QueueUI {
 
         if (Control.QueueControl.isFullConsulting()) {
             System.out.println("\n\n-- Current Consulting Doctor is FULL");
-            System.out.println("Enter any key to continue...");
-            scanner.nextLine();
+            UtilityClass.pressEnterToContinue();
             return;
         }
 
@@ -113,8 +112,7 @@ public class QueueUI {
 
         if (waitingPatients.isEmpty()) {
             System.out.println("No patients are currently waiting in the queue.");
-            System.out.println("Enter any key to continue...");
-            scanner.nextLine();
+            UtilityClass.pressEnterToContinue();
             return;
         }
 
@@ -133,8 +131,7 @@ public class QueueUI {
             System.out.println(next.toString());
         }
 
-        System.out.println("Enter any key to continue...");
-        scanner.nextLine();
+        UtilityClass.pressEnterToContinue();
 
     }
 
@@ -186,8 +183,7 @@ public class QueueUI {
                 break;
             default:
                 System.out.println("Invalid choice. Returning to main menu.");
-                System.out.println("Press Enter to continue...");
-                scanner.nextLine();  // waits for user input
+                UtilityClass.pressEnterToContinue();
                 return;
         }
 
@@ -202,8 +198,7 @@ public class QueueUI {
             }
         }
 
-        System.out.println("Press Enter to continue...");
-        scanner.nextLine();  // waits for user input
+        UtilityClass.pressEnterToContinue();
 
     }
 
@@ -220,8 +215,7 @@ public class QueueUI {
             System.out.println("No queue entry found with the given Identity Number.");
         }
 
-        System.out.println("Press Enter to continue...");
-        scanner.nextLine();  // waits for user input
+        UtilityClass.pressEnterToContinue();
 
     }
 
@@ -261,8 +255,7 @@ public class QueueUI {
                 break;
             case 4:
                 System.out.println("Operation cancelled.");
-                System.out.println("Press Enter to continue...");
-                scanner.nextLine();  // waits for user input
+                UtilityClass.pressEnterToContinue();
                 break;
         }
     }
@@ -281,8 +274,7 @@ public class QueueUI {
             return;
         }
 
-        System.out.println("Press Enter to continue...");
-        scanner.nextLine();  // waits for user input
+        UtilityClass.pressEnterToContinue();
     }
 
     private static void removeQueueRecordsByStatus() {
@@ -317,8 +309,7 @@ public class QueueUI {
             System.out.println("No queue entry found with the given Identity Number.");
         }
 
-        System.out.println("Press Enter to continue...");
-        scanner.nextLine();  // waits for user input
+        UtilityClass.pressEnterToContinue();
 
     }
 
@@ -351,8 +342,7 @@ public class QueueUI {
             System.out.println("Removal of all queue records cancelled.");
         }
 
-        System.out.println("Press Enter to continue...");
-        scanner.nextLine();  // waits for user input
+        UtilityClass.pressEnterToContinue();
 
     }
 }

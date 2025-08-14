@@ -9,6 +9,8 @@ import Entity.Patient;
 import Utility.UtilityClass;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
 
 /**
@@ -119,4 +121,79 @@ public class PatientManagement {
         return (p != null) ? p.getFullName() : "Unknown";
     }
 
+    public static DynamicList.ListStatistics<Patient> getAgeStatistics() {
+        return patientList.getStatistics(patient -> calculateAge(patient));
+    }
+
+    public static int calculateAge(Patient patient) {
+        Calendar today = Calendar.getInstance();
+        Calendar dob = Calendar.getInstance();
+        dob.setTime(patient.getDateOfBirth());
+        int age = today.get(Calendar.YEAR) - dob.get(Calendar.YEAR);
+        if (today.get(Calendar.DAY_OF_YEAR) < dob.get(Calendar.DAY_OF_YEAR)) {
+            age--;
+        }
+        return age;
+    }
+
+    public static DynamicList<Patient> getPatientsByAgeGroup(String ageGroup) {
+        switch (ageGroup.toLowerCase()) {
+            case "pediatric":
+                return patientList.findAll(p -> calculateAge(p) < 18);
+            case "adult":
+                return patientList.findAll(p -> calculateAge(p) >= 18 && calculateAge(p) < 65);
+            case "geriatric":
+                return patientList.findAll(p -> calculateAge(p) >= 65);
+            default:
+                return new DynamicList<>();
+        }
+    }
+
+    public static DynamicList<Patient> getOldestPatients(int n) {
+        DynamicList<Patient> sortedByAge = getPatientsSortedBy("age");
+        DynamicList<Patient> result = new DynamicList<>();
+
+        int count = Math.min(n, sortedByAge.size());
+        for (int i = sortedByAge.size() - count; i < sortedByAge.size(); i++) {
+            result.add(sortedByAge.get(i));
+        }
+        return result;
+    }
+
+    public static DynamicList<Patient> getYoungestPatients(int n) {
+        DynamicList<Patient> sortedByAge = getPatientsSortedBy("age");
+        DynamicList<Patient> result = new DynamicList<>();
+
+        int count = Math.min(n, sortedByAge.size());
+        for (int i = 0; i < count; i++) {
+            result.add(sortedByAge.get(i));
+        }
+        return result;
+    }
+    
+        public static DynamicList<Patient> getPatientsSortedBy(String criteria) {
+        DynamicList<Patient> sortedList = patientList.clone();
+
+        switch (criteria.toLowerCase()) {
+            case "name":
+                sortedList.quickSort(Comparator.comparing(Patient::getFullName));
+                break;
+            case "age":
+                sortedList.quickSort(Comparator.comparingInt(PatientManagement::calculateAge));
+                break;
+            case "registration":
+                sortedList.quickSort(Comparator.comparing(Patient::getRegistrationDate));
+                break;
+            case "registration_desc":
+                sortedList.quickSort(Comparator.comparing(Patient::getRegistrationDate).reversed());
+                break;
+            case "gender":
+                sortedList.quickSort(Comparator.comparing(Patient::getGender));
+                break;
+            default:
+                // Return unsorted if criteria not recognized
+                break;
+        }
+        return sortedList;
+    }
 }

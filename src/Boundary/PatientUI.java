@@ -220,8 +220,7 @@ public class PatientUI {
             System.out.println("Failed to register patient.");
         }
 
-        System.out.println("Press Enter to return to continue...");
-        scanner.nextLine();  // waits for user input
+        UtilityClass.pressEnterToContinue();
 
     }
 
@@ -278,8 +277,7 @@ public class PatientUI {
             System.out.println("Update failed. Invalid choice.");
         }
 
-        System.out.println("Press Enter to continue...");
-        scanner.nextLine();  // waits for user input
+        UtilityClass.pressEnterToContinue();
 
     }
 
@@ -306,8 +304,7 @@ public class PatientUI {
         System.out.println("Emergency Contact: " + patient.getEmergencyContact());
         System.out.println("Registration Date: " + UtilityClass.formatDate(patient.getRegistrationDate()));
 
-        System.out.println("Press Enter to continue...");
-        scanner.nextLine();  // waits for user input
+        UtilityClass.pressEnterToContinue();
 
     }
 
@@ -343,8 +340,7 @@ public class PatientUI {
                 break;
             case 3:
                 System.out.println("Operation cancelled.");
-                System.out.println("Press Enter to continue...");
-                scanner.nextLine();  // waits for user input
+                UtilityClass.pressEnterToContinue();
                 break;
         }
     }
@@ -360,8 +356,7 @@ public class PatientUI {
             System.out.println("Removal of all patients cancelled.");
         }
 
-        System.out.println("Press Enter to continue...");
-        scanner.nextLine();  // waits for user input
+        UtilityClass.pressEnterToContinue();
     }
 
     public static void removeSpecificPatient() {
@@ -382,8 +377,7 @@ public class PatientUI {
             System.out.println("Removal cancelled.");
         }
 
-        System.out.println("Press Enter to continue...");
-        scanner.nextLine();  // waits for user input
+        UtilityClass.pressEnterToContinue();
     }
 
     public static void displayAll() {
@@ -413,8 +407,7 @@ public class PatientUI {
         }
 
         System.out.println("-------------------------------------------------------------------------------------------------------------------------------");
-        System.out.println("Press Enter to continue...");
-        scanner.nextLine();
+        UtilityClass.pressEnterToContinue();
     }
 
     public static void generateDemographicsReport() {
@@ -424,9 +417,10 @@ public class PatientUI {
             System.out.println("=".repeat(50));
             System.out.println("1. Total Registered Patients");
             System.out.println("2. Gender Distribution");
-            System.out.println("3. Back to Admin Menu");
+            System.out.println("3. Age Statistics Report");
+            System.out.println("4. Back to Admin Menu");
 
-            System.out.print("Enter your choice (1-3): ");
+            System.out.print("Enter your choice (1-4): ");
             String choice = scanner.nextLine();
 
             switch (choice) {
@@ -437,6 +431,9 @@ public class PatientUI {
                     generateGenderDistributionReport();
                     break;
                 case "3":
+                    generateAgeStatisticsReport();
+                    break;
+                case "4":
                     return;
                 default:
                     System.out.println("Invalid choice. Please enter 1-3.");
@@ -453,8 +450,7 @@ public class PatientUI {
             System.out.println("=".repeat(50));
             System.out.println("No patients registered yet. Cannot generate report.");
             System.out.println("=".repeat(50));
-            System.out.println("\nPress Enter to continue...");
-            scanner.nextLine();
+            UtilityClass.pressEnterToContinue();
             return;
         }
 
@@ -508,8 +504,7 @@ public class PatientUI {
 
         System.out.println("=".repeat(60));
 
-        System.out.println("\nPress Enter to continue...");
-        scanner.nextLine();
+        UtilityClass.pressEnterToContinue();
     }
 
     public static void generateTotalPatientsReport() {
@@ -522,8 +517,7 @@ public class PatientUI {
             System.out.println("=".repeat(50));
             System.out.println("No patients registered yet.");
             System.out.println("=".repeat(50));
-            System.out.println("\nPress Enter to continue...");
-            scanner.nextLine();
+            UtilityClass.pressEnterToContinue();
             return;
         }
 
@@ -605,5 +599,71 @@ public class PatientUI {
 
         System.out.println("-".repeat(86));
         System.out.printf("Showing patients %d-%d of %d\n", startIndex + 1, endIndex, totalPatients);
+    }
+
+    public static void generateAgeStatisticsReport() {
+        DynamicList<Patient> patientList = PatientManagement.getPatientList();
+
+        if (patientList.isEmpty()) {
+            System.out.println("\n" + "=".repeat(60));
+            System.out.println("           AGE STATISTICS REPORT");
+            System.out.println("=".repeat(60));
+            System.out.println("No patients registered yet. Cannot generate report.");
+            System.out.println("=".repeat(60));
+            System.out.println("\nPress Enter to continue...");
+            scanner.nextLine();
+            return;
+        }
+
+        // Get age statistics using the new statistical function
+        DynamicList.ListStatistics<Patient> ageStats = PatientManagement.getAgeStatistics();
+
+        System.out.println("\n" + "=".repeat(70));
+        System.out.println("                   AGE STATISTICS ANALYSIS");
+        System.out.println("=".repeat(70));
+
+        System.out.printf("Total Patients Analyzed: %d\n", ageStats.count);
+        System.out.println("-".repeat(70));
+
+        System.out.println("AGE DISTRIBUTION STATISTICS:");
+        System.out.printf("|- Average Age: %.1f years\n", ageStats.average);
+        System.out.printf("|- Youngest Patient: %.0f years old\n", ageStats.min);
+        System.out.printf("|- Oldest Patient: %.0f years old\n", ageStats.max);
+        System.out.printf("|- Age Range: %.0f years\n", ageStats.max - ageStats.min);
+        System.out.printf("|- Standard Deviation: %.1f years\n", ageStats.standardDeviation);
+
+        // Age group analysis
+        DynamicList<Patient> pediatric = PatientManagement.getPatientsByAgeGroup("pediatric");
+        DynamicList<Patient> adult = PatientManagement.getPatientsByAgeGroup("adult");
+        DynamicList<Patient> geriatric = PatientManagement.getPatientsByAgeGroup("geriatric");
+
+        System.out.println("\nAGE GROUP BREAKDOWN:");
+        System.out.printf("|- Pediatric (0-17 years): %d patients (%.1f%%)\n",
+                pediatric.size(), (double) pediatric.size() / ageStats.count * 100);
+        System.out.printf("|- Adult (18-64 years): %d patients (%.1f%%)\n",
+                adult.size(), (double) adult.size() / ageStats.count * 100);
+        System.out.printf("|- Geriatric (65+ years): %d patients (%.1f%%)\n",
+                geriatric.size(), (double) geriatric.size() / ageStats.count * 100);
+
+        // Show top 3 oldest and youngest using sorting
+        System.out.println("\nAGE EXTREMES:");
+        DynamicList<Patient> oldest = PatientManagement.getOldestPatients(3);
+        DynamicList<Patient> youngest = PatientManagement.getYoungestPatients(3);
+
+        System.out.println("Oldest Patients:");
+        for (int i = 0; i < oldest.size(); i++) {
+            Patient p = oldest.get(i);
+            System.out.printf("  %d. %s - %d years old\n", i + 1, p.getFullName(), PatientManagement.calculateAge(p));
+        }
+
+        System.out.println("Youngest Patients:");
+        for (int i = 0; i < youngest.size(); i++) {
+            Patient p = youngest.get(i);
+            System.out.printf("  %d. %s - %d years old\n", i + 1, p.getFullName(), PatientManagement.calculateAge(p));
+        }
+
+        System.out.println("=".repeat(70));
+        System.out.println("\nPress Enter to continue...");
+        scanner.nextLine();
     }
 }
