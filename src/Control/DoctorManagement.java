@@ -42,19 +42,19 @@ public class DoctorManagement {
         SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
         try {
             Doctor d1 = new Doctor("D001", "Lee Wee Teck", sdf.parse("01/01/1990"), 'M',
-                    "0123456789", "leewt@example.com", UtilityClass.statusFree);
+                    "0123456789", "leewt@example.com", "Bachelor of Medicine, TARUMT", UtilityClass.statusFree);
             
             Doctor d2 = new Doctor("D002", "Lee Chong Wei", sdf.parse("02/01/1985"), 'M',
-                    "0123456780", "chongwei@example.com", UtilityClass.statusFree);
+                    "0123456780", "chongwei@example.com", "Bachelor of Surgery, UTAR", UtilityClass.statusFree);
              
             Doctor d3 = new Doctor("D003", "Aaron Chia Teng Feng", sdf.parse("15/11/1997"), 'M',
-                    "0123666789", "aaron@example.com", UtilityClass.statusFree);
+                    "0123666789", "aaron@example.com", "Bachelor of Medicine, TARUMT", UtilityClass.statusFree);
             
             Doctor d4 = new Doctor("D004", "Soh Wooi Yik", sdf.parse("27/03/1998"), 'M',
-                    "0123666789", "wooiyik@example.com", UtilityClass.statusConsulting);
+                    "0123666789", "wooiyik@example.com", "Bachelor of Medicine, SUNWAY", UtilityClass.statusConsulting);
             
             Doctor d5 = new Doctor("D005", "Lee Zii Jia", sdf.parse("05/03/1998"), 'M',
-                    "0123666789", "lzj@example.com", UtilityClass.workingStatusOff);
+                    "0123666789", "lzj@example.com", "Bachelor of Medicine, University of Melaya", UtilityClass.workingStatusOff);
 
             add(d1);
             add(d2);

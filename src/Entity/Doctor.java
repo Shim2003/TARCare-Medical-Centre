@@ -18,8 +18,17 @@ public class Doctor {
     private char gender;
     private String contactNumber;
     private String email;
+    private String qualification;
     private String workingStatus;  //Free, Consulting, Off
 
+    public String getQualification() {
+        return qualification;
+    }
+
+    public void setQualification(String qualification) {
+        this.qualification = qualification;
+    }
+    
     public String getDoctorID() {
         return doctorID;
     }
@@ -76,18 +85,21 @@ public class Doctor {
         this.workingStatus = workingStatus;
     }
 
-    public Doctor(String doctorID, String name, Date dateOfBirth, char gender, String contactNumber, String email, String workingStatus) {
+    public Doctor(String doctorID, String name, Date dateOfBirth, char gender, String contactNumber, String email, String qualification, String workingStatus) {
         this.doctorID = doctorID;
         this.name = name;
         this.dateOfBirth = dateOfBirth;
         this.gender = gender;
         this.contactNumber = contactNumber;
         this.email = email;
+        this.qualification = qualification;
         this.workingStatus = workingStatus;
     }
-    
+
     @Override
     public String toString() {
-        return "Doctor{" + "doctorID=" + doctorID + ", name=" + name + ", dateOfBirth=" + dateOfBirth + ", gender=" + gender + ", contactNumber=" + contactNumber + ", email=" + email + ", workingStatus=" + workingStatus + '}';
+        return "Doctor{" + "doctorID=" + doctorID + ", name=" + name + ", dateOfBirth=" + dateOfBirth + ", gender=" + gender + ", contactNumber=" + contactNumber + ", email=" + email + ", qualification=" + qualification + ", workingStatus=" + workingStatus + '}';
     }
+
+   
 }
