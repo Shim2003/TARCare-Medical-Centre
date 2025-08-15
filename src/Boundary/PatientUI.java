@@ -8,7 +8,6 @@ import ADT.DynamicList;
 import Control.PatientManagement;
 import Entity.Patient;
 import Utility.UtilityClass;
-import java.text.ParseException;
 import java.util.Date;
 import java.util.Scanner;
 
@@ -19,6 +18,7 @@ import java.util.Scanner;
 public class PatientUI {
 
     private static final Scanner scanner = new Scanner(System.in);
+    private static ConsultationUI con = new ConsultationUI();
 
     public static void main(String[] args) {
         PatientManagement.addSamplePatients();
@@ -225,7 +225,7 @@ public class PatientUI {
     }
 
     public static void updatePatient() {
-        System.out.print("Enter the Patient ID of the patient to update: ");
+        System.out.print("\n\n\nEnter the Patient ID of the patient to update: ");
         String patientId = scanner.nextLine();
 
         Patient existingPatient = PatientManagement.findPatientById(patientId); // service layer
@@ -389,10 +389,10 @@ public class PatientUI {
             return;
         }
 
-        System.out.println("\n------------------------------------------------------------ PATIENT LIST ------------------------------------------------------------");
+        System.out.println("\n---------------------------------------------------- PATIENT LIST ----------------------------------------------------");
         System.out.printf("| %-5s | %-20s | %-15s | %-10s | %-6s | %-15s | %-25s |\n",
                 "ID", "Full Name", "Identity No", "Birth Date", "Gender", "Contact", "Email");
-        System.out.println("-------------------------------------------------------------------------------------------------------------------------------");
+        System.out.println("----------------------------------------------------------------------------------------------------------------------");
 
         for (int i = 0; i < patientList.size(); i++) {
             Patient p = patientList.get(i);
@@ -406,7 +406,7 @@ public class PatientUI {
                     UtilityClass.truncate(p.getEmail(), 25));
         }
 
-        System.out.println("-------------------------------------------------------------------------------------------------------------------------------");
+        System.out.println("----------------------------------------------------------------------------------------------------------------------");
         UtilityClass.pressEnterToContinue();
     }
 

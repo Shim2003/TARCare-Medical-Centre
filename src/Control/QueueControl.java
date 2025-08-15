@@ -5,9 +5,11 @@
 package Control;
 
 import ADT.DynamicList;
-import Boundary.PatientUI;
+import DAO.CurrentServingDAO;
+import Entity.Doctor;
 import Entity.Patient;
 import Entity.QueueEntry;
+import Utility.UtilityClass;
 
 /**
  *
@@ -16,6 +18,7 @@ import Entity.QueueEntry;
 public class QueueControl {
 
     private static DynamicList<QueueEntry> queueList = new DynamicList<>();
+    private static DynamicList<CurrentServingDAO> currentServingPatient = new DynamicList<>();
 
     public static QueueEntry addInQueue(String patientId) {
 
@@ -49,6 +52,11 @@ public class QueueControl {
     }
 
     public static QueueEntry getNextInQueue() {
+
+        LeaveManagement.addSampleLeaves();
+        ScheduleManagement.addSampleSchedules();
+        DoctorManagement.addSampleDoctor();
+
         // Get all waiting patients
         DynamicList<QueueEntry> waitingPatients = queueList.findAll(qe
                 -> qe.getStatus().equals(Utility.UtilityClass.statusWaiting));
@@ -66,13 +74,44 @@ public class QueueControl {
             }
         }
 
-        // Change status to consulting
+        // Consultation need to change the status
+        DynamicList<Doctor> freeDoctors = DoctorManagement.getFreeDoctors();
+
+        if (freeDoctors.isEmpty()) {
+            System.out.println("No free doctors available. Please wait.");
+            return null;
+        }
+
+        freeDoctors.get(0).setWorkingStatus(UtilityClass.statusConsulting);
+        CurrentServingDAO newConsulattion = new CurrentServingDAO(nextPatient.getPatientId(), freeDoctors.get(0).getDoctorID());
+
+        if (currentServingPatient.size() >= 3) {
+            System.out.println("Consultation is full. Please try again later.");
+            return null;
+        } else {
+            currentServingPatient.add(newConsulattion);
+        }
+
         nextPatient.setStatus(Utility.UtilityClass.statusConsulting);
         return nextPatient;
     }
-    
-    public static QueueEntry getQueueEntryByPatientId(String patientId) {
-        return queueList.findFirst(qe -> qe.getPatientId().equals(patientId));
+
+    public static DynamicList<CurrentServingDAO> getCurrentServingPatient() {
+        return currentServingPatient;
+    }
+
+    public static void updateQueueStatus(String patientId) {
+        if (patientId == null || patientId.trim().isEmpty()) {
+            System.out.println("Invalid patient ID.");
+            return;
+        }
+
+        QueueEntry target = queueList.findFirst(qe -> qe.getPatientId().equals(patientId));
+        if (target != null) {
+            target.setStatus(UtilityClass.statusCompleted);
+        } else {
+            System.out.println("Patient not found in queue.");
+        }
     }
 
     public static boolean isFullConsulting() {

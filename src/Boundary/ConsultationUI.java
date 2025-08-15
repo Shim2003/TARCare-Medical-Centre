@@ -37,10 +37,14 @@ public class ConsultationUI {
                 consultationManagement.addPatientToQueue(patientId);
             }
             case 2 -> consultationManagement.viewQueue();
-            case 3 -> consultationManagement.startNextConsultation();
+            case 3 -> {
+                System.out.print("Enter Doctor ID: ");
+                String doctorId = sc.nextLine();
+                consultationManagement.startNextConsultation(doctorId);
+            }
             case 4 -> consultationManagement.viewCurrentConsulting();
             case 5 -> {
-                System.out.print("Enter Patient ID to end consultation: ");
+                System.out.print("Enter Doctor ID to end consultation: ");
                 String id = sc.nextLine();
                 consultationManagement.endConsultation(id);
             }

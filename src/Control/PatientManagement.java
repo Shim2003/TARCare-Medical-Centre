@@ -34,9 +34,37 @@ public class PatientManagement {
             Patient p3 = new Patient("Charlie Wong", "C111222333", sdf.parse("20/12/1975"), 'M',
                     "0171122334", "charlie@example.com", "789 Jalan DEF, Johor", "01344556677", new Date());
 
+            Patient p4 = new Patient("Daphne Lee", "D555666777", sdf.parse("10/03/1992"), 'F',
+                    "0169988776", "daphne@example.com", "12 Jalan Hijau, Melaka", "01455667788", new Date());
+
+            Patient p5 = new Patient("Ethan Tan", "E999888777", sdf.parse("05/07/1988"), 'M',
+                    "0183344556", "ethan@example.com", "23 Jalan Bunga, Selangor", "01566778899", new Date());
+
+            Patient p6 = new Patient("Fiona Ng", "F112233445", sdf.parse("22/11/1995"), 'F',
+                    "0127766554", "fiona@example.com", "34 Jalan Mawar, Perak", "01377889900", new Date());
+
+            Patient p7 = new Patient("George Ho", "G556677889", sdf.parse("09/09/1980"), 'M',
+                    "0174455667", "george@example.com", "45 Jalan Cempaka, Kedah", "01288990011", new Date());
+
+            Patient p8 = new Patient("Hannah Lim", "H223344556", sdf.parse("17/02/1993"), 'F',
+                    "0192233445", "hannah@example.com", "56 Jalan Kenanga, Terengganu", "01433445566", new Date());
+
+            Patient p9 = new Patient("Ivan Chong", "I667788990", sdf.parse("28/06/1978"), 'M',
+                    "0165566778", "ivan@example.com", "67 Jalan Teratai, Sabah", "01344556688", new Date());
+
+            Patient p10 = new Patient("Jasmine Tan", "J334455667", sdf.parse("14/12/1999"), 'F',
+                    "0129988775", "jasmine@example.com", "78 Jalan Dahlia, Sarawak", "01255667788", new Date());
+
             add(p1);
             add(p2);
             add(p3);
+            add(p4);
+            add(p5);
+            add(p6);
+            add(p7);
+            add(p8);
+            add(p9);
+            add(p10);
 
         } catch (ParseException e) {
             System.out.println("Error parsing date in sample data.");
@@ -170,8 +198,8 @@ public class PatientManagement {
         }
         return result;
     }
-    
-        public static DynamicList<Patient> getPatientsSortedBy(String criteria) {
+
+    public static DynamicList<Patient> getPatientsSortedBy(String criteria) {
         DynamicList<Patient> sortedList = patientList.clone();
 
         switch (criteria.toLowerCase()) {

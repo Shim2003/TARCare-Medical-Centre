@@ -22,25 +22,29 @@ public class QueueUI {
         while (true) {
             System.out.println("\n--- Admin Queue Management Menu ---");
             QueueUI.displayCurrentQueue();
-            System.out.println("1. Get Next Queue Patient");
-            System.out.println("2. Display Queue By Status");
-            System.out.println("3. Remove Queue Records");
-            System.out.println("4. Back to Admin Main Menu");
+            System.out.println("1. Queue for Consultation");
+            System.out.println("2. Get Next Queue Patient");
+            System.out.println("3. Display Queue By Status");
+            System.out.println("4. Remove Queue Records");
+            System.out.println("5. Back to Admin Main Menu");
 
-            System.out.print("Enter your choice (1-4): ");
+            System.out.print("Enter your choice (1-5): ");
             String choice = scanner.nextLine();
 
             switch (choice) {
                 case "1":
-                    QueueUI.getNextInQueue();
+                    QueueUI.startQueue();
                     break;
                 case "2":
-                    QueueUI.displayQueueByStatus();
+                    QueueUI.getNextInQueue();
                     break;
                 case "3":
-                    QueueUI.removeQueueRecord();
+                    QueueUI.displayQueueByStatus();
                     break;
                 case "4":
+                    QueueUI.removeQueueRecord();
+                    break;
+                case "5":
                     return;
                 default:
                     System.out.println("Invalid choice. Please enter 1-4.");
@@ -99,40 +103,56 @@ public class QueueUI {
     }
 
     public static void getNextInQueue() {
+        System.out.println("\n========================================");
+        System.out.println("         SERVE NEXT PATIENT");
+        System.out.println("========================================");
 
+        // Check if doctor is available
         if (Control.QueueControl.isFullConsulting()) {
-            System.out.println("\n\n-- Current Consulting Doctor is FULL");
+            System.out.println("STATUS: Doctor is currently busy with other patients");
+            System.out.println("        Please wait and try again later");
             UtilityClass.pressEnterToContinue();
             return;
         }
 
-        System.out.println("\n\n--- Serve Next Patient ---");
-
-        DynamicList<QueueEntry> waitingPatients = Control.QueueControl.getQueueListByStatus(Utility.UtilityClass.statusWaiting);
+        // Get waiting patients
+        DynamicList<QueueEntry> waitingPatients = Control.QueueControl.getQueueListByStatus(
+                Utility.UtilityClass.statusWaiting
+        );
 
         if (waitingPatients.isEmpty()) {
-            System.out.println("No patients are currently waiting in the queue.");
+            System.out.println("STATUS: No patients waiting in queue");
             UtilityClass.pressEnterToContinue();
             return;
         }
 
-        System.out.println("Current waiting patients:");
+        // Display current queue
+        System.out.println("\n+--------------------------------------+");
+        System.out.println("|     CURRENT WAITING LIST             |");
+        System.out.println("|     (" + waitingPatients.size() + " patients)                     |");
+        System.out.println("+--------------------------------------+");
         for (int i = 0; i < waitingPatients.size(); i++) {
-            System.out.println(waitingPatients.get(i).toString());
+            System.out.printf("| %2d. %-32s |%n", (i + 1), waitingPatients.get(i).toString());
         }
+        System.out.println("+--------------------------------------+");
 
-        QueueEntry next = Control.QueueControl.getNextInQueue();
+        // Get and serve next patient
+        QueueEntry nextPatient = Control.QueueControl.getNextInQueue();
 
-        if (next == null) {
-            System.out.println("No waiting patients available.");
+        if (nextPatient != null) {
+            System.out.println("\n+--------------------------------------+");
+            System.out.println("|            NOW SERVING               |");
+            System.out.println("+--------------------------------------+");
+            System.out.printf("| %-36s |%n", nextPatient.toString());
+            System.out.println("+--------------------------------------+");
+            System.out.println("| Patient called for consultation      |");
+            System.out.println("+--------------------------------------+");
         } else {
-            System.out.println("\nNext patient being served (Queue ID: " + next.getQueueNumber() + "):");
-            System.out.println("-----------------");
-            System.out.println(next.toString());
+            System.out.println("\nERROR: Unable to retrieve next patient");
         }
 
+        System.out.println("\n========================================");
         UtilityClass.pressEnterToContinue();
-
     }
 
     public static void displayCurrentQueue() {

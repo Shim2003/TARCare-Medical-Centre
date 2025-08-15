@@ -18,16 +18,6 @@ public class QueueEntry {
     private String status;
     private Date checkInTime;
     private String patientId;
-
-    private String doctorId;
-
-    public String getDoctorId() {
-        return doctorId;
-    }
-
-    public void setDoctorId(String doctorId) {
-        this.doctorId = doctorId;
-    }
     
     public QueueEntry(String patientId) {
         this.queueNumber = queueCounter++;
@@ -67,7 +57,7 @@ public class QueueEntry {
     @Override
     public String toString() {
         String patientName = Control.PatientManagement.getPatientNameById(this.getPatientId());
-        return String.format("Queue #%d | Name: %s | Status: %s", queueNumber, patientName, status);
+        return String.format("Queue #%d | Name: %s ", queueNumber, patientName);
     }
     
 }
