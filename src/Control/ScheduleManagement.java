@@ -87,8 +87,8 @@ public static void addSampleSchedules() {
         LocalTime.of(9, 30), LocalTime.of(23, 45)));
     addSchedule(new Schedule("S007", "D004", DayOfWeek.SUNDAY, 
         LocalTime.of(9, 30), LocalTime.of(23, 45)));
-    addSchedule(new Schedule("S008", "D004", DayOfWeek.SATURDAY, 
-        LocalTime.of(9, 30), LocalTime.of(23, 45)));
+    addSchedule(new Schedule("S020", "D005", DayOfWeek.FRIDAY, 
+        LocalTime.of(9, 0), LocalTime.of(23, 45)));
 }
 
 
