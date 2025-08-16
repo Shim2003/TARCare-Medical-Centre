@@ -7,6 +7,8 @@ package Boundary;
 import ADT.DynamicList;
 import Control.DiagnosisManagement;
 import Entity.*;
+import java.text.SimpleDateFormat;
+import java.time.Year;
 import java.util.Date;
 import java.util.Scanner;
 
@@ -36,15 +38,18 @@ public class DiagnosisUI {
 
                 switch (choice) {
                     case 1 -> 
-                        addDiagnosis();
+                        addDiagnosisTest();
                     case 2 -> 
                         viewDiagnosisDetails();
                     case 3 -> 
                         updateDiagnosisDetails();
                     case 4 ->
                         deleteDiagnosis();
-                    case 5 ->
-                        DiagnosisManagement.displayDiagnosisList();
+                    case 5 -> {
+                        String report = displayDiagnosisList();
+                        System.out.println(report);
+                    }
+                        
                     case 6 ->
                         generateDiagnosisStatisticsReport();
                     case 7 -> {
@@ -64,7 +69,7 @@ public class DiagnosisUI {
         }
     }
 
-    public static void addDiagnosis1() {
+    public static void addDiagnosis() {
         String patientId;
         try {
             System.out.println("\n=== Add New Diagnosis ===");
@@ -100,8 +105,19 @@ public class DiagnosisUI {
             System.out.println("2. Medium");
             System.out.println("3. High");
             System.out.println("4. Critical");
-            System.out.print("Select Severity Level (1-4): ");
-            String severityLevel = scanner.nextLine();
+            System.out.print("Select Severity Level(1-4): ");
+            String severity = scanner.nextLine();
+            String severityLevel = null;
+            switch (severity) {
+                case "1" -> severityLevel = "Low!";
+                case "2" -> severityLevel = "Medium!!";
+                case "3" -> severityLevel = "High!!";
+                case "4" -> severityLevel = "Critical!!!";
+                default -> {
+                    System.out.println("Invalid Input. Please select again.");
+                    return;
+                }
+            }
 
             System.out.print("Enter Recommendations: ");
             String recommendations = scanner.nextLine();
@@ -123,7 +139,7 @@ public class DiagnosisUI {
     }
 
     // add diagnosis method with dummy data for testing
-    public static void addDiagnosis() {
+    public static void addDiagnosisTest() {
         System.out.println("\n=== Add New Diagnosis ===");
         
         // Dummy data for testing
@@ -132,8 +148,9 @@ public class DiagnosisUI {
         
         DynamicList<String> symptomsInput = new DynamicList<>();
         symptomsInput.add("Fever");
-        symptomsInput.add("Cough");
-        symptomsInput.add("Sore Throat");
+        symptomsInput.add("Awake");
+        symptomsInput.add("baking powder");
+        
         DynamicList<String> symptomsList = DiagnosisManagement.addSymptoms(symptomsInput);
         
         String diagnosisDescription = "Patient shows signs of flu.";
@@ -153,6 +170,8 @@ public class DiagnosisUI {
         System.out.println("Diagnosis ID: " + diagnosis.getDiagnosisId());
     }
 
+    // Update diagnosis details method
+    // This method will prompt the user for input and update the diagnosis record
     public static void updateDiagnosisDetails() {
         System.out.println("\n=== Update Diagnosis Details ===");
         System.out.print("Enter Diagnosis ID: ");
@@ -168,8 +187,25 @@ public class DiagnosisUI {
         System.out.print("Enter New Diagnosis Description: ");
         String newDiagnosisDescription = scanner.nextLine();
 
-        System.out.print("Enter New Severity Level: ");
-        String newSeverityLevel = scanner.nextLine();
+
+        System.out.println("Severity Level");
+        System.out.println("1. Low");
+        System.out.println("2. Medium");
+        System.out.println("3. High");
+        System.out.println("4. Critical");
+        System.out.print("Select Severity Level(1-4): ");
+        String newSeverity = scanner.nextLine();
+        String newSeverityLevel = null;
+        switch (newSeverity) {
+            case "1" -> newSeverityLevel = "Low!";
+            case "2" -> newSeverityLevel = "Medium!!";
+            case "3" -> newSeverityLevel = "High!!";
+            case "4" -> newSeverityLevel = "Critical!!!";
+            default -> {
+                System.out.println("Invalid Input. Please select again.");
+                return;
+            }
+        }
 
         System.out.print("Enter New Recommendations: ");
         String newRecommendations = scanner.nextLine();
@@ -200,75 +236,209 @@ public class DiagnosisUI {
 
     //View Diagnosis Details
     public static void viewDiagnosisDetails() {
-        System.out.println("\n=== Diagnosis Details ===");
-        
-        if (DiagnosisManagement.getDiagnosisList().isEmpty()) {
-            System.out.println("No diagnoses record currently.");
-            // UtilityClass.pressEnterToContinue();
-            return;
-        }
-        
-        // Display available diagnosis IDs for reference
-        System.out.println("\nAvailable Diagnosis IDs:");
-        System.out.println("------------------------");
-        for (int i = 0; i < DiagnosisManagement.getDiagnosisList().size(); i++) {
-            Diagnosis d = DiagnosisManagement.getDiagnosisList().get(i);
-            System.out.printf(">> %s (Patient: %s, Date: %s)\n", 
-                d.getDiagnosisId(), 
+    System.out.println("\n=== Diagnosis Details ===");
+
+    if (DiagnosisManagement.getDiagnosisList().isEmpty()) {
+        System.out.println("No diagnoses record currently.");
+        return;
+    }
+
+    // Display available diagnosis IDs for reference
+    System.out.println("\nAvailable Diagnosis IDs:");
+    System.out.println("------------------------");
+    for (int i = 0; i < DiagnosisManagement.getDiagnosisList().size(); i++) {
+        Diagnosis d = DiagnosisManagement.getDiagnosisList().get(i);
+        System.out.printf(">> %s (Patient: %s, Date: %s)\n",
+                d.getDiagnosisId(),
                 d.getPatientId() != null ? d.getPatientId() : "N/A",
-                d.getDiagnosisDate() != null ? 
-                    new java.text.SimpleDateFormat("dd/MM/yyyy").format(d.getDiagnosisDate()) : "N/A");
-        }
-        System.out.println();
-        
-        System.out.print("Enter Diagnosis ID: ");
-        String diagnosisId = scanner.nextLine().trim();
+                d.getDiagnosisDate() != null
+                        ? new SimpleDateFormat("dd/MM/yyyy").format(d.getDiagnosisDate()) : "N/A");
+    }
+    System.out.println();
 
-        // Validate input
-        if (diagnosisId.isEmpty()) {
-            System.out.println(">> Diagnosis ID cannot be empty. Please try again.");
-            // UtilityClass.pressEnterToContinue();
+    System.out.print("Enter Diagnosis ID: ");
+    String diagnosisId = scanner.nextLine().trim();
+
+    // Validate input
+    if (diagnosisId.isEmpty()) {
+        System.out.println(">> Diagnosis ID cannot be empty. Please try again.");
+        return;
+    }
+
+    // Find the diagnosis
+    Diagnosis diagnosis = DiagnosisManagement.getDiagnosisListById(diagnosisId);
+
+    if (diagnosis == null) {
+        System.out.println(">> No diagnosis found with ID: " + diagnosisId);
+        System.out.println("Please check the available Diagnosis IDs above and try again.");
+        return;
+    }
+
+    // Sort symptoms alphabetically
+    DynamicList<String> symptoms = diagnosis.getSymptoms();
+    if (symptoms != null && !symptoms.isEmpty()) {
+        symptoms.quickSort(String::compareToIgnoreCase); // Assuming `quickSort` is implemented in `DynamicList`
+    }
+
+    // Display diagnosis details
+    System.out.println("\n==============================================================");
+    System.out.printf("Diagnosis ID: %s\n", diagnosis.getDiagnosisId());
+    System.out.printf("Patient ID: %s\n", diagnosis.getPatientId());
+    System.out.printf("Doctor ID: %s\n", diagnosis.getDoctorId());
+    System.out.printf("Diagnosis Date: %s\n",
+            diagnosis.getDiagnosisDate() != null
+                    ? new SimpleDateFormat("dd/MM/yyyy").format(diagnosis.getDiagnosisDate()) : "N/A");
+    System.out.printf("Severity Level: %s\n", diagnosis.getSeverityLevel());
+    System.out.println("Symptoms:");
+    if (symptoms != null && !symptoms.isEmpty()) {
+        for (int i = 0; i < symptoms.size(); i++) {
+            System.out.printf("  [%d] %s\n", i + 1, symptoms.get(i));
+        }
+    } else {
+        System.out.println("  No symptoms recorded.");
+    }
+    System.out.println("==============================================================");
+}
+    // Generate diagnosis statistics report
+    public static void generateDiagnosisStatisticsReport() {
+    System.out.println("\n=== Diagnosis Statistics Report ===");
+
+    // Prompt user to enter the year
+    System.out.print("Enter the year (e.g., 2025): ");
+    String yearInput = scanner.nextLine().trim();
+
+    int year;
+    try {
+        year = Integer.parseInt(yearInput);
+        if (year < 2020 || year > Year.now().getValue()) {
+            System.out.println("Please enter a valid year between 2020 and the current year.");
             return;
         }
+    } catch (NumberFormatException e) {
+        System.out.println("Invalid input. Please enter a valid year.");
+        return;
+    }
 
-        // Find the diagnosis
+    // Prompt user to enter the month
+    System.out.print("Enter the month (01-12): ");
+    String monthInput = scanner.nextLine().trim();
+
+    if (monthInput.length() == 1) {
+        monthInput = "0" + monthInput; // Ensure the month is in two-digit format
+    }
+
+    int month;
+    try {
+        month = Integer.parseInt(monthInput);
+        if (month < 1 || month > 12) {
+            System.out.println("Invalid input. Please enter a month between 01 and 12.");
+            return;
+        }
+    } catch (NumberFormatException e) {
+        System.out.println("Invalid input. Please enter a valid month.");
+        return;
+    }
+
+    // Filter diagnoses by year and month
+    DynamicList<Diagnosis> filteredDiagnoses = DiagnosisManagement.getDiagnosesByYearAndMonth(year, month);
+
+    if (filteredDiagnoses.isEmpty()) {
+        System.out.printf("No diagnoses found for %s %d.\n", new SimpleDateFormat("MMMM").format(new Date(year - 1900, month - 1, 1)), year);
+        return;
+    }
+
+    // Initialize counters for severity levels
+    int lowCount = 0, mediumCount = 0, highCount = 0, criticalCount = 0;
+
+    for (int i = 0; i < filteredDiagnoses.size(); i++) {
+        Diagnosis diagnosis = filteredDiagnoses.get(i);
+        switch (diagnosis.getSeverityLevel().toUpperCase()) {
+            case "LOW" -> lowCount++;
+            case "MEDIUM" -> mediumCount++;
+            case "HIGH" -> highCount++;
+            case "CRITICAL" -> criticalCount++;
+        }
+    }
+
+    // Display the statistics
+    System.out.println("\n==============================================================");
+    System.out.printf("Diagnosis Statistics Report for %s %d\n", new SimpleDateFormat("MMMM").format(new Date(year - 1900, month - 1, 1)), year);
+    System.out.println("==============================================================");
+    System.out.printf("Total Diagnoses: %d\n", filteredDiagnoses.size());
+    System.out.printf("Low Severity: %d\n", lowCount);
+    System.out.printf("Medium Severity: %d\n", mediumCount);
+    System.out.printf("High Severity: %d\n", highCount);
+    System.out.printf("Critical Severity: %d\n", criticalCount);
+    System.out.println("==============================================================");
+}
+
+    public static String displayDiagnosisList() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        StringBuilder sb = new StringBuilder();
+
+        System.out.print("\nEnter Diagnosis ID to view details (or press Enter to exit): ");
+        String diagnosisId = scanner.nextLine();
+
+        if (diagnosisId.isEmpty()) {
+            return "No Diagnosis Available. Exiting Diagnosis Details View.\n"; // Exit if no ID is provided
+        }
+
         Diagnosis diagnosis = DiagnosisManagement.getDiagnosisListById(diagnosisId);
 
         if (diagnosis == null) {
-            System.out.println(">> No diagnosis found with ID: " + diagnosisId);
-            System.out.println("Please check the available Diagnosis IDs above and try again.");
-            // UtilityClass.pressEnterToContinue();
-            return;
+            return "No Diagnosis found with ID: " + diagnosisId + ". Please check the ID and try again.\n";
         }
-
-        diagnosis.toString();
-    }
-
-    // Generate diagnosis statistics report
-    public static void generateDiagnosisStatisticsReport() {
-        System.out.println("\n=== Diagnosis Statistics Report ===");
-        System.out.println("Total Diagnoses: " + DiagnosisManagement.getDiagnosisList().size());
         
-        int lowCount = 0, mediumCount = 0, highCount = 0, criticalCount = 0;
+        sb.append("=================================================================\n");
+        sb.append(">                        MEDICAL DIAGNOSIS                      <\n");
+        sb.append("=================================================================\n");
+        sb.append(String.format("> Diagnosis ID      : %-41s <\n", diagnosis.getDiagnosisId() != null ? diagnosis.getDiagnosisId() : "N/A"));
+        sb.append(String.format("> Patient ID        : %-41s <\n", diagnosis.getPatientId() != null ? diagnosis.getPatientId() : "N/A"));
+        sb.append(String.format("> Doctor ID         : %-41s <\n", diagnosis.getDoctorId() != null ? diagnosis.getDoctorId() : "N/A"));
+        sb.append(String.format("> Diagnosis Date    : %-41s <\n", diagnosis.getDiagnosisDate() != null ? dateFormat.format(diagnosis.getDiagnosisDate()) : "N/A"));
+        sb.append("=================================================================\n");
         
-        for (int i = 0; i < DiagnosisManagement.getDiagnosisList().size(); i++) {
-            Diagnosis diagnosis = DiagnosisManagement.getDiagnosisList().get(i);
-            switch (diagnosis.getSeverityLevel().toUpperCase()) {
-                case "LOW"->
-                    lowCount++;
-                case "MEDIUM"->
-                    mediumCount++;
-                case "HIGH"->
-                    highCount++;
-                case "CRITICAL"->
-                    criticalCount++;
+        // Severity Level with visual indicator
+        String severity = diagnosis.getSeverityLevel();
+        String severityDisplay = DiagnosisManagement.getSeverityDisplay(severity);
+
+        
+
+        sb.append(String.format("> Severity Level    : %-41s <\n", severityDisplay));
+        
+        sb.append("=================================================================\n");
+        
+        // Symptoms
+        sb.append("> Symptoms:                                                    <\n");
+        if (diagnosis.getSymptoms() != null && !diagnosis.getSymptoms().isEmpty()) {
+            for (int i = 0; i < diagnosis.getSymptoms().size(); i++) {
+                sb.append(String.format(">   [%d] %-55s<\n", i + 1, diagnosis.getSymptoms().get(i)));
             }
+        } else {
+            sb.append(">   N/A                                                         <\n");
         }
         
-        System.out.println("Low Severity: " + lowCount);
-        System.out.println("Medium Severity: " + mediumCount);
-        System.out.println("High Severity: " + highCount);
-        System.out.println("Critical Severity: " + criticalCount);
+        sb.append("=================================================================\n");
+        // Diagnosis Description
+        sb.append("> Diagnosis Description:                                        <\n");
+        DiagnosisManagement.appendWrappedText(sb, diagnosis.getDiagnosisDescription());
+        sb.append("=================================================================\n");
+        // Recommendations
+        sb.append("> Recommendations:                                              <\n");
+        DiagnosisManagement.appendWrappedText(sb, diagnosis.getRecommendations());
+        sb.append("=================================================================\n");
+        // Additional Notes
+        sb.append("> Additional Notes:                                             <\n");
+        DiagnosisManagement.appendWrappedText(sb, diagnosis.getNotes());
+        sb.append("=================================================================\n");
+        sb.append(">                        END OF REPORT                          <\n");
+        sb.append("=================================================================\n");
+        sb.append("\n");
+
+
+        return sb.toString();
     }
+    
+    
 
 }

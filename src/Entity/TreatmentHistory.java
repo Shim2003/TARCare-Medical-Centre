@@ -3,7 +3,6 @@ package Entity;
 import ADT.DynamicList;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Scanner;
 
 public class TreatmentHistory {
 
@@ -22,10 +21,12 @@ public class TreatmentHistory {
     private String treatmentAdvice; // Advice given to the patient
     private String notes; // Additional notes
     private DynamicList<MedicalTreatmentItem> medicineList;
+    private String distributionStatus; // Status of medicine distribution (e.g., Pending, Distributed, Cancelled)
 
     public TreatmentHistory(String treatmentId, String consultationId, String patientId, String doctorId,
                             Date treatmentDate, Date followUpDate, String treatmentOutcome, 
-                          String status, String treatmentAdvice,String notes, DynamicList<MedicalTreatmentItem> medicineList) {
+                          String status, String treatmentAdvice,String notes, 
+                          DynamicList<MedicalTreatmentItem> medicineList, String distributionStatus) {
         this.historyId = "HIST" + historyIdCounter++;
         this.treatmentId = treatmentId;
         this.consultationId = consultationId;
@@ -38,13 +39,16 @@ public class TreatmentHistory {
         this.treatmentAdvice = treatmentAdvice;
         this.notes = notes;
         this.medicineList = medicineList;
+        this.distributionStatus = distributionStatus; // Initialize distribution status
     }
 
     public TreatmentHistory(String treatmentId, String consultationId, String patientId, String doctorId,
                           Date treatmentDate, Date followUpDate, String treatmentOutcome, 
-                          String status, String treatmentAdvice, DynamicList<MedicalTreatmentItem> medicineList) {
+                          String status, String treatmentAdvice, DynamicList<MedicalTreatmentItem> medicineList
+                          , String distributionStatus) {
         this.historyId = "HIST" + historyIdCounter++;
         this.treatmentId = treatmentId;
+        this.consultationId = consultationId;
         this.patientId = patientId;
         this.doctorId = doctorId;
         this.treatmentDate = treatmentDate;
@@ -54,6 +58,7 @@ public class TreatmentHistory {
         this.treatmentAdvice = treatmentAdvice;
         this.notes = "";
         this.medicineList = new DynamicList<>();
+        this.distributionStatus = distributionStatus; // Initialize distribution status
     }
 
     // Getters
@@ -73,6 +78,11 @@ public class TreatmentHistory {
         SimpleDateFormat dateFormatter = new SimpleDateFormat("MM");
         return dateFormatter.format(treatmentDate);
     }
+    public String getYear() {
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy");
+        return dateFormatter.format(treatmentDate);
+    }
+    public String getDistributionStatus() { return distributionStatus; }
 
     // Setters
     public void setHistoryId(String historyId) { this.historyId = historyId; }
@@ -87,12 +97,14 @@ public class TreatmentHistory {
     public void setTreatmentAdvice(String treatmentAdvice) { this.treatmentAdvice = treatmentAdvice; }
     public void setNotes(String notes) { this.notes = notes; }
     public void setMedicineList(DynamicList<MedicalTreatmentItem> medicineList) { this.medicineList = medicineList; }
+    public void setDistributionStatus(String distributionStatus) {
+        this.distributionStatus = distributionStatus;
+    }
 
 @Override
 public String toString() {
     StringBuilder sb = new StringBuilder();
     SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy");
-    Scanner scanner = new Scanner(System.in);
     
     sb.append("==================================================================\n");
     sb.append(">                    TREATMENT HISTORY RECORD                    <\n");
@@ -154,8 +166,14 @@ public String toString() {
         sb.append("> No medications prescribed                                      <\n");
     }
     
-    sb.append("==================================================================");
-    
+    sb.append("==================================================================\n");
+
+    sb.append("> Distribution Status: ");
+    if (distributionStatus != null && !distributionStatus.trim().isEmpty()) {
+        sb.append(String.format("%-62s <\n", distributionStatus));
+    } else {
+        sb.append("Not specified                                                 <\n");
+    }
     return sb.toString();
 }
 // Helper method to wrap long text into multiple lines
