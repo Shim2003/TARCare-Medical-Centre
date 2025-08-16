@@ -26,19 +26,11 @@ public class Prescription {
         this.status = "PENDING";
     }
     
-    // Updated method - removed quantityNeeded parameter since it's now calculated
     public void addMedicineItem(String medicineName, String dosage, String frequency, 
                                String duration, String method) {
         MedicalTreatmentItem item = new MedicalTreatmentItem(medicineName, dosage, frequency, 
                                                            duration, method);
         medicineItems.add(item);
-    }
-    
-    // Overloaded method for backward compatibility with existing code
-    public void addMedicineItem(String medicineName, String dosage, String frequency, 
-                               String duration, String method, int ignoredQuantity) {
-        // The quantity parameter is ignored since we calculate it from dosage info
-        addMedicineItem(medicineName, dosage, frequency, duration, method);
     }
     
     // Getters and Setters
