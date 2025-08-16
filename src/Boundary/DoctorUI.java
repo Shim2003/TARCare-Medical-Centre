@@ -32,11 +32,11 @@ public class DoctorUI {
         DoctorManagement.addSampleDoctor();
         //
 
-        DoctorMenu();
+        DoctorModuleMenu();
 //        testing();
     }
 
-    public static void DoctorMenu() {
+    public static void DoctorModuleMenu() {
 
         boolean validOption = false;
 
@@ -65,20 +65,16 @@ public class DoctorUI {
         }
 
     }
-
-    public static void AdminMode() {
-
+    
+    public static void AdminMode(){
         boolean validOption = false;
 
         while (!validOption) {
             System.out.println("--- Welcome Admin ---");
-            System.out.println("1. Check All Doctors");
-            System.out.println("2. Check Schedules");
-            System.out.println("3. Register a new doctor");
-            System.out.println("4. Edit Doctors detail");
-            System.out.println("5. Add a new schedule");
-            System.out.println("6. Apply Leave(s)");
-            System.out.println("7. Back");
+            System.out.println("1. Manage Doctors");
+            System.out.println("2. Manage Schedules");
+            System.out.println("3. Manage Leaves");
+            System.out.println("4. Back");
             System.out.print("Enter your choice: ");
 
             String choice = scanner.nextLine();
@@ -86,11 +82,11 @@ public class DoctorUI {
             switch (choice) {
                 case "1":
                     validOption = true;
-                    DisplayAllDoctors();
+                    ManageDoctor();
                     break;
                 case "2":
                     validOption = true;
-                    System.out.println("check doctors");
+                    ManageSchedule();
                     break;
                 case "3":
                     validOption = true;
@@ -98,18 +94,8 @@ public class DoctorUI {
                     break;
                 case "4":
                     validOption = true;
-                    editDoctorDetailsUI();
+                    DoctorModuleMenu();
                     break;
-                case "5":
-                    validOption = true;
-                    System.out.println("check doctors");
-                    break;
-                case "6":
-                    validOption = true;
-                    break;
-                case "7":
-                    validOption = true;
-                    DoctorMenu();
                 default:
                     System.out.println("Invalid Option!!! Pls try again");
                     UtilityClass.pressEnterToContinue();
@@ -142,7 +128,7 @@ public class DoctorUI {
                     break;
                 case "3":
                     validOption = true;
-                    DoctorMenu();
+                    DoctorModuleMenu();
                 default:
                     System.out.println("Invalid Option!!! Pls try again");
                     UtilityClass.pressEnterToContinue();
@@ -150,6 +136,133 @@ public class DoctorUI {
 
         }
 
+    }
+    
+     public static void ManageDoctor() {
+
+        boolean validOption = false;
+
+        while (!validOption) {
+            System.out.println("--- Welcome Admin ---");
+            System.out.println("1. Check All Doctors");
+            System.out.println("2. Register a new doctor");
+            System.out.println("3. Edit Doctor(s) detail");
+            System.out.println("4. Remove Doctor(s)");
+            System.out.println("5. Back");
+            System.out.print("Enter your choice: ");
+
+            String choice = scanner.nextLine();
+
+            switch (choice) {
+                case "1":
+                    validOption = true;
+                    DisplayAllDoctors();
+                    break;
+                case "2":
+                    validOption = true;
+                    System.out.println("check doctors");
+                    break;
+                case "3":
+                    validOption = true;
+                    editDoctorDetailsUI();
+                    break;
+                case "4":
+                    validOption = true;
+                    System.out.println("delete");
+                    break;
+                case "5":
+                    validOption = true;
+                    AdminMode();
+                    break;
+                default:
+                    System.out.println("Invalid Option!!! Pls try again");
+                    UtilityClass.pressEnterToContinue();
+            }
+
+        }
+    }
+     
+     public static void ManageSchedule() {
+
+        boolean validOption = false;
+
+        while (!validOption) {
+            System.out.println("--- Welcome Admin ---");
+            System.out.println("1. Check Timetable");
+            System.out.println("2. Add a new schedule");
+            System.out.println("3. Edit Schedule(s) detail");
+            System.out.println("4. Remove Schedule(s)");
+            System.out.println("5. Back");
+            System.out.print("Enter your choice: ");
+
+            String choice = scanner.nextLine();
+
+            switch (choice) {
+                case "1":
+                    validOption = true;
+                    DisplayAllTimetable();
+                    break;
+                case "2":
+                    validOption = true;
+                    System.out.println("");
+                    break;
+                case "3":
+                    validOption = true;
+                    System.out.println("");
+                    break;
+                case "4":
+                    validOption = true;
+                    System.out.println("");
+                    break;
+                case "5":
+                    validOption = true;
+                    AdminMode();
+                    break;
+                default:
+                    System.out.println("Invalid Option!!! Pls try again");
+                    UtilityClass.pressEnterToContinue();
+            }
+
+        }
+    }
+     
+     public static void ManageLeave() {
+
+        boolean validOption = false;
+
+        while (!validOption) {
+            System.out.println("--- Welcome Admin ---");
+            System.out.println("1. Check Leave(s)");
+            System.out.println("2. Apply Leave(s)");
+            System.out.println("3. Remove Leave(s)");
+            System.out.println("4. Back");
+            System.out.print("Enter your choice: ");
+
+            String choice = scanner.nextLine();
+
+            switch (choice) {
+                case "1":
+                    validOption = true;
+                    System.out.println("");
+                    break;
+                case "2":
+                    validOption = true;
+                    System.out.println("");
+                    break;
+                case "3":
+                    validOption = true;
+                    System.out.println("");
+                    break;
+                case "4":
+                    validOption = true;
+                    AdminMode();
+                    break;
+                default:
+                    System.out.println("Invalid Option!!! Pls try again");
+                    UtilityClass.pressEnterToContinue();
+            }
+
+        }
     }
 
     public static void DisplayAllDoctors() {
