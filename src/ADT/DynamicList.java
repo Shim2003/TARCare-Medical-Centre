@@ -2,9 +2,9 @@ package ADT;
 
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.Objects;
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
@@ -347,6 +347,7 @@ public class DynamicList<T> implements MyList<T> {
     medicines.quickSort(Comparator.comparing(m -> ((Medicine) m).getName()));
 
      */
+    
     // clone method that create a deep copy of the list, save a snapshot of the current state before any modifications
     @SuppressWarnings("unchecked")
     @Override

@@ -57,7 +57,7 @@ public class DiagnosisManagement {
     }
 
     //update diagnosis details
-    public static boolean updateDiagnosisDetails(String diagnosisId, Diagnosis newDiagnosis) {
+    public static boolean   updateDiagnosisDetails(String diagnosisId, Diagnosis newDiagnosis) {
         Diagnosis existingDiagnosis = findDiagnosisById(diagnosisId);
         if (existingDiagnosis != null) {
             existingDiagnosis.setPatientId(newDiagnosis.getPatientId());

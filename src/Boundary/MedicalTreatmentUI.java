@@ -141,7 +141,7 @@ public class MedicalTreatmentUI {
 
         // Create a new MedicalTreatment object
         MedicalTreatment treatment = new MedicalTreatment(consultationId, patientId, doctorId,
-                treatmentDate, "Active", treatmentAdvice, medicineList, "Pending");
+                treatmentDate, "Active", treatmentAdvice, medicineList);
 
         // Add the new MedicalTreatment object to the treatmentList
         MedicalTreatmentManagement.addMedicalTreatment(treatment);
@@ -149,7 +149,7 @@ public class MedicalTreatmentUI {
         String notes = "Patient responded well to initial consultation. No allergic reactions reported.";
 
         TreatmentHistory history = new TreatmentHistory(treatment.getTreatmentId(), consultationId, patientId, doctorId,
-                treatmentDate, null, "Ongoing", "Active", treatmentAdvice, notes, medicineList);
+                treatmentDate, null, "Ongoing", "Active", treatmentAdvice, notes, medicineList, "Pending");
 
         // Add the new TreatmentHistory object to the historyList
         MedicalTreatmentManagement.addTreatmentHistory(history);
@@ -253,14 +253,14 @@ public class MedicalTreatmentUI {
 
         // Create a new MedicalTreatment object
         MedicalTreatment treatment = new MedicalTreatment(consultationId, patientId, doctorId,
-                treatmentDate, "Active", treatmentAdvice, medicineList, "Pending");
+                treatmentDate, "Active", treatmentAdvice, medicineList);
 
         // Add the new MedicalTreatment object to the treatmentList
         MedicalTreatmentManagement.addMedicalTreatment(treatment);
 
         // Create treatment history
         TreatmentHistory history = new TreatmentHistory(treatment.getTreatmentId(), consultationId, patientId, doctorId,
-                treatmentDate, null, "Ongoing", "Active", treatmentAdvice, medicineList);
+                treatmentDate, null, "Ongoing", "Active", treatmentAdvice, medicineList, "Pending");
 
         // Add the new TreatmentHistory object to the historyList
         MedicalTreatmentManagement.addTreatmentHistory(history);
