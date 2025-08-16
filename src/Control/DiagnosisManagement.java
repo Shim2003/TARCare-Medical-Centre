@@ -6,7 +6,9 @@ package Control;
 
 import ADT.DynamicList;
 import Entity.Diagnosis;
+import java.util.Date;
 import java.util.Iterator;
+
 
 /**
  *
@@ -79,5 +81,60 @@ public class DiagnosisManagement {
     // display the all diagnosis list based on diagnosis ID
     public static DynamicList<Diagnosis> getDiagnosisList() {
         return diagnosisList;
+    }
+
+    public static String getSeverityDisplay(String severityLevel) {
+        if (severityLevel == null) return "N/A";
+        
+        switch (severityLevel.toUpperCase()) {
+            case "LOW":
+                return severityLevel + " !";
+            case "MEDIUM":
+                return severityLevel + " !!";
+            case "HIGH":
+                return severityLevel + " !!!";
+            case "CRITICAL":
+                return severityLevel + " !!!!";
+            default:
+                return severityLevel;
+        }
+    }
+
+    public static void appendWrappedText(StringBuilder sb, String text) {
+        if (text == null || text.trim().isEmpty()) {
+            sb.append(">   N/A                                                         <\n");
+            return;
+        }
+        
+        String[] words = text.split(" ");
+        StringBuilder line = new StringBuilder(">   ");
+        
+        for (String word : words) {
+            if (line.length() + word.length() + 1 > 63) {
+                sb.append(String.format("%-63s <\n", line.toString()));
+                line = new StringBuilder(">   ");
+            }
+            line.append(word).append(" ");
+        }
+        
+        if (line.length() > 4) {
+            sb.append(String.format("%-63s <\n", line.toString().trim()));
+        }
+    }
+
+    public static DynamicList<Diagnosis> getDiagnosesByYearAndMonth(int year, int month) {
+    DynamicList<Diagnosis> filteredDiagnoses = new DynamicList<>();
+        for (int i = 0; i < diagnosisList.size(); i++) {
+            Diagnosis diagnosis = diagnosisList.get(i);
+            Date diagnosisDate = diagnosis.getDiagnosisDate();
+            if (diagnosisDate != null) {
+                int diagnosisYear = diagnosisDate.getYear() + 1900;
+                int diagnosisMonth = diagnosisDate.getMonth() + 1;
+                if (diagnosisYear == year && diagnosisMonth == month) {
+                    filteredDiagnoses.add(diagnosis);
+                }
+            }
+        }
+        return filteredDiagnoses;
     }
 }

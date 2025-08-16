@@ -129,4 +129,23 @@ public class MedicalTreatmentManagement {
         }
         return monthlyTreatments;
     }
+
+    // method to call in order to set the treatment history status
+    public static void setDistributionStatusToCompleted(String treatmentId) {
+        if (distributionStatus(treatmentId, "Completed")) {
+            System.out.println("Distribution status set to Completed for treatment ID: " + treatmentId);
+        } else {
+            System.out.println("Failed to set distribution status for treatment ID: " + treatmentId);
+        }
+    }
+
+    // set the distribution status to completed
+    private static boolean distributionStatus(String treatmentId, String status) {
+        TreatmentHistory history = getTreatmentHistoryById(treatmentId);
+        if (history != null) {
+            history.setDistributionStatus(status);
+            return true;
+        }
+        return false;
+    }
 }
