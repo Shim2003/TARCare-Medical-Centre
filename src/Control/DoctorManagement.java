@@ -74,15 +74,19 @@ public class DoctorManagement {
     }
 
     //remove
+//    public static boolean removeDoctorById(String doctorID) {
+//        for (int i = 0; i < doctorList.size(); i++) {
+//            Doctor d = doctorList.get(i);
+//            if (d.getDoctorID().equals(doctorID)) {
+//                doctorList.remove(i);
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
+    
     public static boolean removeDoctorById(String doctorID) {
-        for (int i = 0; i < doctorList.size(); i++) {
-            Doctor d = doctorList.get(i);
-            if (d.getDoctorID().equals(doctorID)) {
-                doctorList.remove(i);
-                return true;
-            }
-        }
-        return false;
+        return doctorList.removeIf(d -> d.getDoctorID().equalsIgnoreCase(doctorID.trim()));
     }
 
     //Read

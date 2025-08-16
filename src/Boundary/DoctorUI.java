@@ -287,6 +287,7 @@ public class DoctorUI {
         System.out.println("Total of " + doctorList.size() + " doctor(s)");
 
         UtilityClass.pressEnterToContinue();
+        ManageDoctor();
 
     }
 
