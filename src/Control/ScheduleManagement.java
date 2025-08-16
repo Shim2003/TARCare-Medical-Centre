@@ -42,6 +42,10 @@ public class ScheduleManagement {
         }
         return false;
     }
+    
+    public static boolean removeScheduleByDoctorId(String doctorID) {
+        return scheduleList.removeIf(s -> s.getDoctorID().equalsIgnoreCase(doctorID.trim()));
+    }
 
     // Find schedules for a specific doctor
     public static DynamicList<Schedule> findSchedulesByDoctorId(String doctorID) {

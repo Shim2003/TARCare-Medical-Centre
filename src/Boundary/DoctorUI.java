@@ -11,9 +11,11 @@ import Control.ScheduleManagement;
 import Entity.Doctor;
 import Entity.Schedule;
 import Utility.UtilityClass;
+import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Date;
 import java.util.Scanner;
 
 /**
@@ -41,7 +43,7 @@ public class DoctorUI {
         boolean validOption = false;
 
         while (!validOption) {
-            System.out.println("--- Welcome to TAR UMT Clinic Doctor Management System ---");
+            System.out.println("\n--- Welcome to TAR UMT Clinic Doctor Management System ---");
             System.out.println("Select a mode");
             System.out.println("1. Patients/User");
             System.out.println("2. Admin\n");
@@ -65,12 +67,12 @@ public class DoctorUI {
         }
 
     }
-    
-    public static void AdminMode(){
+
+    public static void AdminMode() {
         boolean validOption = false;
 
         while (!validOption) {
-            System.out.println("--- Welcome Admin ---");
+            System.out.println("\n--- Welcome Admin ---");
             System.out.println("1. Manage Doctors");
             System.out.println("2. Manage Schedules");
             System.out.println("3. Manage Leaves");
@@ -109,7 +111,7 @@ public class DoctorUI {
         boolean validOption = false;
 
         while (!validOption) {
-            System.out.println("--- Welcome ---");
+            System.out.println("\n--- Welcome ---");
             System.out.println("1. Check Doctors");
             System.out.println("2. Check Schedules");
             System.out.println("3. Back");
@@ -137,13 +139,13 @@ public class DoctorUI {
         }
 
     }
-    
-     public static void ManageDoctor() {
+
+    public static void ManageDoctor() {
 
         boolean validOption = false;
 
         while (!validOption) {
-            System.out.println("--- Welcome Admin ---");
+            System.out.println("\n--- Welcome Admin ---");
             System.out.println("1. Check All Doctors");
             System.out.println("2. Register a new doctor");
             System.out.println("3. Edit Doctor(s) detail");
@@ -160,7 +162,7 @@ public class DoctorUI {
                     break;
                 case "2":
                     validOption = true;
-                    System.out.println("check doctors");
+                    addDoctorUI();
                     break;
                 case "3":
                     validOption = true;
@@ -181,13 +183,13 @@ public class DoctorUI {
 
         }
     }
-     
-     public static void ManageSchedule() {
+
+    public static void ManageSchedule() {
 
         boolean validOption = false;
 
         while (!validOption) {
-            System.out.println("--- Welcome Admin ---");
+            System.out.println("\n--- Welcome Admin ---");
             System.out.println("1. Check Timetable");
             System.out.println("2. Add a new schedule");
             System.out.println("3. Edit Schedule(s) detail");
@@ -225,13 +227,13 @@ public class DoctorUI {
 
         }
     }
-     
-     public static void ManageLeave() {
+
+    public static void ManageLeave() {
 
         boolean validOption = false;
 
         while (!validOption) {
-            System.out.println("--- Welcome Admin ---");
+            System.out.println("\n--- Welcome Admin ---");
             System.out.println("1. Check Leave(s)");
             System.out.println("2. Apply Leave(s)");
             System.out.println("3. Remove Leave(s)");
@@ -284,13 +286,15 @@ public class DoctorUI {
 
         System.out.println("Total of " + doctorList.size() + " doctor(s)");
 
+        UtilityClass.pressEnterToContinue();
+
     }
 
     public static void DisplayAllSchedules() {
 
         DynamicList<Schedule> schedulesList = ScheduleManagement.getAllSchedules();
 
-        System.out.println("-------------------------------------------------------------------");
+        System.out.println("\n-------------------------------------------------------------------");
         System.out.printf("%-10s %-10s %-12s %-10s %-10s%n",
                 "SchedID", "DoctorID", "Day", "Start", "End");
         System.out.println("-------------------------------------------------------------------");
@@ -354,57 +358,226 @@ public class DoctorUI {
 
     }
 
+    public static void addDoctorUI() {
+        Scanner sc = new Scanner(System.in);
+
+        try {
+            System.out.println("\n=== Register New Doctor ===");
+
+            // Doctor ID (not empty)
+            String doctorID;
+            while (true) {
+                System.out.print("Enter Doctor ID: ");
+                doctorID = sc.nextLine().trim();
+                if (!doctorID.isEmpty()) {
+                    break;
+                }
+                System.out.println("❌ Doctor ID cannot be empty!");
+            }
+
+            // Name (not empty, not only spaces)
+            String name;
+            while (true) {
+                System.out.print("Enter Doctor Name: ");
+                name = sc.nextLine().trim();
+                if (!name.isEmpty()) {
+                    break;
+                }
+                System.out.println("❌ Name cannot be empty!");
+            }
+
+            // Date of Birth (must follow yyyy-MM-dd)
+            Date dateOfBirth = null;
+            while (true) {
+                System.out.print("Enter Date of Birth (yyyy-MM-dd): ");
+                String dobInput = sc.nextLine().trim();
+                try {
+                    dateOfBirth = new SimpleDateFormat("yyyy-MM-dd").parse(dobInput);
+                    break;
+                } catch (Exception e) {
+                    System.out.println("❌ Invalid date format. Please use yyyy-MM-dd.");
+                }
+            }
+
+            // Gender (only 1 char, M/F)
+            char gender;
+            while (true) {
+                System.out.print("Enter Gender (M/F): ");
+                String genderInput = sc.nextLine().trim().toUpperCase();
+                if (genderInput.length() == 1 && (genderInput.charAt(0) == 'M' || genderInput.charAt(0) == 'F')) {
+                    gender = genderInput.charAt(0);
+                    break;
+                }
+                System.out.println("❌ Invalid gender. Enter M or F only.");
+            }
+
+            // Contact number (digits only)
+            String contactNumber;
+            while (true) {
+                System.out.print("Enter Contact Number: ");
+                contactNumber = sc.nextLine().trim();
+                if (contactNumber.matches("\\d+")) {
+                    break;
+                }
+                System.out.println("❌ Contact number must contain digits only.");
+            }
+
+            // Email (basic format check)
+            String email;
+            while (true) {
+                System.out.print("Enter Email: ");
+                email = sc.nextLine().trim();
+                if (email.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$")) {
+                    break;
+                }
+                System.out.println("❌ Invalid email format. Example: doctor@example.com");
+            }
+
+            // Qualification (not empty)
+            String qualification;
+            while (true) {
+                System.out.print("Enter Qualification: ");
+                qualification = sc.nextLine().trim();
+                if (!qualification.isEmpty()) {
+                    break;
+                }
+                System.out.println("❌ Qualification cannot be empty!");
+            }
+
+            // Default working status
+            String workingStatus = "Off";
+
+            // Create new Doctor object
+            Doctor newDoctor = new Doctor(
+                    doctorID,
+                    name,
+                    dateOfBirth,
+                    gender,
+                    contactNumber,
+                    email,
+                    qualification,
+                    workingStatus
+            );
+
+            // Add doctor using add() method
+            if (DoctorManagement.add(newDoctor)) {
+                System.out.println("Doctor registered successfully!");
+                UtilityClass.pressEnterToContinue();
+                ManageDoctor();
+            } else {
+                System.out.println("Failed to register doctor. Try again.");
+                UtilityClass.pressEnterToContinue();
+                ManageDoctor();
+            }
+
+        } catch (Exception e) {
+            System.out.println("Error while registering doctor: " + e.getMessage());
+        }
+    }
+
     public static void editDoctorDetailsUI() {
         Scanner scanner = new Scanner(System.in);
 
-        System.out.print("Enter Doctor ID to edit: ");
-        String doctorID = scanner.nextLine();
+        Doctor doctor = null;
+        String doctorID;
 
-        Doctor doctor = DoctorManagement.findDoctorById(doctorID);
-        if (doctor == null) {
-            System.out.println("Doctor not found!");
-            return;
+        while (true) {
+            System.out.print("Enter Doctor ID to edit (or 'x' to cancel): ");
+            doctorID = scanner.nextLine().trim();
+
+            if (doctorID.equalsIgnoreCase("x")) {
+                System.out.println("❎ Edit cancelled.");
+                return; // exit UI
+            }
+
+            // Normalize: trim + uppercase
+            doctorID = doctorID.toUpperCase();
+
+            doctor = DoctorManagement.findDoctorById(doctorID);
+            if (doctor != null) {
+                break; // found doctor, continue to editing
+            }
+
+            System.out.println("❌ Doctor not found! Please try again.");
         }
 
         System.out.println("Type 'xxx' to keep the current value.");
 
-        // Name
-        System.out.print("Name (" + doctor.getName() + "): ");
-        String name = scanner.nextLine();
-        if (name.equalsIgnoreCase("xxx")) {
-            name = doctor.getName();
+        // === Name ===
+        String name;
+        while (true) {
+            System.out.print("Name (" + doctor.getName() + "): ");
+            name = scanner.nextLine().trim();
+            if (name.equalsIgnoreCase("xxx")) {
+                name = doctor.getName();
+                break;
+            }
+            if (!name.isEmpty()) {
+                break;
+            }
+            System.out.println("❌ Name cannot be empty!");
         }
 
-        // Contact Number
-        System.out.print("Contact Number (" + doctor.getContactNumber() + "): ");
-        String contactNumber = scanner.nextLine();
-        if (contactNumber.equalsIgnoreCase("xxx")) {
-            contactNumber = doctor.getContactNumber();
+        // === Contact Number ===
+        String contactNumber;
+        while (true) {
+            System.out.print("Contact Number (" + doctor.getContactNumber() + "): ");
+            contactNumber = scanner.nextLine().trim();
+            if (contactNumber.equalsIgnoreCase("xxx")) {
+                contactNumber = doctor.getContactNumber();
+                break;
+            }
+            if (contactNumber.matches("\\d+")) {
+                break;
+            }
+            System.out.println("❌ Contact number must contain digits only.");
         }
 
-        // Email
-        System.out.print("Email (" + doctor.getEmail() + "): ");
-        String email = scanner.nextLine();
-        if (email.equalsIgnoreCase("xxx")) {
-            email = doctor.getEmail();
+        // === Email ===
+        String email;
+        while (true) {
+            System.out.print("Email (" + doctor.getEmail() + "): ");
+            email = scanner.nextLine().trim();
+            if (email.equalsIgnoreCase("xxx")) {
+                email = doctor.getEmail();
+                break;
+            }
+            if (email.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$")) {
+                break;
+            }
+            System.out.println("❌ Invalid email format. Example: doctor@example.com");
         }
 
-        // Qualifications
-        System.out.print("Qualifications (" + doctor.getQualification() + "): ");
-        String qualifications = scanner.nextLine();
-        if (qualifications.equalsIgnoreCase("xxx")) {
-            qualifications = doctor.getQualification();
+        // === Qualifications ===
+        String qualifications;
+        while (true) {
+            System.out.print("Qualifications (" + doctor.getQualification() + "): ");
+            qualifications = scanner.nextLine().trim();
+            if (qualifications.equalsIgnoreCase("xxx")) {
+                qualifications = doctor.getQualification();
+                break;
+            }
+            if (!qualifications.isEmpty()) {
+                break;
+            }
+            System.out.println("❌ Qualification cannot be empty!");
         }
 
-        // Call your existing edit method
-        boolean success = DoctorManagement.editDoctorDetails(doctorID, name, contactNumber, email, qualifications);
+        // Call edit method
+        boolean success = DoctorManagement.editDoctorDetails(
+                doctorID,
+                name,
+                contactNumber,
+                email,
+                qualifications
+        );
 
         if (success) {
-            System.out.println("Doctor details updated successfully.");
+            System.out.println(" Doctor details updated successfully.");
             UtilityClass.pressEnterToContinue();
             AdminMode();
         } else {
-            System.out.println("Failed to update doctor details.");
+            System.out.println(" Failed to update doctor details.");
         }
     }
 
