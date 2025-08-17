@@ -207,6 +207,6 @@ private String[] wrapText(String text, int maxWidth) {
         lines.add(currentLine.toString());
     }
     
-    return lines.toArray(new String[0]);
-}
+        return lines.toArray(new String[0]);
+    }
 } 
