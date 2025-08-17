@@ -5,6 +5,7 @@
 package Control;
 
 import java.util.Scanner;
+import java.util.Iterator;
 import ADT.DynamicList;
 import DAO.CurrentServingDAO;
 import Entity.QueueEntry;
@@ -12,10 +13,16 @@ import Entity.Patient;
 import Entity.Doctor;
 import Entity.Consultation;
 import Entity.Appointment;
+import Entity.Schedule;
 import Utility.UtilityClass;
+import Control.PatientManagement;
+import Control.ScheduleManagement;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.LocalTime;
+import java.time.LocalDate;
+import java.time.DayOfWeek;
 
 /**
  *
@@ -25,6 +32,7 @@ public class ConsultationManagement {
 
     private static DynamicList<Patient> completedPatients = new DynamicList<>();
     private DynamicList<Appointment> scheduledAppointments = new DynamicList<>();
+    private DynamicList<CurrentServingDAO> currentConsulting = new DynamicList<>();
 
     // 计数器
     private static int appointmentCounter = 1001; // A1001
@@ -60,134 +68,178 @@ public class ConsultationManagement {
             }
         }
     }
-
-    // 开始下一位咨询
-    public void startNextConsultation(String doctorId) {
-
-        DynamicList<CurrentServingDAO> currentServingPatient = QueueControl.getCurrentServingPatient();
-        CurrentServingDAO patientBeingServed = currentServingPatient.findFirst(csp -> csp.getDoctorId().equals(doctorId));
-
-        if (patientBeingServed == null) {
-            System.out.println("No patient served by " + doctorId);
-            return;
-        }
-
-        Patient patient = PatientManagement.findPatientById(patientBeingServed.getPatientId());
-        Doctor doctor = DoctorManagement.findDoctorById(doctorId);
-
-        if ((patient == null) && (doctor == null)) {
-            System.out.println("No patient and doctor");
-            return;
-        }
-
-        // 打印所有医生状态（调试用）
-        System.out.println("\n=== Consult Details ===");
-        System.out.println("Consulting Patient : ");
-        System.out.println("ID : " + patient.getPatientID());
-        System.out.println("Name : " + patient.getFullName());
-
-        String consultationId = generateNextConsultationId();
-
-        Consultation consultation = new Consultation(
-                consultationId,
-                patient.getPatientID(),
-                doctor.getDoctorID(),
-                "", // symptoms
-                "" // diagnosis
-        );
-        consultation.setStartTime(LocalDateTime.now()); // 记录开始咨询时间
-        Consultation.setCurrentConsultation(consultation);
-
-        System.out.println("Doctor ID: " + doctor.getDoctorID()
-                + " (" + doctor.getName() + ")\n"
-                + " started consultation for Patient ID: "
-                + patient.getPatientID()
-                + ", Name: " + patient.getFullName());
-
-        System.out.println("Consultation Start Time: " + consultation.getStartTime());
-
-        // 更新医生状态
-        System.out.println("Updated Doctor Status: " 
-                + doctor.getName()
-                + " is now "
-                + doctor.getWorkingStatus());
-
-        // 打印所有医生状态（调试用）
-        System.out.println("\n=== All Doctors Status After Assignment ===");
+    
+    private void printAllDoctorsStatus(String header) {
+        System.out.println("\n=== " + header + " ===");
         DynamicList<Doctor> allDoctors = DoctorManagement.getAllDoctors();
         for (int i = 0; i < allDoctors.size(); i++) {
             Doctor d = allDoctors.get(i);
-            System.out.println(d.getDoctorID() + " - " + d.getName()
-                    + " : " + d.getWorkingStatus());
+            System.out.println(d.getDoctorID() + " - " + d.getName() + " : " + d.getWorkingStatus());
         }
         System.out.println("==========================\n");
     }
 
+    // 开始下一位咨询
+    public void startNextConsultation() {
+    printAllDoctorsStatus("All Doctors Status Before Assignment");
+
+    // 获取下一个等待的病人
+    QueueEntry nextPatient = null;
+    DynamicList<QueueEntry> queueList = QueueControl.getQueueList();
+    for (int i = 0; i < queueList.size(); i++) {
+        QueueEntry qe = queueList.get(i);
+        if (qe.getStatus().equals(UtilityClass.statusWaiting)) {
+            nextPatient = qe;
+            break;
+        }
+    }
+
+    if (nextPatient == null) {
+        System.out.println("No patients waiting or no free doctors available.");
+        return;
+    }
+
+    // 分配空闲医生
+    DynamicList<Doctor> freeDoctors = DoctorManagement.getFreeDoctors();
+    if (freeDoctors.isEmpty()) {
+        System.out.println("No free doctors available. Please wait.");
+        return;
+    }
+
+    Doctor assignedDoctor = freeDoctors.get(0); // 取第一个空闲医生
+    assignedDoctor.setWorkingStatus(UtilityClass.statusConsulting); // 更新医生状态
+
+    // 创建当前咨询记录
+    CurrentServingDAO current = new CurrentServingDAO(nextPatient.getPatientId(), assignedDoctor.getDoctorID());
+    QueueControl.getCurrentServingPatient().add(current); // 添加到当前咨询列表
+
+    // 更新 QueueEntry 状态
+    nextPatient.setStatus(UtilityClass.statusConsulting);
+
+    // 创建 Consultation 对象
+    Patient patient = PatientManagement.findPatientById(nextPatient.getPatientId());
+    if (patient != null) {
+        String consultationId = generateNextConsultationId();
+        Consultation consultation = new Consultation(
+            consultationId,
+            patient.getPatientID(),
+            assignedDoctor.getDoctorID(),
+            "", // symptoms
+            ""  // diagnosis
+        );
+        consultation.setStartTime(LocalDateTime.now());
+        Consultation.setCurrentConsultation(consultation);
+
+        System.out.println("Doctor ID: " + assignedDoctor.getDoctorID() 
+            + " (" + assignedDoctor.getName() + ")\n" 
+            + " started consultation for Patient ID: " 
+            + patient.getPatientID() 
+            + ", Name: " + patient.getFullName());
+        System.out.println("Consultation Start Time: " + consultation.getStartTime());
+        System.out.println("Updated Doctor Status: " + assignedDoctor.getName() 
+            + " is now " + assignedDoctor.getWorkingStatus());
+    } else {
+        System.out.println("Patient data not found.");
+    }
+
+    // 打印所有医生状态（调试用）
+    printAllDoctorsStatus("All Doctors Status After Assignment");
+}
+
+
+
+
+
+
+    // --- 查看当前咨询 ---
     public void viewCurrentConsulting() {
-        var consultingList = QueueControl.getCurrentServingPatient();
-        if (consultingList.isEmpty()) {
+        if (currentConsulting.size() == 0) {
             System.out.println("No patients currently consulting.");
+            return;
+        }
+
+        System.out.println("\n--- Consulting Patients ---");
+        for (int i = 0; i < currentConsulting.size(); i++) {
+            CurrentServingDAO cs = currentConsulting.get(i);
+            Patient p = PatientManagement.findPatientById(cs.getPatientId());
+            Doctor d = DoctorManagement.findDoctorById(cs.getDoctorId());
+
+            String patientName = (p != null) ? p.getFullName() : "Unknown Patient";
+            String doctorName = (d != null) ? d.getName() : "Unknown Doctor";
+
+            System.out.println("Patient: " + patientName + " (ID: " + cs.getPatientId() + ")"
+                    + " | Doctor: " + doctorName + " (ID: " + cs.getDoctorId() + ")");
+        }
+    }
+
+    
+    // 结束咨询并保存病人信息
+    public void endConsultation(String patientId) {
+        // 找队列中的病人
+        QueueEntry queueEntry = null;
+        DynamicList<QueueEntry> queueList = QueueControl.getQueueList();
+        for (int i = 0; i < queueList.size(); i++) {
+            QueueEntry qe = queueList.get(i);
+            if (qe.getPatientId().equals(patientId) && qe.getStatus().equals(UtilityClass.statusConsulting)) {
+                queueEntry = qe;
+                break;
+            }
+        }
+
+        if (queueEntry == null) {
+            System.out.println("No ongoing consultation found for Patient ID: " + patientId);
+            return;
+        }
+
+        queueEntry.setStatus(UtilityClass.statusCompleted);
+        System.out.println("Consultation ended for Patient ID: " + patientId);
+
+        Consultation consultation = Consultation.getCurrentConsultation();
+        if (consultation != null && consultation.getPatientId().equals(patientId)) {
+            consultation.setEndTime(LocalDateTime.now());
+            System.out.println("Consultation End Time: " + UtilityClass.formatLocalDateTime(consultation.getEndTime()));
+        }
+
+        Patient patient = PatientManagement.findPatientById(patientId);
+        if (patient != null) {
+            completedPatients.add(patient);
+            System.out.println("Patient info saved to completed consultations.");
         } else {
-            System.out.println("\n--- Consulting Patients ---");
-            for (int i = 0; i < consultingList.size(); i++) {
-                CurrentServingDAO cs = consultingList.get(i);
-                Patient p = PatientManagement.findPatientById(cs.getPatientId());
-                Doctor d = DoctorManagement.findDoctorById(cs.getDoctorId());
+            System.out.println("Warning: Patient data not found to save.");
+        }
 
-                String patientId = (p != null) ? p.getPatientID() : "Unknown ID";
-                String patientName = (p != null) ? p.getFullName() : "Unknown Patient";
-                String doctorId = (d != null) ? d.getDoctorID() : "Unknown ID";
-                String doctorName = (d != null) ? d.getName() : "Unknown Doctor";
+        // 用 currentConsulting 管理医生状态
+        CurrentServingDAO current = null;
+        for (int i = 0; i < currentConsulting.size(); i++) {
+            CurrentServingDAO cs = currentConsulting.get(i);
+            if (cs.getPatientId().equals(patientId)) {
+                current = cs;
+                break;
+            }
+        }
 
-                System.out.printf("%d. Patient: %s (%s) - Doctor: %s (%s)%n",
-                        i + 1, patientId, patientName, doctorId, doctorName);
+        if (current != null) {
+            Doctor doctor = DoctorManagement.findDoctorById(current.getDoctorId());
+            if (doctor != null) {
+                doctor.setWorkingStatus(UtilityClass.statusFree);
+                System.out.println("Doctor " + doctor.getName() + " is now free.");
+            }
+            int removeIndex = -1;
+            for (int i = 0; i < currentConsulting.size(); i++) {
+                if (currentConsulting.get(i).getPatientId().equals(patientId)) {
+                    removeIndex = i;
+                    break;
+                }
+            }
+
+            if (removeIndex != -1) {
+                currentConsulting.remove(removeIndex);
             }
         }
     }
 
-    // 结束咨询并保存病人信息
-    public void endConsultation(String doctorId) {
 
-        DynamicList<CurrentServingDAO> cs = QueueControl.getCurrentServingPatient();
-        CurrentServingDAO serving = cs.findFirst(c -> c.getDoctorId().equals(doctorId));
-
-        if (serving == null) {
-            System.out.println("Doctor ID not found in current serving list.");
-            return;
-        }
-
-        Patient patient = PatientManagement.findPatientById(serving.getPatientId());
-        Doctor doctor = DoctorManagement.findDoctorById(doctorId);
-
-        if (patient == null) {
-            System.out.println("Patient data not found for ID: " + serving.getPatientId());
-            return;
-        }
-        if (doctor == null) {
-            System.out.println("Doctor data not found for ID: " + doctorId);
-            return;
-        }
-
-        QueueControl.updateQueueStatus(patient.getPatientID());
-        System.out.println("Consultation ended for Patient ID: " + patient.getPatientID());
-
-        Consultation consultation = Consultation.getCurrentConsultation();
-        if (consultation != null && consultation.getPatientId().equals(patient.getPatientID())) {
-            consultation.setEndTime(LocalDateTime.now());
-            System.out.println("Consultation End Time: "
-                    + UtilityClass.formatLocalDateTime(consultation.getEndTime()));
-        }
-
-        completedPatients.add(patient);
-        System.out.println("Patient info saved to completed consultations.");
-
-        doctor.setWorkingStatus(UtilityClass.statusFree);
-        System.out.println("Doctor " + doctor.getName() + " is now free.");
-
-        cs.removeIf(c -> c.getDoctorId().equals(doctorId));
-        System.out.println("Doctor-patient record removed from current serving list.");
-    }
-
+            
     public void scheduleNextAppointment(String patientId, String doctorId, String dateTimeStr, String symptoms) {
         // 检查病人是否存在
         Patient patient = PatientManagement.findPatientById(patientId);
