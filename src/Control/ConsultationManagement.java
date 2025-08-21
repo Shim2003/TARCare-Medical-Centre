@@ -79,9 +79,17 @@ public class ConsultationManagement {
         }
         System.out.println("==========================\n");
     }
+   
 
     // 开始下一位咨询
     public void startNextConsultation() {
+        
+        // ✅ 限制最大咨询数为3
+        if (Consultation.getCurrentConsultationList().size() >= 3) {
+            System.out.println("Maximum consultations reached (3). Please wait for a consultation to finish.");
+            return;
+        }
+        
         printAllDoctorsStatus("All Doctors Status Before Assignment");
 
         // 获取下一个等待的病人
@@ -100,14 +108,22 @@ public class ConsultationManagement {
             return;
         }
 
-        // 分配空闲医生
-        DynamicList<Doctor> freeDoctors = DoctorManagement.getFreeDoctors();
-        if (freeDoctors.isEmpty()) {
-            System.out.println("No free doctors available. Please wait.");
-            return;
+        // ✅ 手动输入医生ID
+        Scanner sc = new Scanner(System.in);
+        Doctor assignedDoctor = null;
+        while (assignedDoctor == null) {
+            System.out.print("Enter Doctor ID to assign for Patient " + nextPatient.getPatientId() + ": ");
+            String doctorId = sc.nextLine();
+            Doctor d = DoctorManagement.findDoctorById(doctorId);
+            if (d == null) {
+                System.out.println("Doctor ID not found. Try again.");
+            } else if (!d.getWorkingStatus().equals(UtilityClass.statusFree)) {
+                System.out.println("Doctor is not free. Please choose another doctor.");
+            } else {
+                assignedDoctor = d; // 找到空闲医生
+            }
         }
 
-        Doctor assignedDoctor = freeDoctors.get(0); // 取第一个空闲医生
         assignedDoctor.setWorkingStatus(UtilityClass.statusConsulting); // 更新医生状态
 
         // 创建当前咨询记录
@@ -130,7 +146,6 @@ public class ConsultationManagement {
             );
             
             // ✅ 让医生输入病人的 Symptoms
-            Scanner sc = new Scanner(System.in);
             System.out.print("Enter Symptoms for Patient " + patient.getFullName() + ": ");
             String symptoms = sc.nextLine();
             consultation.setSymptoms(symptoms);
@@ -152,11 +167,6 @@ public class ConsultationManagement {
         // 打印所有医生状态（调试用）
         printAllDoctorsStatus("All Doctors Status After Assignment");
     }
-
-
-
-
-
 
     // --- 查看当前咨询 ---
     public void viewCurrentConsulting() {
@@ -264,8 +274,6 @@ public class ConsultationManagement {
             }
         }
     }
-
-
             
     public void scheduleNextAppointment(String patientId, String doctorId, String dateTimeStr, String reason) {
         // 检查病人是否存在

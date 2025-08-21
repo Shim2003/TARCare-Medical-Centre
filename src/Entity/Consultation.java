@@ -8,7 +8,7 @@ package Entity;
  *
  * @author leekeezhan
  */
-
+import ADT.DynamicList;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -21,6 +21,7 @@ public class Consultation {
     private String symptoms;
     private String diagnosis;
     private static Consultation currentConsultation;
+    private static DynamicList<Consultation> currentConsultationList = new DynamicList<>();
 
     public Consultation(String consultationId, String patientId, String doctorId,
                         String symptoms, String diagnosis) {
@@ -31,7 +32,6 @@ public class Consultation {
         this.diagnosis = diagnosis;
     }
 
-    // Getters
     public String getConsultationId() { return consultationId; }
     public String getPatientId() { return patientId; }
     public String getDoctorId() { return doctorId; }
@@ -40,8 +40,11 @@ public class Consultation {
     public LocalDateTime getStartTime() { return startTime; }
     public LocalDateTime getEndTime() { return endTime; }
     public static Consultation getCurrentConsultation() { return currentConsultation; }
+    
+    public static DynamicList<Consultation> getCurrentConsultationList() {
+        return currentConsultationList;
+    }
 
-    // Setters
     public void setConsultationId(String consultationId) { this.consultationId = consultationId; }
     public void setPatientId(String patientId) { this.patientId = patientId; }
     public void setDoctorId(String doctorId) { this.doctorId = doctorId; }
@@ -52,23 +55,32 @@ public class Consultation {
 
     public static void setCurrentConsultation(Consultation consultation) {
         currentConsultation = consultation;
+        currentConsultationList.add(consultation); // 加入列表，追踪所有进行中的咨询
+    }
+    
+    public static void removeCurrentConsultation(Consultation consultation) {
+        for (int i = 0; i < currentConsultationList.size(); i++) {
+            if (currentConsultationList.get(i).getConsultationId().equals(consultation.getConsultationId())) {
+                currentConsultationList.remove(i);
+                break;
+            }
+        }
+
+        if (currentConsultation == consultation) {
+            currentConsultation = null;
+        }
     }
 
-    // ✅ 统一时间格式方法（避免 null 崩溃）
-    private String formatDateTime(LocalDateTime dateTime) {
-        if (dateTime == null) return "-";
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
-        return dateTime.format(formatter);
-    }
 
     @Override
     public String toString() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
         return "Consultation ID: " + consultationId +
                "\nPatient ID: " + patientId +
                "\nDoctor ID: " + doctorId +
-               "\nStart Time: " + formatDateTime(startTime) +
-               "\nEnd Time: " + formatDateTime(endTime) +
-               "\nSymptoms: " + (symptoms == null ? "-" : symptoms) +
-               "\nDiagnosis: " + (diagnosis == null ? "-" : diagnosis) + "\n";
+               "\nStart Time: " + startTime.format(formatter)  +
+               "\nEnd Time: " + endTime.format(formatter)  +
+               "\nSymptoms: " + symptoms +
+               "\nDiagnosis: " + diagnosis + "\n";
     }
 }
