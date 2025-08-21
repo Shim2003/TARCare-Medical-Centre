@@ -1,5 +1,6 @@
 package ADT;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Objects;
@@ -82,13 +83,20 @@ public class DynamicList<T> implements MyList<T> {
         
         if (index < gapStart) {
             removed = (T) buffer[index];
-            System.arraycopy(buffer, index + 1, buffer, index, gapStart - index - 1);
+            int elementsToMove = gapStart - index - 1;
+            if (elementsToMove > 0) {
+                System.arraycopy(buffer, index + 1, buffer, index, elementsToMove);
+            }
             gapStart--;
             buffer[gapStart] = null;
         } else {
             int actualIndex = index + gapSize();
             removed = (T) buffer[actualIndex];
-            System.arraycopy(buffer, actualIndex + 1, buffer, actualIndex, capacity - actualIndex - 1);
+
+            int elementsToMove = capacity - actualIndex - 1;
+            if (elementsToMove > 0) {
+                System.arraycopy(buffer, actualIndex + 1, buffer, actualIndex, elementsToMove);
+            }
             gapEnd++;
             buffer[capacity - 1] = null;
         }
@@ -502,31 +510,39 @@ public class DynamicList<T> implements MyList<T> {
             gapStart += moveCount;
             gapEnd += moveCount;
         }
+        
     }
 
     private void expandGap() {
-        int newCapacity = nextFibonacci(capacity + 1);
+        // Calculate new capacity using adaptive growth strategy
+        int newCapacity = nextCapacity(capacity);
         Object[] newBuffer = new Object[newCapacity];
 
-        // Copy elements before gap
+        // Clear ghost data in old buffer before expansion
+        Arrays.fill(buffer, gapStart, gapEnd, null);
+
+        // Copy elements before gap to the beginning of new buffer
         System.arraycopy(buffer, 0, newBuffer, 0, gapStart);
 
-        // Copy elements after gap
+        // Copy elements after gap to the end of new buffer
         int afterGapCount = capacity - gapEnd;
-        System.arraycopy(buffer, gapEnd, newBuffer, newCapacity - afterGapCount, afterGapCount);
+        int newGapEnd = newCapacity - afterGapCount;
+        System.arraycopy(buffer, gapEnd, newBuffer, newGapEnd, afterGapCount);
 
+        // Update buffer reference and gap boundaries
         buffer = newBuffer;
-        gapEnd = newCapacity - afterGapCount;
+        gapEnd = newGapEnd;
         capacity = newCapacity;
+
     }
-    
-    private int nextFibonacci(int n) {
-        int a = 1, b = 2;
-        while (b < n) {
-            int temp = a + b;
-            a = b;
-            b = temp;
+
+    private int nextCapacity(int current) {
+        if (current < 64) {
+            return current * 2;           // Double for small arrays (aggressive growth)
         }
-        return b;
+        if (current < 8192) {
+            return (int)(current * 1.5);  // 1.5x for medium arrays (moderate growth)  
+        }
+        return current + Math.max(current / 4, 1024); // Linear + minimum for large arrays
     }
 }
