@@ -10,6 +10,7 @@ package Entity;
  */
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Consultation {
     private String consultationId;
@@ -30,6 +31,7 @@ public class Consultation {
         this.diagnosis = diagnosis;
     }
 
+    // Getters
     public String getConsultationId() { return consultationId; }
     public String getPatientId() { return patientId; }
     public String getDoctorId() { return doctorId; }
@@ -39,6 +41,7 @@ public class Consultation {
     public LocalDateTime getEndTime() { return endTime; }
     public static Consultation getCurrentConsultation() { return currentConsultation; }
 
+    // Setters
     public void setConsultationId(String consultationId) { this.consultationId = consultationId; }
     public void setPatientId(String patientId) { this.patientId = patientId; }
     public void setDoctorId(String doctorId) { this.doctorId = doctorId; }
@@ -51,14 +54,21 @@ public class Consultation {
         currentConsultation = consultation;
     }
 
+    // ✅ 统一时间格式方法（避免 null 崩溃）
+    private String formatDateTime(LocalDateTime dateTime) {
+        if (dateTime == null) return "-";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+        return dateTime.format(formatter);
+    }
+
     @Override
     public String toString() {
         return "Consultation ID: " + consultationId +
                "\nPatient ID: " + patientId +
                "\nDoctor ID: " + doctorId +
-               "\nStart Time: " + startTime +
-               "\nEnd Time: " + endTime +
-               "\nSymptoms: " + symptoms +
-               "\nDiagnosis: " + diagnosis + "\n";
+               "\nStart Time: " + formatDateTime(startTime) +
+               "\nEnd Time: " + formatDateTime(endTime) +
+               "\nSymptoms: " + (symptoms == null ? "-" : symptoms) +
+               "\nDiagnosis: " + (diagnosis == null ? "-" : diagnosis) + "\n";
     }
 }

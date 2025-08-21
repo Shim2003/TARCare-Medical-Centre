@@ -23,7 +23,7 @@ public class UtilityClass {
     public static final String TIME_FORMAT = "HH:mm:ss";
     
     // LocalDateTime format
-    public static final String DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    public static final String DATETIME_FORMAT = "dd-MM-yyyy HH:mm:ss";
 
     //Status
     public static final String statusFree = "Free";
@@ -81,14 +81,14 @@ public class UtilityClass {
         return monthNames[month - 1];
     }
     
-    // 格式化 LocalDateTime 为字符串 "yyyy-MM-dd HH:mm:ss"
+    // 格式化 LocalDateTime 为字符串 "dd-MM-yyyy HH:mm:ss"
     public static String formatLocalDateTime(LocalDateTime dateTime) {
         if (dateTime == null) return "N/A";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATETIME_FORMAT);
         return dateTime.format(formatter);
     }
 
-    // 将字符串 "yyyy-MM-dd HH:mm:ss" 解析为 LocalDateTime
+    // 将字符串 "dd-MM-yyyy HH:mm:ss" 解析为 LocalDateTime
     public static LocalDateTime parseLocalDateTime(String dateTimeStr) {
         if (dateTimeStr == null || dateTimeStr.trim().isEmpty()) return null;
         try {

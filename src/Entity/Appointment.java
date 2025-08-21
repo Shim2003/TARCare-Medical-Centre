@@ -5,6 +5,7 @@
 package Entity;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 /**
  *
  * @author leekeezhan
@@ -14,15 +15,15 @@ public class Appointment {
     private String patientId;
     private String doctorId;
     private LocalDateTime appointmentTime;
-    private String symptoms;
+    private String reason; 
 
     public Appointment(String appointmentId, String patientId, String doctorId,
-                       LocalDateTime appointmentTime, String symptoms) {
+                       LocalDateTime appointmentTime, String reason) {
         this.appointmentId = appointmentId;
         this.patientId = patientId;
         this.doctorId = doctorId;
         this.appointmentTime = appointmentTime;
-        this.symptoms = symptoms;
+        this.reason = reason;
     }
 
     public String getAppointmentId() {
@@ -41,15 +42,22 @@ public class Appointment {
         return appointmentTime;
     }
 
-    public String getSymptoms() {
-        return symptoms;
+    public String getReason() {
+        return reason;
+    }
+
+    // ✅ 统一格式化方法（避免 null）
+    private String formatDateTime(LocalDateTime dateTime) {
+        if (dateTime == null) return "-";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+        return dateTime.format(formatter);
     }
 
     @Override
     public String toString() {
-        return appointmentId + " - Patient: " + patientId 
-               + " - Doctor: " + doctorId 
-               + " - Time: " + appointmentTime 
-               + " - Symptoms: " + symptoms;
+        return appointmentId + " - Patient: " + patientId
+               + " - Doctor: " + doctorId
+               + " - Time: " + formatDateTime(appointmentTime)
+               + " - Reason: " + (reason == null ? "-" : reason);
     }
 }
