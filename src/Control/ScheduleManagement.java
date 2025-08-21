@@ -32,7 +32,7 @@ public class ScheduleManagement {
         return scheduleList;
     }
 
-    // Remove schedule by ID
+    // Remove one schedule by ID
     public static boolean removeScheduleById(String scheduleID) {
         for (int i = 0; i < scheduleList.size(); i++) {
             if (scheduleList.get(i).getScheduleID().equals(scheduleID)) {

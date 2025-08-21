@@ -88,6 +88,20 @@ public class DoctorManagement {
     public static boolean removeDoctorById(String doctorID) {
         return doctorList.removeIf(d -> d.getDoctorID().equalsIgnoreCase(doctorID.trim()));
     }
+    
+    public static boolean removeDoctorById2(String doctorID) {
+        // First, remove doctor
+        boolean doctorRemoved = doctorList.removeIf(d -> d.getDoctorID().equalsIgnoreCase(doctorID.trim()));
+
+        if (doctorRemoved) {
+            // Cascade delete schedules of this doctor
+
+            ScheduleManagement.removeScheduleByDoctorId(doctorID);
+        }
+
+        return doctorRemoved;
+    }
+
 
     //Read
     public static DynamicList getAllDoctors() {
