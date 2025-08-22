@@ -4,6 +4,7 @@
  */
 package Control;
 
+
 import ADT.DynamicList;
 import ADT.MyList;
 import Entity.Medicine;
@@ -14,13 +15,16 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Comparator;
 import java.util.function.Predicate;
-
-public class PharmacyService {
+/**
+ *
+ * @author jecsh
+ */
+public class PharmacyManagement {
     private final MyList<Medicine> medicines;
     private final MyList<Prescription> prescriptionQueue;
     private final SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
     
-    public PharmacyService() {
+    public PharmacyManagement() {
         this.medicines = new DynamicList<>();
         this.prescriptionQueue = new DynamicList<>();
     }

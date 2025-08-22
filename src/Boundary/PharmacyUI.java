@@ -8,7 +8,7 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.Scanner;
 import java.util.function.Predicate;
-import Control.PharmacyService;
+import Control.PharmacyManagement;
 import Entity.Medicine;
 import Entity.MedicalTreatmentItem;
 import Entity.Prescription;
@@ -17,7 +17,7 @@ import Entity.Patient;
 public class PharmacyUI {
 
     private static final Scanner sc = new Scanner(System.in);
-    private static final PharmacyService service = new PharmacyService();
+    private static final PharmacyManagement service = new PharmacyManagement();
 
     public static void main(String[] args) {
         
