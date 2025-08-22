@@ -4,29 +4,44 @@
  */
 package Control;
 
-
 import ADT.DynamicList;
 import ADT.MyList;
 import Entity.Medicine;
 import Entity.MedicalTreatmentItem;
 import Entity.Prescription;
+import Entity.StockRequest;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Comparator;
 import java.util.function.Predicate;
+
 /**
- *
+ * Enhanced PharmacyManagement with dosage functionality
  * @author jecsh
  */
 public class PharmacyManagement {
     private final MyList<Medicine> medicines;
     private final MyList<Prescription> prescriptionQueue;
     private final SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+    private final MyList<StockRequest> stockRequests;
+    private int requestCounter = 1;
+    
+    // Common dosage forms for medicine selection
+    public static final String[] DOSAGE_FORMS = {
+        "tablet", "capsule", "ml", "syrup", "cream", "ointment", 
+        "gel", "injection", "drops", "sachet", "powder", "lotion"
+    };
+    
+    // Common dosage units
+    public static final String[] DOSAGE_UNITS = {
+        "mg", "g", "ml", "mcg", "mg/ml", "g/ml", "IU", "%"
+    };
     
     public PharmacyManagement() {
         this.medicines = new DynamicList<>();
         this.prescriptionQueue = new DynamicList<>();
+        this.stockRequests = new DynamicList<>();
     }
     
     // ===== BASIC MEDICINE MANAGEMENT METHODS =====
@@ -64,6 +79,17 @@ public class PharmacyManagement {
     public Date parseDate(String s) throws ParseException {
         return df.parse(s);
     }
+    
+    
+    /**
+     * Get detailed header with dosage information
+     */
+    public String getDetailedHeader() {
+        return String.format("%-8s | %-20s | %5s | %-12s | %8s | %-15s | %s",
+                "ID", "Name", "Qty", "Category", "Price", "Manufacturer", "Expiry");
+    }
+    
+    // ===== EXISTING METHODS (keeping all original functionality) =====
     
     public void addToQueue(Prescription prescription) {
         prescriptionQueue.add(prescription);
@@ -124,7 +150,6 @@ public class PharmacyManagement {
         return true;
     }
     
-    // UPDATED: Use ADT's anyMatch method for cleaner code
     public boolean checkStockAvailability(Prescription prescription) {
         return !prescription.getMedicineItems().anyMatch(item -> {
             Medicine medicine = findByName(item.getMedicineName());
@@ -191,6 +216,13 @@ public class PharmacyManagement {
         System.out.println("Medicines sorted by price (ascending).");
     }
     
+    // Sort medicines by dosage form
+    public void sortMedicinesByDosageForm() {
+        DynamicList<Medicine> medicineList = (DynamicList<Medicine>) medicines;
+        medicineList.quickSort(Comparator.comparing(Medicine::getDosageForm));
+        System.out.println("Medicines sorted by dosage form.");
+    }
+    
     // Find medicines with low stock
     public MyList<Medicine> getLowStockMedicines(int threshold) {
         return medicines.findAll(m -> m.getQuantity() <= threshold);
@@ -227,8 +259,9 @@ public class PharmacyManagement {
             System.out.println("Medicines with stock <= " + threshold + ":");
             for (int i = 0; i < lowStock.size(); i++) {
                 Medicine med = lowStock.get(i);
-                System.out.printf("- %s (ID: %s): %d units remaining%n", 
-                    med.getMedicineName(), med.getMedicineID(), med.getQuantity());
+                System.out.printf("- %s (ID: %s): %d %s remaining%n", 
+                    med.getMedicineName(), med.getMedicineID(), 
+                    med.getQuantity(), med.getDosageForm());
             }
             System.out.println("==========================");
         }
@@ -247,9 +280,9 @@ public class PharmacyManagement {
         }
         
         System.out.println("=== DETAILED INVENTORY REPORT ===");
-        System.out.printf("%-15s %-25s %-10s %-10s %-15s%n", 
-                         "ID", "Name", "Quantity", "Price", "Total Value");
-        System.out.println("-".repeat(75));
+        System.out.printf("%-15s %-25s %-10s %-20s %-10s %-15s%n", 
+                         "ID", "Name", "Quantity", "Dosage", "Price", "Total Value");
+        System.out.println("-".repeat(95));
         
         double grandTotal = 0.0;
         for (int i = 0; i < medicines.size(); i++) {
@@ -257,17 +290,104 @@ public class PharmacyManagement {
             double totalValue = med.getPrice() * med.getQuantity();
             grandTotal += totalValue;
             
-            System.out.printf("%-15s %-25s %-10d $%-9.2f $%-14.2f%n",
+            System.out.printf("%-15s %-25s %-10d %-20s $%-9.2f $%-14.2f%n",
                              med.getMedicineID(),
                              med.getMedicineName(),
                              med.getQuantity(),
+                             med.getCompleteDosage(),
                              med.getPrice(),
                              totalValue);
         }
         
-        System.out.println("-".repeat(75));
+        System.out.println("-".repeat(95));
         System.out.printf("Total Inventory Value: $%.2f%n", grandTotal);
         System.out.println("=================================");
+    }
+    
+    public String createStockRequest(String medicineID, int requestedQuantity) {
+        Medicine medicine = findById(medicineID);
+        if (medicine == null) {
+            return null; // Medicine not found
+        }
+
+        String requestID = generateRequestID();
+        StockRequest request = new StockRequest(
+            requestID,
+            medicineID,
+            medicine.getMedicineName(),
+            requestedQuantity,
+            new Date(),
+            "PENDING"
+        );
+
+        stockRequests.add(request);
+        return requestID;
+    }
+    
+    private String generateRequestID() {
+        return "REQ" + String.format("%03d", requestCounter++);
+    }
+    
+    public MyList<StockRequest> getAllStockRequests() {
+        return stockRequests;
+    }
+    
+    public MyList<StockRequest> getPendingStockRequests() {
+        return stockRequests.findAll(r -> "PENDING".equals(r.getStatus()));
+    }
+    
+    public MyList<StockRequest> getCompletedStockRequests() {
+        return stockRequests.findAll(r -> "COMPLETED".equals(r.getStatus()) || 
+                                         "APPROVED".equals(r.getStatus()) || 
+                                         "REJECTED".equals(r.getStatus()));
+    }
+    
+    public StockRequest findStockRequestById(String requestID) {
+        return stockRequests.findFirst(r -> r.getRequestID().equalsIgnoreCase(requestID));
+    }
+    
+    public boolean updateStockRequestStatus(String requestID, String newStatus) {
+        int index = stockRequests.findIndex(r -> r.getRequestID().equalsIgnoreCase(requestID));
+        if (index == -1) return false;
+
+        StockRequest request = stockRequests.get(index);
+        request.setStatus(newStatus);
+        return true;
+    }
+    
+    public boolean approveStockRequest(String requestID) {
+        StockRequest request = findStockRequestById(requestID);
+        if (request == null || !"PENDING".equals(request.getStatus())) {
+            return false;
+        }
+
+        Medicine medicine = findById(request.getMedicineID());
+        if (medicine == null) return false;
+
+        // Update medicine stock
+        medicine.setQuantity(medicine.getQuantity() + request.getRequestedQuantity());
+
+        // Update request status
+        request.setStatus("COMPLETED");
+
+        return true;
+    }
+    
+    public boolean hasPendingRequestForMedicine(String medicineID) {
+        return stockRequests.anyMatch(r -> r.getMedicineID().equalsIgnoreCase(medicineID) && 
+                                          "PENDING".equals(r.getStatus()));
+    }
+
+    public int getTotalPendingQuantityForMedicine(String medicineID) {
+        int total = 0;
+        for (int i = 0; i < stockRequests.size(); i++) {
+            StockRequest request = stockRequests.get(i);
+            if (request.getMedicineID().equalsIgnoreCase(medicineID) && 
+                "PENDING".equals(request.getStatus())) {
+                total += request.getRequestedQuantity();
+            }
+        }
+        return total;
     }
     
     // Check if medicine exists by name (case-insensitive)
