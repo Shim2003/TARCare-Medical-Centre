@@ -9,6 +9,7 @@ package Entity;
  * @author leekeezhan
  */
 import ADT.DynamicList;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -20,6 +21,7 @@ public class Consultation {
     private LocalDateTime endTime;    // 新增结束时间
     private String symptoms;
     private String diagnosis;
+    private long durationSeconds;
     private static Consultation currentConsultation;
     private static DynamicList<Consultation> currentConsultationList = new DynamicList<>();
 
@@ -40,10 +42,7 @@ public class Consultation {
     public LocalDateTime getStartTime() { return startTime; }
     public LocalDateTime getEndTime() { return endTime; }
     public static Consultation getCurrentConsultation() { return currentConsultation; }
-    
-    public static DynamicList<Consultation> getCurrentConsultationList() {
-        return currentConsultationList;
-    }
+    public long getDurationSeconds() { return durationSeconds; }
 
     public void setConsultationId(String consultationId) { this.consultationId = consultationId; }
     public void setPatientId(String patientId) { this.patientId = patientId; }
@@ -51,7 +50,18 @@ public class Consultation {
     public void setSymptoms(String symptoms) { this.symptoms = symptoms; }
     public void setDiagnosis(String diagnosis) { this.diagnosis = diagnosis; }
     public void setStartTime(LocalDateTime startTime) { this.startTime = startTime; }
-    public void setEndTime(LocalDateTime endTime) { this.endTime = endTime; }
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+        if (this.startTime != null && this.endTime != null) {
+            Duration duration = Duration.between(this.startTime, this.endTime);
+            long seconds = duration.getSeconds();
+            this.durationSeconds = seconds; // ⚠️ 改成存总秒数
+        }
+    } 
+    
+    public static DynamicList<Consultation> getCurrentConsultationList() {
+        return currentConsultationList;
+    }
 
     public static void setCurrentConsultation(Consultation consultation) {
         currentConsultation = consultation;
@@ -70,16 +80,24 @@ public class Consultation {
             currentConsultation = null;
         }
     }
+    
+    private String formatDuration(long totalSeconds) {
+        long hours = totalSeconds / 3600;
+        long minutes = (totalSeconds % 3600) / 60;
+        long seconds = totalSeconds % 60;
 
+        return String.format("%02dh %02dm %02ds", hours, minutes, seconds);
+    }
 
     @Override
     public String toString() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
         return "Consultation ID: " + consultationId +
                "\nPatient ID: " + patientId +
                "\nDoctor ID: " + doctorId +
-               "\nStart Time: " + startTime.format(formatter)  +
-               "\nEnd Time: " + endTime.format(formatter)  +
+               "\nStart Time: " + (startTime != null ? startTime.format(formatter) : "-") +
+               "\nEnd Time: " + (endTime != null ? endTime.format(formatter) : "-") +
+               "\nDuration: " + (endTime != null ? formatDuration(durationSeconds) : "-") +
                "\nSymptoms: " + symptoms +
                "\nDiagnosis: " + diagnosis + "\n";
     }
