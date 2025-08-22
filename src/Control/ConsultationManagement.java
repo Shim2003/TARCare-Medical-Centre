@@ -57,18 +57,6 @@ public class ConsultationManagement {
         }
     }
 
-    public void addSamplePatients() {
-
-        LocalDateTime now = LocalDateTime.now();
-        
-        scheduledAppointments.add(new Appointment("A001", "P1001", "D001", now.plusDays(1).plusHours(3), "General Checkup"));
-        scheduledAppointments.add(new Appointment("A002", "P1001", "D002", now.plusDays(3).plusHours(5), "Dental Cleaning"));
-        scheduledAppointments.add(new Appointment("A003", "P1002", "D001", now.minusDays(1), "Follow-up"));
-        scheduledAppointments.add(new Appointment("A004", "P1001", "D003", now.plusHours(6), "Eye Examination"));
-        scheduledAppointments.add(new Appointment("A005", "P1003", "D004", now.plusDays(10), "Surgery Consultation"));
-
-    }
-
     // 查看队列
     public void viewQueue() {
         if (QueueControl.getQueueList().isEmpty()) {

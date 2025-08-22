@@ -17,15 +17,12 @@ import java.util.Scanner;
 public class TARCareMedicalCentre {
 
     private static Scanner scanner = new Scanner(System.in);
-        private static ConsultationManagement conMan = new ConsultationManagement();
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
         PatientManagement.addSamplePatients();
-        conMan.addSampleAppointment();
-        conMan.viewScheduledAppointments();
         mainMenu();
     }
 
