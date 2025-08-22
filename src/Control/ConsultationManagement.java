@@ -33,57 +33,58 @@ public class ConsultationManagement {
 
     private static DynamicList<Patient> completedPatients = new DynamicList<>();
     private static DynamicList<Appointment> scheduledAppointments = new DynamicList<>();
-    DynamicList<CurrentServingDAO> currentConsulting = QueueControl.getCurrentServingPatient();
-    private DynamicList<Consultation> completedConsultations = new DynamicList<>();
+    private static DynamicList<Consultation> ongoingConsultations = new DynamicList<>();
+    private static DynamicList<CurrentServingDAO> currentConsulting = QueueControl.getCurrentServingPatient();
+    private static DynamicList<Consultation> completedConsultations = new DynamicList<>();
     
     public void showCompletedPatients() {
-    System.out.println("--- Completed Patients ---");
-    if (completedPatients.isEmpty()) {
-        System.out.println("No completed patients.");
-    } else {
-        for (int i = 0; i < completedPatients.size(); i++) {
-            Patient p = completedPatients.get(i);
-            System.out.println(p); // 确保 Patient 有 toString()
+        System.out.println("--- Completed Patients ---");
+        if (completedPatients.isEmpty()) {
+            System.out.println("No completed patients.");
+        } else {
+            for (int i = 0; i < completedPatients.size(); i++) {
+                Patient p = completedPatients.get(i);
+                System.out.println(p); // 确保 Patient 有 toString()
+            }
         }
     }
-}
 
-public void showScheduledAppointments() {
-    System.out.println("--- Scheduled Appointments ---");
-    if (scheduledAppointments.isEmpty()) {
-        System.out.println("No scheduled appointments.");
-    } else {
-        for (int i = 0; i < scheduledAppointments.size(); i++) {
-            Appointment a = scheduledAppointments.get(i);
-            System.out.println(a); // 确保 Appointment 有 toString()
+    public void showCurrentConsulting() {
+        System.out.println("--- Current Consulting Patients ---");
+        if (currentConsulting.isEmpty()) {
+            System.out.println("No patients currently consulting.");
+        } else {
+            for (int i = 0; i < currentConsulting.size(); i++) {
+                CurrentServingDAO c = currentConsulting.get(i);
+                System.out.println(c); // 确保 CurrentServingDAO 有 toString()
+            }
         }
     }
-}
 
-public void showCurrentConsulting() {
-    System.out.println("--- Current Consulting Patients ---");
-    if (currentConsulting.isEmpty()) {
-        System.out.println("No patients currently consulting.");
-    } else {
-        for (int i = 0; i < currentConsulting.size(); i++) {
-            CurrentServingDAO c = currentConsulting.get(i);
-            System.out.println(c); // 确保 CurrentServingDAO 有 toString()
+    public void showCompletedConsultations() {
+        System.out.println("--- Completed Consultations ---");
+        if (completedConsultations.isEmpty()) {
+            System.out.println("No completed consultations.");
+        } else {
+            for (int i = 0; i < completedConsultations.size(); i++) {
+                Consultation c = completedConsultations.get(i);
+                System.out.println(c); // 确保 Consultation 有 toString()
+            }
         }
     }
-}
-
-public void showCompletedConsultations() {
-    System.out.println("--- Completed Consultations ---");
-    if (completedConsultations.isEmpty()) {
-        System.out.println("No completed consultations.");
-    } else {
-        for (int i = 0; i < completedConsultations.size(); i++) {
-            Consultation c = completedConsultations.get(i);
-            System.out.println(c); // 确保 Consultation 有 toString()
+    
+    public void showOngoingConsultations() {
+        System.out.println("===== Ongoing Consultations =====");
+        if (ongoingConsultations.isEmpty()) {
+            System.out.println("No ongoing consultations.");
+        } else {
+            for (int i = 0; i < ongoingConsultations.size(); i++) {
+                Consultation c = ongoingConsultations.get(i);
+                System.out.println("Index " + i + " -> " + c);
+            }
         }
+        System.out.println("=================================");
     }
-}
-
 
     // 计数器
     private static int appointmentCounter = 1001; // A1001
@@ -177,12 +178,12 @@ public void showCompletedConsultations() {
 
         // 创建当前咨询记录
         CurrentServingDAO current = new CurrentServingDAO(nextPatient.getPatientId(), assignedDoctor.getDoctorID());
-        QueueControl.getCurrentServingPatient().add(current); // 添加到当前咨询列表
+        currentConsulting.add(current); // 添加到 currentConsulting
 
         // 更新 QueueEntry 状态
         nextPatient.setStatus(UtilityClass.statusConsulting);
 
-        // 创建 Consultation 对象
+        // 创建 Consultation 对象并加入 static ongoingConsultations
         Patient patient = PatientManagement.findPatientById(nextPatient.getPatientId());
         if (patient != null) {
             String consultationId = generateNextConsultationId();
@@ -190,17 +191,16 @@ public void showCompletedConsultations() {
                     consultationId,
                     patient.getPatientID(),
                     assignedDoctor.getDoctorID(),
-                    "", // symptoms
-                    "" // diagnosis
+                    "" // symptoms 先空着，后面让医生输入
             );
 
             // ✅ 让医生输入病人的 Symptoms
             System.out.print("Enter Symptoms for Patient " + patient.getFullName() + ": ");
             String symptoms = sc.nextLine();
             consultation.setSymptoms(symptoms);
-
             consultation.setStartTime(LocalDateTime.now());
-            Consultation.setCurrentConsultation(consultation);
+
+            ongoingConsultations.add(consultation);
 
             System.out.println("\n================ Consultation Started ================");
             System.out.println("Doctor: " + assignedDoctor.getName() + " (ID: " + assignedDoctor.getDoctorID() + ")");
@@ -249,11 +249,25 @@ public void showCompletedConsultations() {
             String patientName = (p != null) ? p.getFullName() : "Unknown Patient";
             String doctorName = (d != null) ? d.getName() : "Unknown Doctor";
 
-            // ✅ 找对应的 Consultation 并计算时长
-            Consultation consultation = Consultation.getCurrentConsultation();
+            // 找对应的 Consultation 并计算时长
+            Consultation consultation = null;
+            for (int j = 0; j < ongoingConsultations.size(); j++) {
+                Consultation c = ongoingConsultations.get(j);
+                if (c.getPatientId().equals(cs.getPatientId())) {
+                    consultation = c;
+                    break;
+                }
+            }
+
             String duration = "N/A";
-            if (consultation != null && consultation.getPatientId().equals(cs.getPatientId())) {
-                duration = getConsultationDuration(consultation.getStartTime());
+            if (consultation != null && consultation.getStartTime() != null) {
+                LocalDateTime startTime = consultation.getStartTime();
+                LocalDateTime now = LocalDateTime.now();
+                Duration dur = Duration.between(startTime, now);
+                long hours = dur.toHours();
+                long minutes = dur.toMinutesPart();
+                long seconds = dur.toSecondsPart();
+                duration = String.format("%02d:%02d:%02d", hours, minutes, seconds);
             }
 
             System.out.println("Patient: " + patientName + " (ID: " + cs.getPatientId() + ")"
@@ -301,24 +315,36 @@ public void showCompletedConsultations() {
         queueEntry.setStatus(UtilityClass.statusCompleted);
         System.out.println("Consultation ended for Patient ID: " + patientId);
 
-        Consultation consultation = Consultation.getCurrentConsultation();
-        if (consultation != null && consultation.getPatientId().equals(patientId)) {
+        // 从 ongoingConsultations 找对应 consultation
+        Consultation consultation = null;
+        int consultationIndex = -1;
+        for (int i = 0; i < ongoingConsultations.size(); i++) {
+            Consultation c = ongoingConsultations.get(i);
+            if (c.getPatientId().equals(patientId)) {
+                consultation = c;
+                consultationIndex = i;
+                break;
+            }
+        }
+
+        if (consultation != null) {
             consultation.setEndTime(LocalDateTime.now());
-            System.out.println("Consultation End Time: " + UtilityClass.formatLocalDateTime(consultation.getEndTime()));
-            
-            long totalSeconds = consultation.getDurationSeconds();
+
+            long totalSeconds = Duration.between(consultation.getStartTime(), consultation.getEndTime()).getSeconds();
             long hours = totalSeconds / 3600;
             long minutes = (totalSeconds % 3600) / 60;
             long seconds = totalSeconds % 60;
-            
-            // ✅ 打印时长
+
             String formattedDuration = String.format("%02dh %02dm %02ds", hours, minutes, seconds);
             System.out.println("Consultation Duration: " + formattedDuration);
-            
-            // ✅ 保存到 completedConsultations
+
             completedConsultations.add(consultation);
+            if (consultationIndex != -1) {
+                ongoingConsultations.remove(consultationIndex); // ✅ 用索引移除
+            }
         }
 
+        // 保存病人信息
         Patient patient = PatientManagement.findPatientById(patientId);
         if (patient != null) {
             completedPatients.add(patient);
@@ -328,32 +354,22 @@ public void showCompletedConsultations() {
         }
 
         // 用 currentConsulting 管理医生状态
-        CurrentServingDAO current = null;
+        int currentIndex = -1;
         for (int i = 0; i < currentConsulting.size(); i++) {
-            CurrentServingDAO cs = currentConsulting.get(i);
-            if (cs.getPatientId().equals(patientId)) {
-                current = cs;
+            if (currentConsulting.get(i).getPatientId().equals(patientId)) {
+                currentIndex = i;
                 break;
             }
         }
 
-        if (current != null) {
+        if (currentIndex != -1) {
+            CurrentServingDAO current = currentConsulting.get(currentIndex);
             Doctor doctor = DoctorManagement.findDoctorById(current.getDoctorId());
             if (doctor != null) {
                 doctor.setWorkingStatus(UtilityClass.statusFree);
                 System.out.println("Doctor " + doctor.getName() + " is now free.");
             }
-            int removeIndex = -1;
-            for (int i = 0; i < currentConsulting.size(); i++) {
-                if (currentConsulting.get(i).getPatientId().equals(patientId)) {
-                    removeIndex = i;
-                    break;
-                }
-            }
-
-            if (removeIndex != -1) {
-                currentConsulting.remove(removeIndex);
-            }
+            currentConsulting.remove(currentIndex); // ✅ 用索引移除
         }
     }
 
@@ -432,41 +448,203 @@ public void showCompletedConsultations() {
             System.out.println((i + 1) + ". " + scheduledAppointments.get(i).toString());
         }
     }
-
-    // 你可以加个方法查看所有完成咨询的病人
-    public void viewCompletedPatients() {
-        if (completedPatients.isEmpty()) {
-            System.out.println("No patients have completed consultation yet.");
+    
+    // ✅ 查看所有预约，并显示 Patient 名字和 Doctor 名字
+    public void viewAppointmentsWithNames() {
+        if (scheduledAppointments.isEmpty()) {
+            System.out.println("No scheduled appointments.");
             return;
         }
 
-        System.out.println("\n--- Completed Consultation Patients ---");
-        for (int i = 0; i < completedPatients.size(); i++) {
-            Patient p = completedPatients.get(i);
-            System.out.println((i + 1) + ". " + p.getPatientID() + " - " + p.getFullName());
+        System.out.println("\n--- Scheduled Appointments (With Names) ---");
+        for (int i = 0; i < scheduledAppointments.size(); i++) {
+            Appointment a = scheduledAppointments.get(i);
+
+            // 获取 Patient 名字
+            Patient patient = PatientManagement.findPatientById(a.getPatientId());
+            String patientName = (patient != null) ? patient.getFullName() : "Unknown Patient";
+
+            // 获取 Doctor 名字
+            Doctor doctor = DoctorManagement.findDoctorById(a.getDoctorId());
+            String doctorName = (doctor != null) ? doctor.getName() : "Unknown Doctor";
+
+            System.out.printf("%d. Appointment ID: %s | Patient: %s (%s) | Doctor: %s (%s) | Date/Time: %s | Reason: %s\n",
+                    i + 1,
+                    a.getAppointmentId(),
+                    patientName,
+                    a.getPatientId(),
+                    doctorName,
+                    a.getDoctorId(),
+                    a.getAppointmentTime().format(java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")),
+                    a.getReason()
+            );
+        }
+        System.out.println("-------------------------------------------\n");
+    }
+
+    
+    // ✅ 删除 Appointment（通过 Appointment ID）
+    public void deleteAppointmentById(String appointmentId) {
+        if (scheduledAppointments.isEmpty()) {
+            System.out.println("No appointments available to delete.");
+            return;
+        }
+
+        boolean deleted = false;
+        for (int i = 0; i < scheduledAppointments.size(); i++) {
+            Appointment a = scheduledAppointments.get(i);
+            if (a.getAppointmentId().equals(appointmentId)) {
+                scheduledAppointments.remove(i);
+                deleted = true;
+                System.out.println("Appointment " + appointmentId + " has been deleted.");
+                break;
+            }
+        }
+
+        if (!deleted) {
+            System.out.println("Appointment ID " + appointmentId + " not found.");
+        }
+    }
+    
+    // ✅ 修改 Appointment
+    public void modifyAppointment(String appointmentId) {
+        Appointment appointment = null;
+        for (int i = 0; i < scheduledAppointments.size(); i++) {
+            if (scheduledAppointments.get(i).getAppointmentId().equals(appointmentId)) {
+                appointment = scheduledAppointments.get(i);
+                break;
+            }
+        }
+
+        if (appointment == null) {
+            System.out.println("Appointment ID " + appointmentId + " not found.");
+            return;
+        }
+
+        Scanner sc = new Scanner(System.in);
+        System.out.println("\n--- Modifying Appointment " + appointmentId + " ---");
+
+        // 修改 Patient
+        System.out.print("Enter new Patient ID (or press Enter to keep " + appointment.getPatientId() + "): ");
+        String newPatientId = sc.nextLine().trim();
+        if (!newPatientId.isEmpty()) {
+            Patient patient = PatientManagement.findPatientById(newPatientId);
+            if (patient != null) {
+                appointment.setPatientId(newPatientId);
+                System.out.println("Patient updated to " + patient.getFullName());
+            } else {
+                System.out.println("Patient ID not found. Keeping original.");
+            }
+        }
+
+        // 修改 Doctor
+        System.out.print("Enter new Doctor ID (or press Enter to keep " + appointment.getDoctorId() + "): ");
+        String newDoctorId = sc.nextLine().trim();
+        if (!newDoctorId.isEmpty()) {
+            Doctor doctor = DoctorManagement.findDoctorById(newDoctorId);
+            if (doctor != null) {
+                appointment.setDoctorId(newDoctorId);
+                System.out.println("Doctor updated to " + doctor.getName());
+            } else {
+                System.out.println("Doctor ID not found. Keeping original.");
+            }
+        }
+
+        // 修改 Date/Time
+        System.out.print("Enter new date and time (dd-MM-yyyy HH:mm) (or press Enter to keep " 
+                         + appointment.getAppointmentTime().format(java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")) + "): ");
+        String newDateTimeStr = sc.nextLine().trim();
+        if (!newDateTimeStr.isEmpty()) {
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+                LocalDateTime newDateTime = LocalDateTime.parse(newDateTimeStr, formatter);
+                if (newDateTime.isAfter(LocalDateTime.now())) {
+                    appointment.setAppointmentTime(newDateTime);
+                    System.out.println("Appointment date/time updated.");
+                } else {
+                    System.out.println("Invalid date/time. Keeping original.");
+                }
+            } catch (Exception e) {
+                System.out.println("Invalid format. Keeping original.");
+            }
+        }
+
+        // 修改 Reason
+        System.out.print("Enter new reason (or press Enter to keep \"" + appointment.getReason() + "\"): ");
+        String newReason = sc.nextLine().trim();
+        if (!newReason.isEmpty()) {
+            appointment.setReason(newReason);
+            System.out.println("Reason updated.");
+        }
+
+        System.out.println("Appointment modification complete.\n");
+    }
+
+
+    // 你可以加个方法查看所有完成咨询的病人
+    public void viewCompletedPatients() {
+        DynamicList<String> addedPatientIds = new DynamicList<>();
+
+        System.out.println("--- Completed Patients ---");
+        for (int i = 0; i < completedConsultations.size(); i++) {
+            Consultation c = completedConsultations.get(i);
+            String patientId = c.getPatientId();
+            if (!addedPatientIds.contains(patientId)) {
+                addedPatientIds.add(patientId);
+                Patient p = PatientManagement.findPatientById(patientId);
+                String name = (p != null) ? p.getFullName() : "Unknown";
+                System.out.println(patientId + " - " + name);
+            }
+        }
+
+        if (addedPatientIds.isEmpty()) {
+            System.out.println("No completed patients.");
         }
     }
 
-    // ✅ 新增方法：查看病人所有咨询记录
+
+    // ✅ 新增方法：查看病人所有咨询记录（美化版）
     public void viewConsultationReport(String patientId) {
         boolean found = false;
-        System.out.println("\n=== Consultation Report for Patient ID: " + patientId + " ===\n");
+        System.out.println("\n============================================");
+        System.out.println("       CONSULTATION REPORT FOR PATIENT       ");
+        System.out.println("          Patient ID: " + patientId);
+        System.out.println("============================================");
 
         int count = 1;
         for (int i = 0; i < completedConsultations.size(); i++) {
             Consultation c = completedConsultations.get(i);
             if (c.getPatientId().equals(patientId)) {
-                System.out.println("Consultation #" + count++);
-                System.out.println(c.toString());
                 found = true;
+                System.out.println("Consultation #" + count++);
+                System.out.println("--------------------------------------------");
+                System.out.printf("%-15s: %s\n", "Consultation ID", c.getConsultationId());
+                System.out.printf("%-15s: %s\n", "Doctor ID", c.getDoctorId());
+                System.out.printf("%-15s: %s\n", "Start Time", 
+                    c.getStartTime() != null ? c.getStartTime().format(java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")) : "-");
+                System.out.printf("%-15s: %s\n", "End Time", 
+                    c.getEndTime() != null ? c.getEndTime().format(java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")) : "-");
+                System.out.printf("%-15s: %s\n", "Duration", 
+                    c.getEndTime() != null ? formatDuration(c.getDurationSeconds()) : "-");
+                System.out.printf("%-15s: %s\n", "Symptoms", c.getSymptoms().isEmpty() ? "-" : c.getSymptoms());
+                System.out.println("--------------------------------------------\n");
             }
         }
 
         if (!found) {
-            System.out.println("No consultation records found for this patient.");
+            System.out.println("No consultation records found for this patient.\n");
         }
         System.out.println("============================================\n");
     }
+
+    // 辅助方法：格式化持续时间
+    private String formatDuration(long totalSeconds) {
+        long hours = totalSeconds / 3600;
+        long minutes = (totalSeconds % 3600) / 60;
+        long seconds = totalSeconds % 60;
+        return String.format("%02dh %02dm %02ds", hours, minutes, seconds);
+    }
+
     
     // ✅ 删除 Consultation 记录（通过 Consultation ID）
     public void deleteConsultationById(String consultationId) {

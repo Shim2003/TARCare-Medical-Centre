@@ -26,11 +26,18 @@ public class ConsultationUI {
             System.out.println(" 3. Start Next Consultation");
             System.out.println(" 4. View Current Consulting Patients");
             System.out.println(" 5. End Consultation");
-            System.out.println(" 6. View Completed Consultations");
-            System.out.println(" 7. Schedule Appointment");
-            System.out.println(" 8. View All Appointments");
-            System.out.println(" 9. View All Doctors Status");
-            System.out.println("10. View Consultation Report");
+            System.out.println(" 6. View Patients Who Finished Consultation");
+            System.out.println(" 7. View Consultation Report");
+            System.out.println(" 8. Delete Consultation");
+            System.out.println(" 9. Schedule Appointment");
+            System.out.println("10. View Appointments");
+            System.out.println("11. Delete Appointment");
+            System.out.println("12. Modify Appointment");
+            System.out.println("13. View All Doctors Status");
+            System.out.println("14. Show Completed Patients");
+            System.out.println("15. Show Scheduled Appointments");
+            System.out.println("16. Show All Completed Consultations");
+            System.out.println("17. Show Ongoing Consultations (raw list)");
             System.out.println("--------------------------------------");
             System.out.println(" 0. Back to Main Menu");
             System.out.println("======================================");
@@ -59,7 +66,17 @@ public class ConsultationUI {
                     consultationManagement.endConsultation(id);
                 }
                 case 6 -> consultationManagement.viewCompletedPatients();
-                case 7 -> {
+                case 7 -> {   // ✅ View Consultation Report
+                    System.out.print("Enter Patient ID to view report: ");
+                    String patientId = sc.nextLine();
+                    consultationManagement.viewConsultationReport(patientId);
+                }
+                case 8 -> {   // Delete Consultation
+                    System.out.print("Enter Consultation ID to delete: ");
+                    String consultationId = sc.nextLine();
+                    consultationManagement.deleteConsultationById(consultationId);
+                }
+                case 9 -> {   // Schedule Appointment
                     System.out.print("Enter Patient ID: ");
                     String patientId = sc.nextLine();
                     System.out.print("Enter Doctor ID: ");
@@ -71,13 +88,22 @@ public class ConsultationUI {
 
                     consultationManagement.scheduleNextAppointment(patientId, doctorId, dateTimeStr, symptoms);
                 }
-                case 8 -> consultationManagement.viewScheduledAppointments();
-                case 9 -> consultationManagement.printAllDoctorsStatus("=== Current Doctors Status ===");
-                case 10 -> {
-                    System.out.print("Enter Patient ID to view report: ");
-                    String patientId = sc.nextLine();
-                    consultationManagement.viewConsultationReport(patientId);
+                case 10 -> consultationManagement.viewAppointmentsWithNames();
+                case 11 -> {   // Delete Appointment
+                    System.out.print("Enter Appointment ID to delete: ");
+                    String appointmentId = sc.nextLine();
+                    consultationManagement.deleteAppointmentById(appointmentId);
                 }
+                case 12 -> {  // ✅ Modify Appointment
+                    System.out.print("Enter Appointment ID to modify: ");
+                    String appointmentId = sc.nextLine();
+                    consultationManagement.modifyAppointment(appointmentId);
+                }
+                case 13 -> consultationManagement.printAllDoctorsStatus("=== Current Doctors Status ===");
+                case 14 -> consultationManagement.showCompletedPatients();
+                case 15 -> consultationManagement.viewScheduledAppointments();
+                case 16 -> consultationManagement.showCompletedConsultations();
+                case 17 -> consultationManagement.showOngoingConsultations();
                 case 0 -> System.out.println("  Returning to Main Menu...");
                 default -> System.out.println("  Invalid choice. Please try again.");
             }

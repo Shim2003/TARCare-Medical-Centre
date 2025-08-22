@@ -45,6 +45,23 @@ public class Appointment {
     public String getReason() {
         return reason;
     }
+    
+    public void setPatientId(String patientId) {
+        this.patientId = patientId;
+    }
+
+    public void setDoctorId(String doctorId) {
+        this.doctorId = doctorId;
+    }
+
+    public void setAppointmentTime(LocalDateTime appointmentTime) {
+        this.appointmentTime = appointmentTime;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
+
 
     // ✅ 统一格式化方法（避免 null）
     private String formatDateTime(LocalDateTime dateTime) {
