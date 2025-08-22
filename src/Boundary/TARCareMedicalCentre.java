@@ -24,7 +24,7 @@ public class TARCareMedicalCentre {
      */
     public static void main(String[] args) {
         PatientManagement.addSamplePatients();
-        conMan.addSamplePatients();
+        conMan.addSampleAppointment();
         conMan.viewScheduledAppointments();
         mainMenu();
     }
