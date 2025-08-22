@@ -2,6 +2,7 @@ package ADT;
 
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 /*
@@ -35,4 +36,8 @@ public interface MyList<T> {
     void quickSort(Comparator<T> comparator);
     DynamicList<T> clone();
     DynamicList<T> filter(Predicate<T> predicate);
+    boolean equals(Object obj);
+    int hashCode();
+    T[] toArray();
+    DynamicList.ListStatistics<T> getStatistics(Function<T, Number> numericExtractor);
 }
