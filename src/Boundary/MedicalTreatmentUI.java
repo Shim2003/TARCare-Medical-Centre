@@ -174,7 +174,7 @@ public class MedicalTreatmentUI {
     
     // Method to create a new medical treatment
     // This method will prompt the user for input and create a new treatment record
-    public static void createTreatment1() {
+    public static void createTreatment() {
 
         System.out.println("\n=== Create Medical Treatment ===");
 

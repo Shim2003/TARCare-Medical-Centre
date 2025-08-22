@@ -38,7 +38,7 @@ public class DiagnosisUI {
 
                 switch (choice) {
                     case 1 -> 
-                        addDiagnosisTest();
+                        addDiagnosis();
                     case 2 -> 
                         viewDiagnosisDetails();
                     case 3 -> 
@@ -237,17 +237,53 @@ public class DiagnosisUI {
     //View Diagnosis Details
     public static void viewDiagnosisDetails() {
     System.out.println("\n=== Diagnosis Details ===");
+    System.out.print("Enter the Year: ");
+    String yearInput = scanner.nextLine().trim();
 
-    if (DiagnosisManagement.getDiagnosisList().isEmpty()) {
-        System.out.println("No diagnoses record currently.");
+    int year;
+    try {
+        year = Integer.parseInt(yearInput);
+        if (year < 2020 || year > Year.now().getValue()) {
+            System.out.println("Please enter a valid year between 2020 and the current year.");
+            return;
+        }
+    } catch (NumberFormatException e) {
+        System.out.println("Invalid input. Please enter a valid year.");
+        return;
+    }
+
+    System.out.print("Enter the Month: ");
+    String monthInput = scanner.nextLine().trim();
+
+    if (monthInput.length() == 1) {
+        monthInput = "0" + monthInput; // Ensure the month is in two-digit format
+    }
+
+    int month;
+    try {
+        month = Integer.parseInt(monthInput);
+        if (month < 1 || month > 12) {
+            System.out.println("Invalid input. Please enter a month between 01 and 12.");
+            return;
+        }
+    } catch (NumberFormatException e) {
+        System.out.println("Invalid input. Please enter a valid month.");
+        return;
+    }
+
+    DynamicList<Diagnosis> filteredDiagnoses = DiagnosisManagement.getDiagnosesByYearAndMonth(year, month);
+
+
+    if (filteredDiagnoses.isEmpty()) {
+        System.out.println("No diagnoses found for the specified year and month.");
         return;
     }
 
     // Display available diagnosis IDs for reference
     System.out.println("\nAvailable Diagnosis IDs:");
     System.out.println("------------------------");
-    for (int i = 0; i < DiagnosisManagement.getDiagnosisList().size(); i++) {
-        Diagnosis d = DiagnosisManagement.getDiagnosisList().get(i);
+    for (int i = 0; i < filteredDiagnoses.size(); i++) {
+        Diagnosis d = filteredDiagnoses.get(i);
         System.out.printf(">> %s (Patient: %s, Date: %s)\n",
                 d.getDiagnosisId(),
                 d.getPatientId() != null ? d.getPatientId() : "N/A",
@@ -412,7 +448,7 @@ public class DiagnosisUI {
         sb.append("> Symptoms:                                                    <\n");
         if (diagnosis.getSymptoms() != null && !diagnosis.getSymptoms().isEmpty()) {
             for (int i = 0; i < diagnosis.getSymptoms().size(); i++) {
-                sb.append(String.format(">   [%d] %-55s<\n", i + 1, diagnosis.getSymptoms().get(i)));
+                sb.append(String.format(">   [%d] %-56s<\n", i + 1, diagnosis.getSymptoms().get(i)));
             }
         } else {
             sb.append(">   N/A                                                         <\n");

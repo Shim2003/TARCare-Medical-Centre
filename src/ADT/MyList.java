@@ -32,11 +32,7 @@ public interface MyList<T> {
     int findIndex(Predicate<T> predicate);
     boolean removeIf(Predicate<T> predicate);
     Iterator<T> iterator();
-    // DynamicList<T> map(Function<T, T> function);
-    // DynamicList<T> filter(Predicate<T> predicate);
     void quickSort(Comparator<T> comparator);
     DynamicList<T> clone();
-    boolean equals(Object obj);
-    int hashCode();
-
+    DynamicList<T> filter(Predicate<T> predicate);
 }

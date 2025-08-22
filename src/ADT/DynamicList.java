@@ -1,9 +1,7 @@
 package ADT;
 
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -83,20 +81,13 @@ public class DynamicList<T> implements MyList<T> {
         
         if (index < gapStart) {
             removed = (T) buffer[index];
-            int elementsToMove = gapStart - index - 1;
-            if (elementsToMove > 0) {
-                System.arraycopy(buffer, index + 1, buffer, index, elementsToMove);
-            }
+            System.arraycopy(buffer, index + 1, buffer, index, gapStart - index - 1);
             gapStart--;
             buffer[gapStart] = null;
         } else {
             int actualIndex = index + gapSize();
             removed = (T) buffer[actualIndex];
-
-            int elementsToMove = capacity - actualIndex - 1;
-            if (elementsToMove > 0) {
-                System.arraycopy(buffer, actualIndex + 1, buffer, actualIndex, elementsToMove);
-            }
+            System.arraycopy(buffer, actualIndex + 1, buffer, actualIndex, capacity - actualIndex - 1);
             gapEnd++;
             buffer[capacity - 1] = null;
         }
@@ -459,36 +450,6 @@ public class DynamicList<T> implements MyList<T> {
         return clonedList;
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!(obj instanceof DynamicList)) {
-            return false;
-        }
-        DynamicList<?> other = (DynamicList<?>) obj;
-        if (size() != other.size()) {
-            return false;
-        }
-        for (int i = 0; i < size(); i++) {
-            if (!Objects.equals(get(i), other.get(i))) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = 1;
-        for (int i = 0; i < size(); i++) {
-            T item = get(i);
-            result = 31 * result + (item == null ? 0 : item.hashCode());
-        }
-        return result;
-    }
-
     // Gap buffer specific helper methods
     private int gapSize() {
         return gapEnd - gapStart;
@@ -510,39 +471,49 @@ public class DynamicList<T> implements MyList<T> {
             gapStart += moveCount;
             gapEnd += moveCount;
         }
-        
     }
 
     private void expandGap() {
-        // Calculate new capacity using adaptive growth strategy
-        int newCapacity = nextCapacity(capacity);
+        int newCapacity = nextFibonacci(capacity + 1);
         Object[] newBuffer = new Object[newCapacity];
 
-        // Clear ghost data in old buffer before expansion
-        Arrays.fill(buffer, gapStart, gapEnd, null);
-
-        // Copy elements before gap to the beginning of new buffer
+        // Copy elements before gap
         System.arraycopy(buffer, 0, newBuffer, 0, gapStart);
 
-        // Copy elements after gap to the end of new buffer
+        // Copy elements after gap
         int afterGapCount = capacity - gapEnd;
-        int newGapEnd = newCapacity - afterGapCount;
-        System.arraycopy(buffer, gapEnd, newBuffer, newGapEnd, afterGapCount);
+        System.arraycopy(buffer, gapEnd, newBuffer, newCapacity - afterGapCount, afterGapCount);
 
-        // Update buffer reference and gap boundaries
         buffer = newBuffer;
-        gapEnd = newGapEnd;
+        gapEnd = newCapacity - afterGapCount;
         capacity = newCapacity;
-
+    }
+    
+    private int nextFibonacci(int n) {
+        int a = 1, b = 2;
+        while (b < n) {
+            int temp = a + b;
+            a = b;
+            b = temp;
+        }
+        return b;
     }
 
-    private int nextCapacity(int current) {
-        if (current < 64) {
-            return current * 2;           // Double for small arrays (aggressive growth)
+    // filter method that allow users to extract and view specific elements based on a predefined predicate
+    // normally used in term of narrowing down data to meet some specific criteria
+    // Use Case:
+    // DynamicList<Patient> criticalPatients = patients.filter(p -> p.getSeverityLevel().equals("Critical"));
+    // Filter treatment records based on a specific condition like last 30 days or last 3 months in MTManagement
+    @SuppressWarnings("unchecked")
+    @Override
+    public DynamicList<T> filter(Predicate<T> predicate) {
+        DynamicList<T> result = new DynamicList<>();
+        for (int i = 0; i < size(); i++) {
+            T item = get(i);
+            if (predicate.test(item)) {
+                result.add(item);
+            }
         }
-        if (current < 8192) {
-            return (int)(current * 1.5);  // 1.5x for medium arrays (moderate growth)  
-        }
-        return current + Math.max(current / 4, 1024); // Linear + minimum for large arrays
+        return result;
     }
 }
