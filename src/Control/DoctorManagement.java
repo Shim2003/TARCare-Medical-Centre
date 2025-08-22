@@ -37,6 +37,30 @@ public class DoctorManagement {
 
         return false;
     }
+    
+    public static String generateNextDoctorId() {
+        int maxId = 0;
+        DynamicList<Doctor> doctors = getAllDoctors();
+
+        for (int i = 0; i < doctors.size(); i++) {
+            String id = doctors.get(i).getDoctorID().trim().toUpperCase();
+
+            if (id.startsWith("D")) {
+                try {
+                    int num = Integer.parseInt(id.substring(1)); // remove 'D'
+                    if (num > maxId) {
+                        maxId = num;
+                    }
+                } catch (NumberFormatException e) {
+                    // ignore invalid formats
+                }
+            }
+        }
+
+        int nextId = maxId + 1;
+        return String.format("D%03d", nextId); // e.g. D004
+    }
+
 
     public static void addSampleDoctor() {
         SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
@@ -85,11 +109,8 @@ public class DoctorManagement {
 //        return false;
 //    }
     
-    public static boolean removeDoctorById(String doctorID) {
-        return doctorList.removeIf(d -> d.getDoctorID().equalsIgnoreCase(doctorID.trim()));
-    }
     
-    public static boolean removeDoctorById2(String doctorID) {
+    public static boolean removeDoctorById(String doctorID) {
         // First, remove doctor
         boolean doctorRemoved = doctorList.removeIf(d -> d.getDoctorID().equalsIgnoreCase(doctorID.trim()));
 
@@ -97,6 +118,7 @@ public class DoctorManagement {
             // Cascade delete schedules of this doctor
 
             ScheduleManagement.removeScheduleByDoctorId(doctorID);
+            LeaveManagement.removeLeaveByDoctorId(doctorID);
         }
 
         return doctorRemoved;

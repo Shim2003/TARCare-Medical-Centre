@@ -92,7 +92,7 @@ public class DoctorUI {
                     break;
                 case "3":
                     validOption = true;
-                    System.out.println("check doctors");
+                    LeaveUI.ManageLeave();
                     break;
                 case "4":
                     validOption = true;
@@ -122,11 +122,15 @@ public class DoctorUI {
             switch (choice) {
                 case "1":
                     validOption = true;
-                    DisplayAllDoctors();
+                    ShowDoctors();
+                    UtilityClass.pressEnterToContinue();
+                    UserMode();
                     break;
                 case "2":
                     validOption = true;
                     ScheduleUI.DisplayAllTimetable();
+                    UtilityClass.pressEnterToContinue();
+                    UserMode();
                     break;
                 case "3":
                     validOption = true;
@@ -145,7 +149,7 @@ public class DoctorUI {
         boolean validOption = false;
 
         while (!validOption) {
-            System.out.println("\n--- Welcome Admin ---");
+            System.out.println("\n-*-*- Doctor(s) Management -*-*-");
             System.out.println("1. Check All Doctors");
             System.out.println("2. Register a new doctor");
             System.out.println("3. Edit Doctor(s) detail");
@@ -159,6 +163,8 @@ public class DoctorUI {
                 case "1":
                     validOption = true;
                     DisplayAllDoctors();
+                    UtilityClass.pressEnterToContinue();
+                    ManageDoctor();
                     break;
                 case "2":
                     validOption = true;
@@ -170,48 +176,11 @@ public class DoctorUI {
                     break;
                 case "4":
                     validOption = true;
-                    System.out.println("delete");
+                    removeDoctorUI();
+                    UtilityClass.pressEnterToContinue();
+                    ManageDoctor();
                     break;
                 case "5":
-                    validOption = true;
-                    AdminMode();
-                    break;
-                default:
-                    System.out.println("Invalid Option!!! Pls try again");
-                    UtilityClass.pressEnterToContinue();
-            }
-
-        }
-    }
-
-    public static void ManageLeave() {
-
-        boolean validOption = false;
-
-        while (!validOption) {
-            System.out.println("\n--- Welcome Admin ---");
-            System.out.println("1. Check Leave(s)");
-            System.out.println("2. Apply Leave(s)");
-            System.out.println("3. Remove Leave(s)");
-            System.out.println("4. Back");
-            System.out.print("Enter your choice: ");
-
-            String choice = scanner.nextLine();
-
-            switch (choice) {
-                case "1":
-                    validOption = true;
-                    System.out.println("");
-                    break;
-                case "2":
-                    validOption = true;
-                    System.out.println("");
-                    break;
-                case "3":
-                    validOption = true;
-                    System.out.println("");
-                    break;
-                case "4":
                     validOption = true;
                     AdminMode();
                     break;
@@ -242,8 +211,26 @@ public class DoctorUI {
 
         System.out.println("Total of " + doctorList.size() + " doctor(s)");
 
-        UtilityClass.pressEnterToContinue();
-        ManageDoctor();
+    }
+    
+     public static void ShowDoctors() {
+
+        DynamicList<Doctor> doctorList = DoctorManagement.getAllDoctors();
+        System.out.println("\n------------------------------------------------ DOCTOR LIST ------------------------------------------------");
+        System.out.printf(" %-20s | %-15s | %-25s | %-25s |\n",
+                 "Full Name", "Contact", "Email", "Working Status");
+        System.out.println("----------------------------------------------------------------------------------------------------------------");
+
+        for (int i = 0; i < doctorList.size(); i++) {
+            Doctor d = doctorList.get(i);
+            System.out.printf(" %-20s | %-15s | %-30s | %-10s |\n",
+                    d.getName(), 
+                    d.getContactNumber(),
+                    d.getEmail(), d.getWorkingStatus());
+
+        }
+
+        System.out.println("Total of " + doctorList.size() + " doctor(s)");
 
     }
 
@@ -253,16 +240,7 @@ public class DoctorUI {
         try {
             System.out.println("\n=== Register New Doctor ===");
 
-            // Doctor ID (not empty)
-            String doctorID;
-            while (true) {
-                System.out.print("Enter Doctor ID: ");
-                doctorID = sc.nextLine().trim();
-                if (!doctorID.isEmpty()) {
-                    break;
-                }
-                System.out.println("❌ Doctor ID cannot be empty!");
-            }
+           String newDoctorId = DoctorManagement.generateNextDoctorId();
 
             // Name (not empty, not only spaces)
             String name;
@@ -338,7 +316,7 @@ public class DoctorUI {
 
             // Create new Doctor object
             Doctor newDoctor = new Doctor(
-                    doctorID,
+                    newDoctorId,
                     name,
                     dateOfBirth,
                     gender,
@@ -470,7 +448,71 @@ public class DoctorUI {
         }
     }
     
-    public static void removeDoctorUI(){
+    public static void removeDoctorUI() {
+
+    while (true) {
+        System.out.println("\n=== Remove Doctor ===");
+        DisplayAllDoctors();
+
+        System.out.print("\nEnter Doctor ID to remove (or 'xxx' to cancel): ");
+        String input = scanner.nextLine().trim();
+
+        if (input.equalsIgnoreCase("xxx")) {
+            System.out.println("Returning to menu...");
+            return; // leave the method
+        }
+
+        String doctorID = input.toUpperCase();
+        Doctor doctor = DoctorManagement.findDoctorById(doctorID);
+
+        if (doctor == null) {
+            System.out.println("❌ Doctor not found. Please try again.");
+            continue;
+        }
+
+        // Show doctor details before deleting
+        System.out.println("\nDoctor found:");
+        doctorDetail(doctor.getDoctorID());
+
+        System.out.print("Are you sure you want to remove this doctor and all their schedules? (y/n): ");
+        String confirm = scanner.nextLine().trim();
+
+        if (confirm.equalsIgnoreCase("y")) {
+            boolean removed = DoctorManagement.removeDoctorById(doctorID);
+            if (removed) {
+                System.out.println("Doctor and their schedules removed successfully.");
+            } else {
+                System.out.println("❌ Failed to remove doctor.");
+            }
+            return; // exit after one removal
+        } else {
+            System.out.println("Removal cancelled.");
+            return;
+        }
+    }
+}
+    
+    public static void doctorDetail(String doctorID){
+        Doctor doctor;
+        doctor = DoctorManagement.findDoctorById(doctorID);
+        
+        System.out.println("-------------------------------------------------");
+        System.out.printf("""
+                          | Name: %-35s  %s
+                          """, doctor.getName(), doctor.getDoctorID());
+        System.out.printf("""
+                          | DOB: %10s
+                          """, UtilityClass.formatDate(doctor.getDateOfBirth()));
+        System.out.printf("""
+                          | Qualification: %s
+                          """, doctor.getQualification());
+        System.out.printf("""
+                          | Contact No.: %s
+                          """, doctor.getContactNumber());
+        System.out.printf("""
+                          | Email: %s
+                          """, doctor.getEmail());
+         System.out.println("-------------------------------------------------");
         
     }
 
@@ -515,7 +557,7 @@ public class DoctorUI {
             System.out.println(d);
         }
         
-        DoctorManagement.removeDoctorById2("D001");
+        DoctorManagement.removeDoctorById("D001");
         
         System.out.println("\n");
         
@@ -534,4 +576,5 @@ public class DoctorUI {
 
 //        System.out.println("Today: " + currentDay + " " + currentTime);
     }
+    
 }
