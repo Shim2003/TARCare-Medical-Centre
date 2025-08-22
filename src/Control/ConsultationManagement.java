@@ -31,7 +31,7 @@ import java.time.DayOfWeek;
 public class ConsultationManagement {
 
     private static DynamicList<Patient> completedPatients = new DynamicList<>();
-    private DynamicList<Appointment> scheduledAppointments = new DynamicList<>();
+    private static DynamicList<Appointment> scheduledAppointments = new DynamicList<>();
     DynamicList<CurrentServingDAO> currentConsulting = QueueControl.getCurrentServingPatient();
     private DynamicList<Consultation> completedConsultations = new DynamicList<>();
 
@@ -57,6 +57,18 @@ public class ConsultationManagement {
         }
     }
 
+    public void addSamplePatients() {
+
+        LocalDateTime now = LocalDateTime.now();
+        
+        scheduledAppointments.add(new Appointment("A001", "P1001", "D001", now.plusDays(1).plusHours(3), "General Checkup"));
+        scheduledAppointments.add(new Appointment("A002", "P1001", "D002", now.plusDays(3).plusHours(5), "Dental Cleaning"));
+        scheduledAppointments.add(new Appointment("A003", "P1002", "D001", now.minusDays(1), "Follow-up"));
+        scheduledAppointments.add(new Appointment("A004", "P1001", "D003", now.plusHours(6), "Eye Examination"));
+        scheduledAppointments.add(new Appointment("A005", "P1003", "D004", now.plusDays(10), "Surgery Consultation"));
+
+    }
+
     // 查看队列
     public void viewQueue() {
         if (QueueControl.getQueueList().isEmpty()) {
@@ -69,7 +81,7 @@ public class ConsultationManagement {
             }
         }
     }
-    
+
     public void printAllDoctorsStatus(String header) {
         System.out.println("\n=== " + header + " ===");
         DynamicList<Doctor> allDoctors = DoctorManagement.getAllDoctors();
@@ -79,17 +91,16 @@ public class ConsultationManagement {
         }
         System.out.println("==========================\n");
     }
-   
 
     // 开始下一位咨询
     public void startNextConsultation() {
-        
+
         // ✅ 限制最大咨询数为3
         if (Consultation.getCurrentConsultationList().size() >= 3) {
             System.out.println("Maximum consultations reached (3). Please wait for a consultation to finish.");
             return;
         }
-        
+
         printAllDoctorsStatus("All Doctors Status Before Assignment");
 
         // 获取下一个等待的病人
@@ -138,18 +149,18 @@ public class ConsultationManagement {
         if (patient != null) {
             String consultationId = generateNextConsultationId();
             Consultation consultation = new Consultation(
-                consultationId,
-                patient.getPatientID(),
-                assignedDoctor.getDoctorID(),
-                "", // symptoms
-                ""  // diagnosis
+                    consultationId,
+                    patient.getPatientID(),
+                    assignedDoctor.getDoctorID(),
+                    "", // symptoms
+                    "" // diagnosis
             );
-            
+
             // ✅ 让医生输入病人的 Symptoms
             System.out.print("Enter Symptoms for Patient " + patient.getFullName() + ": ");
             String symptoms = sc.nextLine();
             consultation.setSymptoms(symptoms);
-            
+
             consultation.setStartTime(LocalDateTime.now());
             Consultation.setCurrentConsultation(consultation);
 
@@ -188,7 +199,7 @@ public class ConsultationManagement {
                     + " | Doctor: " + doctorName + " (ID: " + cs.getDoctorId() + ")");
         }
     }
-    
+
     // 打印所有 currentConsulting 的内容
     public void printAllCurrentConsulting() {
         System.out.println("===== Current Consulting List =====");
@@ -198,16 +209,15 @@ public class ConsultationManagement {
             for (int i = 0; i < currentConsulting.size(); i++) {
                 CurrentServingDAO cs = currentConsulting.get(i);
                 System.out.println(
-                    "Index " + i + 
-                    " -> PatientId: " + cs.getPatientId() + 
-                    ", DoctorId: " + cs.getDoctorId()
+                        "Index " + i
+                        + " -> PatientId: " + cs.getPatientId()
+                        + ", DoctorId: " + cs.getDoctorId()
                 );
             }
         }
         System.out.println("===================================");
     }
 
-    
     // 结束咨询并保存病人信息
     public void endConsultation(String patientId) {
         // 找队列中的病人
@@ -274,7 +284,7 @@ public class ConsultationManagement {
             }
         }
     }
-            
+
     public void scheduleNextAppointment(String patientId, String doctorId, String dateTimeStr, String reason) {
         // 检查病人是否存在
         Patient patient = PatientManagement.findPatientById(patientId);
@@ -282,7 +292,7 @@ public class ConsultationManagement {
             System.out.println("Patient not found. Cannot schedule appointment.");
             return;
         }
-        
+
         // 检查医生是否存在
         Doctor doctor = DoctorManagement.findDoctorById(doctorId);
         if (doctor == null) {
@@ -293,7 +303,7 @@ public class ConsultationManagement {
         try {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
             LocalDateTime appointmentTime = LocalDateTime.parse(dateTimeStr, formatter);
-            
+
             // 检查预约时间必须是未来
             if (appointmentTime.isBefore(LocalDateTime.now())) {
                 System.out.println("Invalid appointment time. The appointment must be in the future.");
@@ -357,14 +367,14 @@ public class ConsultationManagement {
             System.out.println("No patients have completed consultation yet.");
             return;
         }
-        
+
         System.out.println("\n--- Completed Consultation Patients ---");
         for (int i = 0; i < completedPatients.size(); i++) {
             Patient p = completedPatients.get(i);
             System.out.println((i + 1) + ". " + p.getPatientID() + " - " + p.getFullName());
         }
     }
-    
+
     // ✅ 新增方法：查看病人所有咨询记录
     public void viewConsultationReport(String patientId) {
         boolean found = false;
@@ -381,5 +391,9 @@ public class ConsultationManagement {
             System.out.println("No consultation records found for this patient.");
         }
         System.out.println("============================================\n");
+    }
+
+    public DynamicList<Appointment> getScheduledAppointments() {
+        return scheduledAppointments;
     }
 }

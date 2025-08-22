@@ -6,6 +6,7 @@ package Boundary;
 
 import ADT.DynamicList;
 import Control.PatientManagement;
+import DAO.AppointmentInfo;
 import Entity.Patient;
 import Utility.UtilityClass;
 import java.util.Date;
@@ -207,8 +208,11 @@ public class PatientUI {
             System.out.println("Patient not found.");
             return;
         }
-
-        System.out.println("\n--- Patient Details ---");
+        
+        System.out.println("\n\n");
+        
+        appointmentStatus(patient.getPatientID());
+        System.out.println("--- Patient Details ---");
         System.out.println("Full Name: " + patient.getFullName());
         System.out.println("Identity Number: " + patient.getIdentityNumber());
         System.out.println("Date of Birth: " + UtilityClass.formatDate(patient.getDateOfBirth()));
@@ -369,53 +373,37 @@ public class PatientUI {
             return;
         }
 
-        // Count gender distribution
-        int maleCount = 0;
-        int femaleCount = 0;
-        int totalPatients = patientList.size();
-
-        for (int i = 0; i < patientList.size(); i++) {
-            Patient patient = patientList.get(i);
-            char gender = patient.getGender();
-
-            if (gender == 'M' || gender == 'm') {
-                maleCount++;
-            } else if (gender == 'F' || gender == 'f') {
-                femaleCount++;
-            }
-        }
-
-        // Calculate percentages
-        double malePercentage = totalPatients > 0 ? (double) maleCount / totalPatients * 100 : 0;
-        double femalePercentage = totalPatients > 0 ? (double) femaleCount / totalPatients * 100 : 0;
+        DynamicList<Patient> malePatients = PatientManagement.getMalePatients();
+        DynamicList<Patient> femalePatients = PatientManagement.getFemalePatients();
+        PatientManagement.GenderStatistics genderStats = PatientManagement.getGenderStatistics();
 
         // Display the report
         System.out.println("\n" + "=".repeat(60));
         System.out.println("             GENDER DISTRIBUTION REPORT");
         System.out.println("=".repeat(60));
 
-        System.out.printf("Total Patients Analyzed: %d\n", totalPatients);
+        System.out.printf("Total Patients Analyzed: %d\n", genderStats.totalCount);
         System.out.println("-".repeat(60));
 
         System.out.println("GENDER BREAKDOWN:");
-        System.out.printf("%-15s: %3d patients (%.1f%%)\n", "Male", maleCount, malePercentage);
-        System.out.printf("%-15s: %3d patients (%.1f%%)\n", "Female", femaleCount, femalePercentage);
+        System.out.printf("%-15s: %3d patients (%.1f%%)\n", "Male", genderStats.maleCount, genderStats.malePercentage);
+        System.out.printf("%-15s: %3d patients (%.1f%%)\n", "Female", genderStats.femaleCount, genderStats.femalePercentage);
 
         // Visual representation
         System.out.println("\nVISUAL REPRESENTATION:");
         System.out.print("Male   [");
-        int maleBarLength = (int) (malePercentage / 2); // Scale down for display
+        int maleBarLength = (int) (genderStats.malePercentage / 2); // Scale down for display
         for (int i = 0; i < maleBarLength; i++) {
             System.out.print("#");
         }
-        System.out.printf("] %.1f%%\n", malePercentage);
+        System.out.printf("] %.1f%%\n", genderStats.malePercentage);
 
         System.out.print("Female [");
-        int femaleBarLength = (int) (femalePercentage / 2); // Scale down for display
+        int femaleBarLength = (int) (genderStats.femalePercentage / 2); // Scale down for display
         for (int i = 0; i < femaleBarLength; i++) {
             System.out.print("#");
         }
-        System.out.printf("] %.1f%%\n", femalePercentage);
+        System.out.printf("] %.1f%%\n", genderStats.femalePercentage);
 
         System.out.println("=".repeat(60));
 
@@ -423,7 +411,7 @@ public class PatientUI {
     }
 
     public static void generateTotalPatientsReport() {
-        DynamicList<Patient> patientList = PatientManagement.getPatientList();
+        DynamicList<Patient> patientList = PatientManagement.getPatientsSortedBy("name");
         int totalPatients = patientList.size();
 
         if (totalPatients == 0) {
@@ -581,4 +569,34 @@ public class PatientUI {
         System.out.println("\nPress Enter to continue...");
         scanner.nextLine();
     }
+
+    public static void appointmentStatus(String patientId) {
+        AppointmentInfo nextAppointmentInfo = PatientManagement.checkPatientAppointments(patientId);
+
+        if (nextAppointmentInfo != null) {
+            String details = "Next Appointment: " + nextAppointmentInfo.getAppointment().getAppointmentId();
+            String time = "Time: " + nextAppointmentInfo.getAppointment().getAppointmentTime()
+                    .format(java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm"));
+            String remaining = "In: " + nextAppointmentInfo.getDayLeft() + " days " + nextAppointmentInfo.getHoursLeft() + " hours";
+
+            // Find the width for the box
+            int width = Math.max(details.length(), Math.max(time.length(), remaining.length()));
+            String border = "+" + "-".repeat(width + 2) + "+";
+
+            System.out.println(border);
+            System.out.printf("| %-" + width + "s |\n", details);
+            System.out.printf("| %-" + width + "s |\n", time);
+            System.out.printf("| %-" + width + "s |\n", remaining);
+            System.out.println(border);
+        } else {
+            String msg = "No upcoming appointments.";
+            int width = msg.length();
+            String border = "+" + "-".repeat(width + 2) + "+";
+
+            System.out.println(border);
+            System.out.printf("| %s |\n", msg);
+            System.out.println(border);
+        }
+    }
+
 }

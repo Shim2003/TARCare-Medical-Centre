@@ -5,10 +5,14 @@
 package Control;
 
 import ADT.DynamicList;
+import DAO.AppointmentInfo;
+import Entity.Appointment;
 import Entity.Patient;
 import Utility.UtilityClass;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
@@ -21,6 +25,7 @@ public class PatientManagement {
 
     // list to store patient details
     private static DynamicList<Patient> patientList = new DynamicList<>();
+    private static ConsultationManagement conMan = new ConsultationManagement();
 
     public static void addSamplePatients() {
         SimpleDateFormat sdf = new SimpleDateFormat(UtilityClass.DATE_FORMAT);
@@ -245,4 +250,93 @@ public class PatientManagement {
         }
         return sortedList;
     }
+
+    public static DynamicList<Patient> getMalePatients() {
+        return patientList.filter(patient
+                -> patient.getGender() == 'M' || patient.getGender() == 'm');
+    }
+
+    public static DynamicList<Patient> getFemalePatients() {
+        return patientList.filter(patient
+                -> patient.getGender() == 'F' || patient.getGender() == 'f');
+    }
+
+    public static DynamicList<Patient> getPatientsByGender(char gender) {
+        return patientList.filter(patient
+                -> Character.toLowerCase(patient.getGender()) == Character.toLowerCase(gender));
+    }
+
+    public static GenderStatistics getGenderStatistics() {
+        DynamicList<Patient> malePatients = getMalePatients();
+        DynamicList<Patient> femalePatients = getFemalePatients();
+        int totalPatients = patientList.size();
+
+        return new GenderStatistics(
+                malePatients.size(),
+                femalePatients.size(),
+                totalPatients
+        );
+    }
+
+    public static AppointmentInfo checkPatientAppointments(String patientId) {
+
+        // Get all appointment list 
+        DynamicList<Appointment> appointmentList = conMan.getScheduledAppointments();
+
+        DynamicList<Appointment> patientAppointments = appointmentList.filter(
+                appointment -> appointment.getPatientId().equalsIgnoreCase(patientId)
+        );
+
+        if (patientAppointments.isEmpty()) {
+            return null;
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        DynamicList<Appointment> upcomingAppointments = patientAppointments.filter(
+                appointment -> appointment.getAppointmentTime().isAfter(now)
+        );
+
+        if (upcomingAppointments.isEmpty()) {
+            return null;
+        }
+
+        upcomingAppointments.quickSort(
+                Comparator.comparing(Appointment::getAppointmentTime)
+        );
+
+        Appointment nextAppointment = upcomingAppointments.get(0);
+
+        Duration duration = Duration.between(now, nextAppointment.getAppointmentTime());
+        int totalHours = (int) duration.toHours();
+        int days = totalHours / 24;
+        int hours = totalHours % 24;
+
+        // Convert to AppointmentInfo if needed
+        return new AppointmentInfo(nextAppointment, days, hours);
+
+    }
+
+    public static class GenderStatistics {
+
+        public final int maleCount;
+        public final int femaleCount;
+        public final int totalCount;
+        public final double malePercentage;
+        public final double femalePercentage;
+
+        public GenderStatistics(int maleCount, int femaleCount, int totalCount) {
+            this.maleCount = maleCount;
+            this.femaleCount = femaleCount;
+            this.totalCount = totalCount;
+            this.malePercentage = totalCount > 0 ? (double) maleCount / totalCount * 100 : 0;
+            this.femalePercentage = totalCount > 0 ? (double) femaleCount / totalCount * 100 : 0;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("Gender Statistics: Male=%d (%.1f%%), Female=%d (%.1f%%), Total=%d",
+                    maleCount, malePercentage, femaleCount, femalePercentage, totalCount);
+        }
+    }
+
 }

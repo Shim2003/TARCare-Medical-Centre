@@ -6,6 +6,7 @@ package Boundary;
 
 import static Boundary.PatientUI.adminUserMenu;
 import static Boundary.PatientUI.patientUserMenu;
+import Control.ConsultationManagement;
 import Control.PatientManagement;
 import java.util.Scanner;
 
@@ -16,12 +17,15 @@ import java.util.Scanner;
 public class TARCareMedicalCentre {
 
     private static Scanner scanner = new Scanner(System.in);
+        private static ConsultationManagement conMan = new ConsultationManagement();
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
         PatientManagement.addSamplePatients();
+        conMan.addSamplePatients();
+        conMan.viewScheduledAppointments();
         mainMenu();
     }
 
