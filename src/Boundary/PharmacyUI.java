@@ -26,7 +26,7 @@ public class PharmacyUI {
         
         try {
             // Initialize medicine inventory with only dosage form
-            service.addMedicine(new Medicine("M001", "Paracetamol", 10, "Analgesic", 0.25, "China", 
+            service.addMedicine(new Medicine("M001", "Paracetamol", 100, "Analgesic", 0.25, "China", 
                 service.parseDate("31/12/2030"), "tablet"));
             service.addMedicine(new Medicine("M002", "Aspirin", 50, "Analgesic", 1.00, "Bayer", 
                 service.parseDate("15/11/2029"), "tablet"));
@@ -116,8 +116,8 @@ public class PharmacyUI {
 
             Prescription prescription1 = new Prescription("RX001", patient1, "DR001");
             // Updated calls - removed quantityNeeded parameter (it's now calculated)
-            prescription1.addMedicineItem("Paracetamol", "1 tablet", "3x/day after meals", "5 days", "Oral");
-            prescription1.addMedicineItem("Amoxicillin", "1 capsule", "3x/day", "7 days", "Oral");
+            prescription1.addMedicineItem("Paracetamol", "1", "3x/day after meals", "5 days", "Oral");
+            prescription1.addMedicineItem("Amoxicillin", "1", "3x/day", "7 days", "Oral");
             service.addToQueue(prescription1);
 
             Patient patient2 = new Patient("Jane Smith", "987654321098",
@@ -127,8 +127,8 @@ public class PharmacyUI {
                                           new Date());
 
             Prescription prescription2 = new Prescription("RX002", patient2, "DR002");
-            prescription2.addMedicineItem("Benadryl Cough Syrup", "10ml", "2x/day", "5 days", "Oral");
-            prescription2.addMedicineItem("ORS Sachet", "1 sachet", "after each loose stool", "as needed", "dissolve in water");
+            prescription2.addMedicineItem("Benadryl Cough Syrup", "10", "2x/day", "5 days", "Oral");
+            prescription2.addMedicineItem("ORS Sachet", "1", "after each loose stool", "as needed", "dissolve in water");
             service.addToQueue(prescription2);
 
             Patient patient3 = new Patient("Bob Johnson", "555123456789",
@@ -139,7 +139,7 @@ public class PharmacyUI {
 
             Prescription prescription3 = new Prescription("RX003", patient3, "DR003");
             prescription3.addMedicineItem("Hydrocortisone Cream", "Apply thin layer", "2 times a day", "7 days", "Topical");
-            prescription3.addMedicineItem("Omeprazole", "1 capsule", "Before breakfast", "7 days", "Oral");
+            prescription3.addMedicineItem("Omeprazole", "1", "Before breakfast", "7 days", "Oral");
             service.addToQueue(prescription3);
         } catch (Exception e) {
             System.err.println("Error initializing sample queue: " + e.getMessage());
@@ -260,8 +260,13 @@ public class PharmacyUI {
             System.out.println("Medicine Items:");
             for (int j = 0; j < p.getMedicineItems().size(); j++) {
                 MedicalTreatmentItem item = p.getMedicineItems().get(j);
+
+                // Get medicine to access dosage form
+                Medicine medicine = service.findByName(item.getMedicineName());
+                String dosageForm = medicine != null ? medicine.getDosageForm() : "unit";
+
                 System.out.println("  - " + item.getMedicineName() + 
-                                 " | Dosage: " + item.getDosage() +
+                                 " | Dosage: " + item.getCompleteDosageDescription(dosageForm) +
                                  " | Frequency: " + item.getFrequency() +
                                  " | Duration: " + item.getDuration() +
                                  " | Method: " + item.getMethod() +
