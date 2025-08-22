@@ -19,7 +19,7 @@ import java.time.LocalTime;
 public class LeaveManagement {
 
     private static DynamicList<DoctorLeave> leaveList = new DynamicList<>();
-    
+
     public static void addSampleLeaves() {
         addLeave(new DoctorLeave(
                 "L001", // leaveID
@@ -38,14 +38,47 @@ public class LeaveManagement {
         ));
     }
 
-
     // Add leaves
     public static boolean addLeave(DoctorLeave l) {
         if (l != null) {
             leaveList.add(l);
+
+            // ✅ Update doctor's working status
+            Doctor doctor = DoctorManagement.findDoctorById(l.getDoctorID());
+            if (doctor != null) {
+                DoctorManagement.updateWorkingStatus(doctor);
+            }
+
             return true;
         }
         return false;
+    }
+
+    //Read
+    public static DynamicList getAllLeaves() {
+        return leaveList;
+    }
+
+    public static String generateNextLeaveId() {
+        int max = 0;
+
+        DynamicList<DoctorLeave> leaves = getAllLeaves();
+        for (int i = 0; i < leaves.size(); i++) {
+            String id = leaves.get(i).getLeaveID(); // e.g., "L001"
+            if (id != null && id.startsWith("L")) {
+                try {
+                    int num = Integer.parseInt(id.substring(1)); // take part after "L"
+                    if (num > max) {
+                        max = num;
+                    }
+                } catch (NumberFormatException e) {
+                    // ignore invalid leave IDs
+                }
+            }
+        }
+
+        // format with leading zeros (L001, L002, etc.)
+        return String.format("L%03d", max + 1);
     }
 
     public static DoctorLeave findLeaveById(String leaveID) {
@@ -79,28 +112,57 @@ public class LeaveManagement {
         return false;
     }
 
-    public static boolean updateLeave(String leaveID, LocalDate newDateFrom, LocalDate newDateTo, String newReason) {
+//    public static boolean updateLeave(String leaveID, LocalDate newDateFrom, LocalDate newDateTo, String newReason) {
+//        for (int i = 0; i < leaveList.size(); i++) {
+//            DoctorLeave leave = leaveList.get(i);
+//            if (leave.getLeaveID().equals(leaveID)) {
+//                leave.setDateFrom(newDateFrom);
+//                leave.setDateTo(newDateTo);
+//                leave.setReason(newReason);
+//                leaveList.replace(i, leave);
+//
+//                // ✅ Update doctor's working status
+//                Doctor doctor = DoctorManagement.findDoctorById(leave.getDoctorID());
+//                if (doctor != null) {
+//                    DoctorManagement.updateWorkingStatus(doctor);
+//                }
+//
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
+
+    public static boolean removeLeave(String leaveID) {
         for (int i = 0; i < leaveList.size(); i++) {
             DoctorLeave leave = leaveList.get(i);
             if (leave.getLeaveID().equals(leaveID)) {
-                leave.setDateFrom(newDateFrom);
-                leave.setDateTo(newDateTo);
-                leave.setReason(newReason);
-                leaveList.replace(i, leave); // Use your DynamicList's replace
+                leaveList.remove(i);
+
+                // ✅ Update doctor's working status
+                Doctor doctor = DoctorManagement.findDoctorById(leave.getDoctorID());
+                if (doctor != null) {
+                    DoctorManagement.updateWorkingStatus(doctor);
+                }
+
                 return true;
             }
         }
         return false;
     }
 
-    public static boolean removeLeave(String leaveID) {
-        for (int i = 0; i < leaveList.size(); i++) {
-            if (leaveList.get(i).getLeaveID().equals(leaveID)) {
-                leaveList.remove(i);
-                return true;
+    public static boolean removeLeaveByDoctorId(String doctorID) {
+        boolean removed = leaveList.removeIf(s -> s.getDoctorID().equalsIgnoreCase(doctorID.trim()));
+
+        if (removed) {
+            // ✅ Update doctor's working status
+            Doctor doctor = DoctorManagement.findDoctorById(doctorID);
+            if (doctor != null) {
+                DoctorManagement.updateWorkingStatus(doctor);
             }
         }
-        return false;
+
+        return removed;
     }
 
     public static int countLeavesForMonth(String doctorID, int year, int month) {
