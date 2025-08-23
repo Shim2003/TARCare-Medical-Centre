@@ -9,7 +9,10 @@ import ADT.MyList;
 import Entity.Doctor;
 import Entity.Schedule;
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.YearMonth;
+import java.time.temporal.TemporalAdjusters;
 
 /**
  *
@@ -19,14 +22,6 @@ public class ScheduleManagement {
 
     private static MyList<Schedule> scheduleList = new DynamicList<>();
 
-    // Add schedule
-//    public static boolean addSchedule(Schedule s) {
-//        if (s != null) {
-//            scheduleList.add(s);
-//            return true;
-//        }
-//        return false;
-//    }
     public static boolean addSchedule(Schedule s) {
         if (s != null) {
             scheduleList.add(s);
@@ -69,16 +64,6 @@ public class ScheduleManagement {
         return scheduleList;
     }
 
-    // Remove one schedule by ID
-//    public static boolean removeScheduleById(String scheduleID) {
-//        for (int i = 0; i < scheduleList.size(); i++) {
-//            if (scheduleList.get(i).getScheduleID().equals(scheduleID)) {
-//                scheduleList.remove(i);
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
     public static boolean removeScheduleById(String scheduleID) {
         for (int i = 0; i < scheduleList.size(); i++) {
             Schedule schedule = scheduleList.get(i);
@@ -217,30 +202,74 @@ public class ScheduleManagement {
 //
 //        return removed;
 //    }
+    public static int countWorkingDaysInMonth(String doctorID, YearMonth month) {
+        MyList<Schedule> schedules = getAllSchedules();
+        LocalDate monthStart = month.atDay(1);
+        LocalDate monthEnd = month.atEndOfMonth();
+
+        // use DynamicList<LocalDate> instead of Set
+        DynamicList<LocalDate> uniqueDates = new DynamicList<>();
+
+        for (int i = 0; i < schedules.size(); i++) {
+            Schedule s = schedules.get(i);
+            if (s.getDoctorID().equals(doctorID)) {
+                DayOfWeek scheduleDay = s.getDayOfWeek();
+
+                // find all matching days in this month
+                LocalDate d = monthStart.with(TemporalAdjusters.nextOrSame(scheduleDay));
+                while (!d.isAfter(monthEnd)) {
+                    // avoid duplicates manually
+                    boolean exists = false;
+                    for (int j = 0; j < uniqueDates.size(); j++) {
+                        if (uniqueDates.get(j).equals(d)) {
+                            exists = true;
+                            break;
+                        }
+                    }
+                    if (!exists) {
+                        uniqueDates.add(d);
+                    }
+
+                    d = d.plusWeeks(1);
+                }
+            }
+        }
+
+        return uniqueDates.size();
+    }
+
 // Sample schedules
     public static void addSampleSchedules() {
-        addSchedule(new Schedule("S001", "D001", DayOfWeek.TUESDAY,
+        addSchedule(new Schedule("S001", "D001", DayOfWeek.MONDAY,
+                LocalTime.of(9, 0), LocalTime.of(13, 0)));
+        addSchedule(new Schedule("S002", "D002", DayOfWeek.MONDAY,
+                LocalTime.of(9, 0), LocalTime.of(13, 0)));
+        addSchedule(new Schedule("S003", "D003", DayOfWeek.MONDAY,
+                LocalTime.of(9, 0), LocalTime.of(13, 0)));
+        addSchedule(new Schedule("S004", "D004", DayOfWeek.MONDAY,
+                LocalTime.of(13, 0), LocalTime.of(18, 0)));
+        addSchedule(new Schedule("S005", "D005", DayOfWeek.MONDAY,
+                LocalTime.of(13, 0), LocalTime.of(18, 0)));
+        addSchedule(new Schedule("S006", "D001", DayOfWeek.TUESDAY,
                 LocalTime.of(9, 0), LocalTime.of(12, 0)));
-        addSchedule(new Schedule("S002", "D001", DayOfWeek.THURSDAY,
-                LocalTime.of(0, 0), LocalTime.of(12, 0)));
-        addSchedule(new Schedule("S003", "D003", DayOfWeek.THURSDAY,
-                LocalTime.of(0, 0), LocalTime.of(12, 0)));
-        addSchedule(new Schedule("S004", "D002", DayOfWeek.TUESDAY,
-                LocalTime.of(13, 0), LocalTime.of(17, 0)));
-        addSchedule(new Schedule("S005", "D001", DayOfWeek.WEDNESDAY,
-                LocalTime.of(9, 0), LocalTime.of(23, 45)));
-        addSchedule(new Schedule("S006", "D002", DayOfWeek.FRIDAY,
-                LocalTime.of(9, 0), LocalTime.of(23, 45)));
-        addSchedule(new Schedule("S007", "D001", DayOfWeek.MONDAY,
-                LocalTime.of(9, 30), LocalTime.of(12, 30)));
-        addSchedule(new Schedule("S008", "D005", DayOfWeek.SUNDAY,
-                LocalTime.of(9, 30), LocalTime.of(23, 45)));
-        addSchedule(new Schedule("S009", "D004", DayOfWeek.SUNDAY,
-                LocalTime.of(9, 30), LocalTime.of(23, 45)));
-        addSchedule(new Schedule("S010", "D004", DayOfWeek.SATURDAY,
-                LocalTime.of(3, 30), LocalTime.of(23, 45)));
-        addSchedule(new Schedule("S020", "D005", DayOfWeek.FRIDAY,
-                LocalTime.of(9, 0), LocalTime.of(23, 45)));
+        addSchedule(new Schedule("S007", "D003", DayOfWeek.TUESDAY,
+                LocalTime.of(9, 0), LocalTime.of(12, 0)));
+        addSchedule(new Schedule("S008", "D005", DayOfWeek.TUESDAY,
+                LocalTime.of(9, 0), LocalTime.of(13, 0)));
+        addSchedule(new Schedule("S009", "D004", DayOfWeek.TUESDAY,
+                LocalTime.of(13, 0), LocalTime.of(15, 0)));
+        addSchedule(new Schedule("S010", "D005", DayOfWeek.TUESDAY,
+                LocalTime.of(15, 0), LocalTime.of(18, 0)));
+        addSchedule(new Schedule("S011", "D005", DayOfWeek.WEDNESDAY,
+                LocalTime.of(9, 0), LocalTime.of(12, 0)));
+        addSchedule(new Schedule("S012", "D003", DayOfWeek.WEDNESDAY,
+                LocalTime.of(9, 0), LocalTime.of(12, 0)));
+        addSchedule(new Schedule("S013", "D001", DayOfWeek.THURSDAY,
+                LocalTime.of(9, 0), LocalTime.of(12, 0)));
+        addSchedule(new Schedule("S014", "D001", DayOfWeek.THURSDAY,
+                LocalTime.of(13, 0), LocalTime.of(18, 0)));
+        addSchedule(new Schedule("S020", "D002", DayOfWeek.FRIDAY,
+                LocalTime.of(9, 0), LocalTime.of(13, 30)));
     }
 
 }

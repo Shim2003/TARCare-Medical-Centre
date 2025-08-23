@@ -12,6 +12,7 @@ import Entity.Schedule;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.YearMonth;
 
 /**
  *
@@ -37,7 +38,7 @@ public class LeaveManagement {
                 LocalDate.of(2025, 8, 16),
                 "Family vacation"
         ));
-        
+
         addLeave(new DoctorLeave(
                 "L003",
                 "D004",
@@ -45,7 +46,7 @@ public class LeaveManagement {
                 LocalDate.of(2025, 8, 25),
                 "Family vacation"
         ));
-        
+
         addLeave(new DoctorLeave(
                 "L004",
                 "D004",
@@ -149,7 +150,6 @@ public class LeaveManagement {
 //        }
 //        return false;
 //    }
-
     public static boolean removeLeave(String leaveID) {
         for (int i = 0; i < leaveList.size(); i++) {
             DoctorLeave leave = leaveList.get(i);
@@ -198,5 +198,77 @@ public class LeaveManagement {
         }
         return daysCount;
     }
+
+    //total leave taken regardless of shift
+    public static int countLeaveDaysInMonth(String doctorID, YearMonth month) {
+        MyList<DoctorLeave> leaves = getAllLeaves();
+        LocalDate monthStart = month.atDay(1);
+        LocalDate monthEnd = month.atEndOfMonth();
+
+        int leaveDays = 0;
+
+        for (int i = 0; i < leaves.size(); i++) {
+            DoctorLeave leave = leaves.get(i);
+            if (leave.getDoctorID().equals(doctorID)) {
+                LocalDate from = leave.getDateFrom();
+                LocalDate to = leave.getDateTo();
+
+                // clip range to current month
+                if (to.isBefore(monthStart) || from.isAfter(monthEnd)) {
+                    continue; // skip if completely outside
+                }
+                if (from.isBefore(monthStart)) {
+                    from = monthStart;
+                }
+                if (to.isAfter(monthEnd)) {
+                    to = monthEnd;
+                }
+
+                while (!from.isAfter(to)) {
+                    leaveDays++;
+                    from = from.plusDays(1);
+                }
+            }
+        }
+
+        return leaveDays;
+    }
+    
+    //actual leave days (according to schedule)
+    public static int countLeaveDaysForDoctor(String doctorID, YearMonth month,
+            MyList<DoctorLeave> leaves, MyList<Schedule> schedules) {
+        LocalDate monthStart = month.atDay(1);
+        LocalDate monthEnd = month.atEndOfMonth();
+
+        // First get all working days of the doctor (Mon, Fri etc.)
+        MyList<DayOfWeek> workingDays = new DynamicList<>();
+        for (int i = 0; i < schedules.size(); i++) {
+            Schedule s = schedules.get(i);
+            if (s.getDoctorID().equals(doctorID) && !workingDays.contains(s.getDayOfWeek())) {
+                workingDays.add(s.getDayOfWeek());
+            }
+        }
+
+        int leaveDays = 0;
+        for (int i = 0; i < leaves.size(); i++) {
+            DoctorLeave leave = leaves.get(i);
+            if (leave.getDoctorID().equals(doctorID)) {
+                LocalDate start = leave.getDateFrom().isBefore(monthStart) ? monthStart : leave.getDateFrom();
+                LocalDate end = leave.getDateTo().isAfter(monthEnd) ? monthEnd : leave.getDateTo();
+
+                for (LocalDate d = start; !d.isAfter(end); d = d.plusDays(1)) {
+                    // count only if this leave date is a scheduled working day
+                    for (int j = 0; j < workingDays.size(); j++) {
+                        if (d.getDayOfWeek().equals(workingDays.get(j))) {
+                            leaveDays++;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        return leaveDays;
+    }
+
 
 }

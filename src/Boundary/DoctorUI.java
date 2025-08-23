@@ -16,6 +16,7 @@ import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.YearMonth;
 import java.util.Date;
 import java.util.Scanner;
 
@@ -35,7 +36,7 @@ public class DoctorUI {
         DoctorManagement.addSampleDoctor();
         //
 
-        DoctorModuleMenu();
+       DoctorModuleMenu();
 //       testing();
     }
 
@@ -77,7 +78,8 @@ public class DoctorUI {
             System.out.println("1. Manage Doctors");
             System.out.println("2. Manage Schedules");
             System.out.println("3. Manage Leaves");
-            System.out.println("4. Back");
+            System.out.println("4. Summary Report");
+            System.out.println("5. Back");
             System.out.print("Enter your choice: ");
 
             String choice = scanner.nextLine();
@@ -97,6 +99,10 @@ public class DoctorUI {
                     break;
                 case "4":
                     validOption = true;
+                    DoctorReportUI.ReportMenu();
+                    break;
+                case "5":
+                    validOption = true;
                     DoctorModuleMenu();
                     break;
                 default:
@@ -114,10 +120,11 @@ public class DoctorUI {
         while (!validOption) {
             System.out.println("\n--- Welcome ---");
             System.out.println("1. Show All Doctors");
-            System.out.println("2. Check Day of Week");
-            System.out.println("3. Check Availability (Current Week)");
-            System.out.println("4. Check Schedules");
-            System.out.println("5. Back");
+            System.out.println("2. Show Current Free Doctor(s)");
+            System.out.println("3. Check Day of Week");
+            System.out.println("4. Check Availability (Current Week)");
+            System.out.println("5. Check Schedules");
+            System.out.println("6. Back");
             System.out.print("Enter your choice: ");
 
             String choice = scanner.nextLine();
@@ -131,23 +138,29 @@ public class DoctorUI {
                     break;
                 case "2":
                     validOption = true;
-                    ShowDoctorsSchedulesByDayUI();
+                    ShowDCurrentFreeDoctors();
                     UtilityClass.pressEnterToContinue();
                     UserMode();
                     break;
                 case "3":
                     validOption = true;
-                    DisplayAllTimetableWithLeaves();
+                    ShowDoctorsSchedulesByDayUI();
                     UtilityClass.pressEnterToContinue();
                     UserMode();
                     break;
                 case "4":
                     validOption = true;
-                    ScheduleUI.DisplayAllTimetable();
+                    DisplayAllTimetableWithLeaves();
                     UtilityClass.pressEnterToContinue();
                     UserMode();
                     break;
                 case "5":
+                    validOption = true;
+                    ScheduleUI.DisplayAllTimetable();
+                    UtilityClass.pressEnterToContinue();
+                    UserMode();
+                    break;
+                case "6":
                     validOption = true;
                     DoctorModuleMenu();
                 default:
@@ -232,13 +245,13 @@ public class DoctorUI {
 
         MyList<Doctor> doctorList = DoctorManagement.getAllDoctors();
         System.out.println("\n------------------------------------------------ DOCTOR LIST ------------------------------------------------");
-        System.out.printf(" %-20s | %-15s | %-30s | %-8s |\n",
+        System.out.printf(" %-20s | %-15s | %-30s | %-20s |\n",
                 "Full Name", "Contact", "Email", "Working Status");
         System.out.println("----------------------------------------------------------------------------------------------------------------");
 
         for (int i = 0; i < doctorList.size(); i++) {
             Doctor d = doctorList.get(i);
-            System.out.printf(" %-20s | %-15s | %-30s | %-8s |\n",
+            System.out.printf(" %-20s | %-15s | %-30s | %-20s |\n",
                     d.getName(),
                     d.getContactNumber(),
                     d.getEmail(), d.getWorkingStatus());
@@ -246,6 +259,27 @@ public class DoctorUI {
         }
 
         System.out.println("Total of " + doctorList.size() + " doctor(s)");
+
+    }
+    
+    public static void ShowDCurrentFreeDoctors() {
+
+        MyList<Doctor> doctorList = DoctorManagement.getFreeDoctors();
+        System.out.println("\n------------------------------------------------ AVAILABLE NOW ------------------------------------------------");
+        System.out.printf(" %-20s | %-15s | %-30s | %-20s |\n",
+                "Full Name", "Contact", "Email", "Working Status");
+        System.out.println("----------------------------------------------------------------------------------------------------------------");
+
+        for (int i = 0; i < doctorList.size(); i++) {
+            Doctor d = doctorList.get(i);
+            System.out.printf(" %-20s | %-15s | %-30s | %-20s |\n",
+                    d.getName(),
+                    d.getContactNumber(),
+                    d.getEmail(), d.getWorkingStatus());
+
+        }
+
+        System.out.println("Total of " + doctorList.size() + " doctor(s) available now");
 
     }
 
@@ -686,6 +720,8 @@ public class DoctorUI {
             Schedule s = schedulesList.get(i);
             System.out.println(s);
         }
+        System.out.println("");
+//        DisplaySummaryReport();
 
 //        System.out.println("Today: " + currentDay + " " + currentTime);
     }

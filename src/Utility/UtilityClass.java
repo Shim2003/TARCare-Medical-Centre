@@ -31,6 +31,7 @@ public class UtilityClass {
     public static final String statusConsulting = "Consulting";
     public static final String statusCompleted = "Completed";
     public static final String workingStatusOff = "Off";
+    public static final String statusOnLeave = "On Leave";
 
     //Diagnosis Status
     private static final String lowLevel = "Low";
