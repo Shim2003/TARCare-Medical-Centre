@@ -25,8 +25,8 @@ public class PatientManagement {
 
     // list to store patient details
     private static DynamicList<Patient> patientList = new DynamicList<>();
-    private static ConsultationManagement conMan = new ConsultationManagement();
-
+    private static AppointmentManagement appMan = new AppointmentManagement();
+    
     public static void addSamplePatients() {
         SimpleDateFormat sdf = new SimpleDateFormat(UtilityClass.DATE_FORMAT);
         try {
@@ -281,7 +281,7 @@ public class PatientManagement {
     public static AppointmentInfo checkPatientAppointments(String patientId) {
 
         // Get all appointment list 
-        DynamicList<Appointment> appointmentList = conMan.getScheduledAppointments();
+        DynamicList<Appointment> appointmentList = appMan.getScheduledAppointments();
 
         DynamicList<Appointment> patientAppointments = appointmentList.filter(
                 appointment -> appointment.getPatientId().equalsIgnoreCase(patientId)
