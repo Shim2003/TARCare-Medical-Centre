@@ -6,8 +6,7 @@ package Boundary;
 
 import static Boundary.PatientUI.adminUserMenu;
 import static Boundary.PatientUI.patientUserMenu;
-import Control.ConsultationManagement;
-import Control.PatientManagement;
+import DAO.ClinicData;
 import java.util.Scanner;
 
 /**
@@ -22,7 +21,7 @@ public class TARCareMedicalCentre {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        PatientManagement.addSamplePatients();
+        ClinicData.run();
         mainMenu();
     }
 

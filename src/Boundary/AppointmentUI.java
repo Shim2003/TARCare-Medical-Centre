@@ -9,6 +9,7 @@ import Control.PatientManagement;
 import Control.DoctorManagement;
 import Control.ScheduleManagement;
 import Control.LeaveManagement;
+import DAO.ClinicData;
 import java.util.Scanner;
 /**
  *
@@ -75,7 +76,7 @@ public class AppointmentUI {
     public static void main(String[] args) {
         // 初始化样本数据
         DoctorManagement.addSampleDoctor();
-        PatientManagement.addSamplePatients();
+        ClinicData.run();
         LeaveManagement.addSampleLeaves();
         ScheduleManagement.addSampleSchedules();
 

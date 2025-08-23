@@ -117,7 +117,7 @@ public class QueueUI {
         }
 
         // Get waiting patients
-        DynamicList<QueueEntry> waitingPatients = Control.QueueControl.getQueueListByStatus(
+        MyList<QueueEntry> waitingPatients = Control.QueueControl.getQueueListByStatus(
                 Utility.UtilityClass.statusWaiting
         );
 
@@ -208,7 +208,7 @@ public class QueueUI {
                 return;
         }
 
-        DynamicList<QueueEntry> filteredList = Control.QueueControl.getQueueListByStatus(selectedStatus);
+        MyList<QueueEntry> filteredList = Control.QueueControl.getQueueListByStatus(selectedStatus);
 
         if (filteredList.isEmpty()) {
             System.out.println("No queue entries found with status: " + selectedStatus);

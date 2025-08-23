@@ -51,7 +51,7 @@ public class QueueControl {
     public static QueueEntry getNextInQueue() {
 
         // Get all waiting patients
-        DynamicList<QueueEntry> waitingPatients = queueList.findAll(qe
+        MyList<QueueEntry> waitingPatients = queueList.findAll(qe
                 -> qe.getStatus().equals(Utility.UtilityClass.statusWaiting));
 
         if (waitingPatients.isEmpty()) {
@@ -108,7 +108,7 @@ public class QueueControl {
     }
 
     public static boolean isFullConsulting() {
-        DynamicList<QueueEntry> consulting = queueList.findAll(qe
+        MyList<QueueEntry> consulting = queueList.findAll(qe
                 -> qe.getStatus().equals(Utility.UtilityClass.statusConsulting));
 
         // Full
@@ -143,7 +143,7 @@ public class QueueControl {
 
     }
 
-    public static DynamicList<QueueEntry> getQueueListByStatus(String status) {
+    public static MyList<QueueEntry> getQueueListByStatus(String status) {
         return queueList.findAll(entry -> entry.getStatus().equalsIgnoreCase(status));
     }
 
@@ -167,7 +167,7 @@ public class QueueControl {
 
     public static boolean removeByStatus(String selectedStatus) {
 
-        DynamicList<QueueEntry> recordsToRemove = QueueControl.getQueueListByStatus(selectedStatus);
+        MyList<QueueEntry> recordsToRemove = QueueControl.getQueueListByStatus(selectedStatus);
 
         if (recordsToRemove.isEmpty()) {
             System.out.println("No queue records found with status: " + selectedStatus);
