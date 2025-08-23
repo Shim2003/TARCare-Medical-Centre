@@ -1,5 +1,6 @@
 package ADT;
 
+import ADT.DynamicList.ListStatistics;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.function.Function;
@@ -41,7 +42,7 @@ public interface MyList<T> {
 
     boolean anyMatch(Predicate<T> predicate);
 
-    DynamicList<T> findAll(Predicate<T> predicate);
+    MyList<T> findAll(Predicate<T> predicate);
 
     void replace(int index, T newItem);
 
@@ -53,9 +54,9 @@ public interface MyList<T> {
 
     void quickSort(Comparator<T> comparator);
 
-    DynamicList<T> clone();
+    MyList<T> clone();
 
-    DynamicList<T> filter(Predicate<T> predicate);
+    MyList<T> filter(Predicate<T> predicate);
 
     boolean equals(Object obj);
 
@@ -63,5 +64,5 @@ public interface MyList<T> {
 
     T[] toArray();
 
-    DynamicList.ListStatistics<T> getStatistics(Function<T, Number> numericExtractor);
+    ListStatistics<T> getStatistics(Function<T, Number> numericExtractor);
 }

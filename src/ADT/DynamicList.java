@@ -197,7 +197,7 @@ public class DynamicList<T> implements MyList<T> {
     }
 
     @Override
-    public DynamicList<T> findAll(Predicate<T> predicate) {
+    public MyList<T> findAll(Predicate<T> predicate) {
         DynamicList<T> result = new DynamicList<>();
         // Check before gap
         for (int i = 0; i < gapStart; i++) {
@@ -440,8 +440,8 @@ public class DynamicList<T> implements MyList<T> {
     }
 
     @Override
-    public DynamicList<T> clone() {
-        DynamicList<T> clonedList = new DynamicList<>(this.capacity);
+    public MyList<T> clone() {
+        MyList<T> clonedList = new DynamicList<>(this.capacity);
         
         // Copy all elements in order
         for (int i = 0; i < size(); i++) {
@@ -507,8 +507,8 @@ public class DynamicList<T> implements MyList<T> {
     // Filter treatment records based on a specific condition like last 30 days or last 3 months in MTManagement
     @SuppressWarnings("unchecked")
     @Override
-    public DynamicList<T> filter(Predicate<T> predicate) {
-        DynamicList<T> result = new DynamicList<>();
+    public MyList<T> filter(Predicate<T> predicate) {
+        MyList<T> result = new DynamicList<>();
         for (int i = 0; i < size(); i++) {
             T item = get(i);
             if (predicate.test(item)) {
