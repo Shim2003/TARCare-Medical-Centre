@@ -6,6 +6,7 @@ package Boundary;
 
 import ADT.DynamicList;
 import ADT.MyList;
+import Control.ConsultationManagement;
 import Control.DiagnosisManagement;
 import Entity.*;
 import java.text.SimpleDateFormat;
@@ -42,7 +43,7 @@ public class DiagnosisUI {
 
                 switch (choice) {
                     case 1 ->
-                        addDiagnosisTest();
+                        addDiagnosis();
                     case 2 ->
                         viewDiagnosisDetails();
                     case 3 ->
@@ -76,12 +77,14 @@ public class DiagnosisUI {
     }
 
     public static void addDiagnosis() {
-        String patientId;
         try {
             System.out.println("\n=== Add New Diagnosis ===");
 
-            System.out.print("Enter Patient ID: ");
-            patientId = scanner.nextLine();
+            // get the first patient ID directly from the DAO current serving list
+            QueueEntry nextPatient = ConsultationManagement.getNextWaitingPatient();
+            String patientId = nextPatient.getPatientId();
+            System.out.println("Patient ID: " + patientId);
+
 
             System.out.print("Enter Doctor ID: ");
             String doctorId = scanner.nextLine();

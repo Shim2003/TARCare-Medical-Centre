@@ -58,10 +58,6 @@ public interface MyList<T> {
 
     MyList<T> filter(Predicate<T> predicate);
 
-    boolean equals(Object obj);
-
-    int hashCode();
-
     T[] toArray();
 
     ListStatistics<T> getStatistics(Function<T, Number> numericExtractor);
