@@ -16,7 +16,6 @@ import java.util.Scanner;
  */
 public class AppointmentUI {
 
-    private final AppointmentManagement appointmentManagement = new AppointmentManagement();
     private final Scanner sc = new Scanner(System.in);
 
     public void run() {
@@ -52,19 +51,19 @@ public class AppointmentUI {
                     System.out.print("Enter reason: ");
                     String reason = sc.nextLine();
 
-                    appointmentManagement.scheduleNextAppointment(patientId, doctorId, dateTimeStr, reason);
+                    AppointmentManagement.scheduleNextAppointment(patientId, doctorId, dateTimeStr, reason);
                 }
-                case 2 -> appointmentManagement.viewScheduledAppointments();
-                case 3 -> appointmentManagement.viewAppointmentsWithNames();
+                case 2 -> AppointmentManagement.viewScheduledAppointments();
+                case 3 -> AppointmentManagement.viewAppointmentsWithNames();
                 case 4 -> { // Delete Appointment
                     System.out.print("Enter Appointment ID to delete: ");
                     String appointmentId = sc.nextLine();
-                    appointmentManagement.deleteAppointmentById(appointmentId);
+                    AppointmentManagement.deleteAppointmentById(appointmentId);
                 }
                 case 5 -> { // Modify Appointment
                     System.out.print("Enter Appointment ID to modify: ");
                     String appointmentId = sc.nextLine();
-                    appointmentManagement.modifyAppointment(appointmentId);
+                    AppointmentManagement.modifyAppointment(appointmentId);
                 }
                 case 0 -> System.out.println("Returning to Main Menu...");
                 default -> System.out.println("Invalid choice. Please try again.");
@@ -79,7 +78,7 @@ public class AppointmentUI {
         PatientManagement.addSamplePatients();
         LeaveManagement.addSampleLeaves();
         ScheduleManagement.addSampleSchedules();
-        
+
         AppointmentUI ui = new AppointmentUI();
         ui.run();
     }

@@ -29,15 +29,10 @@ public class ConsultationUI {
             System.out.println(" 6. View Patients Who Finished Consultation");
             System.out.println(" 7. View Consultation Report");
             System.out.println(" 8. Delete Consultation");
-            System.out.println(" 9. Schedule Appointment");
-            System.out.println("10. View Appointments");
-            System.out.println("11. Delete Appointment");
-            System.out.println("12. Modify Appointment");
-            System.out.println("13. View All Doctors Status");
-            System.out.println("14. Show Completed Patients");
-            System.out.println("15. Show Scheduled Appointments");
-            System.out.println("16. Show All Completed Consultations");
-            System.out.println("17. Show Ongoing Consultations (raw list)");
+            System.out.println(" 9. View All Doctors Status");
+            System.out.println("10. Show Completed Patients");
+            System.out.println("11. Show All Completed Consultations");
+            System.out.println("12. Show Ongoing Consultations (raw list)");
             System.out.println("--------------------------------------");
             System.out.println(" 0. Back to Main Menu");
             System.out.println("======================================");
@@ -76,34 +71,10 @@ public class ConsultationUI {
                     String consultationId = sc.nextLine();
                     consultationManagement.deleteConsultationById(consultationId);
                 }
-                case 9 -> {   // Schedule Appointment
-                    System.out.print("Enter Patient ID: ");
-                    String patientId = sc.nextLine();
-                    System.out.print("Enter Doctor ID: ");
-                    String doctorId = sc.nextLine();
-                    System.out.print("Enter appointment date and time (dd-MM-yyyy HH:mm): ");
-                    String dateTimeStr = sc.nextLine();
-                    System.out.print("Enter reason : ");
-                    String symptoms = sc.nextLine();
-
-                    consultationManagement.scheduleNextAppointment(patientId, doctorId, dateTimeStr, symptoms);
-                }
-                case 10 -> consultationManagement.viewAppointmentsWithNames();
-                case 11 -> {   // Delete Appointment
-                    System.out.print("Enter Appointment ID to delete: ");
-                    String appointmentId = sc.nextLine();
-                    consultationManagement.deleteAppointmentById(appointmentId);
-                }
-                case 12 -> {  // ✅ Modify Appointment
-                    System.out.print("Enter Appointment ID to modify: ");
-                    String appointmentId = sc.nextLine();
-                    consultationManagement.modifyAppointment(appointmentId);
-                }
-                case 13 -> consultationManagement.printAllDoctorsStatus("=== Current Doctors Status ===");
-                case 14 -> consultationManagement.showCompletedPatients();
-                case 15 -> consultationManagement.viewScheduledAppointments();
-                case 16 -> consultationManagement.showCompletedConsultations();
-                case 17 -> consultationManagement.showOngoingConsultations();
+                case 9 -> consultationManagement.printAllDoctorsStatus("=== Current Doctors Status ===");
+                case 10 -> consultationManagement.showCompletedPatients();
+                case 11 -> consultationManagement.showCompletedConsultations();
+                case 12 -> consultationManagement.showOngoingConsultations();
                 case 0 -> System.out.println("  Returning to Main Menu...");
                 default -> System.out.println("  Invalid choice. Please try again.");
             }

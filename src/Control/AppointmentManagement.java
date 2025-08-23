@@ -5,6 +5,7 @@
 package Control;
 
 import ADT.DynamicList;
+import ADT.MyList;
 import Entity.Appointment;
 import Entity.Patient;
 import Entity.Doctor;
@@ -23,13 +24,15 @@ import java.time.format.DateTimeFormatter;
  */
 public class AppointmentManagement {
     private static DynamicList<Appointment> scheduledAppointments = new DynamicList<>();
-    private static int appointmentCounter = 1001;
+    
+    // 计数器
+    private static int appointmentCounter = 1001; // A1001
 
-    private String generateNextAppointmentId() {
+    private static String generateNextAppointmentId() {
         return "A" + appointmentCounter++;
     }
 
-    public void scheduleNextAppointment(String patientId, String doctorId, String dateTimeStr, String reason) {
+    public static void scheduleNextAppointment(String patientId, String doctorId, String dateTimeStr, String reason) {
         // 检查病人是否存在
         Patient patient = PatientManagement.findPatientById(patientId);
         if (patient == null) {
@@ -56,7 +59,7 @@ public class AppointmentManagement {
 
             // 检查医生在预约那天是否有排班
             DayOfWeek dayOfWeek = appointmentTime.getDayOfWeek();
-            DynamicList<Schedule> doctorSchedules = ScheduleManagement.findSchedulesByDoctorId(doctorId);
+            MyList<Schedule> doctorSchedules = ScheduleManagement.findSchedulesByDoctorId(doctorId);
             boolean isAvailable = false;
             for (int i = 0; i < doctorSchedules.size(); i++) {
                 Schedule s = doctorSchedules.get(i);
@@ -94,7 +97,7 @@ public class AppointmentManagement {
     }
     
     // 查看所有预约consultations
-    public void viewScheduledAppointments() {
+    public static void viewScheduledAppointments() {
         if (scheduledAppointments.isEmpty()) {
             System.out.println("No scheduled appointments.");
             return;
@@ -106,7 +109,7 @@ public class AppointmentManagement {
     }
 
     // ✅ 查看所有预约，并显示 Patient 名字和 Doctor 名字
-    public void viewAppointmentsWithNames() {
+    public static void viewAppointmentsWithNames() {
         if (scheduledAppointments.isEmpty()) {
             System.out.println("No scheduled appointments.");
             return;
@@ -116,11 +119,9 @@ public class AppointmentManagement {
         for (int i = 0; i < scheduledAppointments.size(); i++) {
             Appointment a = scheduledAppointments.get(i);
 
-            // 获取 Patient 名字
             Patient patient = PatientManagement.findPatientById(a.getPatientId());
             String patientName = (patient != null) ? patient.getFullName() : "Unknown Patient";
 
-            // 获取 Doctor 名字
             Doctor doctor = DoctorManagement.findDoctorById(a.getDoctorId());
             String doctorName = (doctor != null) ? doctor.getName() : "Unknown Doctor";
 
@@ -131,7 +132,7 @@ public class AppointmentManagement {
                     a.getPatientId(),
                     doctorName,
                     a.getDoctorId(),
-                    a.getAppointmentTime().format(java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")),
+                    a.getAppointmentTime().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")),
                     a.getReason()
             );
         }
@@ -139,7 +140,7 @@ public class AppointmentManagement {
     }
 
     // ✅ 删除 Appointment（通过 Appointment ID）
-    public void deleteAppointmentById(String appointmentId) {
+    public static void deleteAppointmentById(String appointmentId) {
         if (scheduledAppointments.isEmpty()) {
             System.out.println("No appointments available to delete.");
             return;
@@ -162,7 +163,7 @@ public class AppointmentManagement {
     }
 
     // ✅ 修改 Appointment
-    public void modifyAppointment(String appointmentId) {
+    public static void modifyAppointment(String appointmentId) {
         Appointment appointment = null;
         for (int i = 0; i < scheduledAppointments.size(); i++) {
             if (scheduledAppointments.get(i).getAppointmentId().equals(appointmentId)) {
@@ -179,7 +180,6 @@ public class AppointmentManagement {
         Scanner sc = new Scanner(System.in);
         System.out.println("\n--- Modifying Appointment " + appointmentId + " ---");
 
-        // 修改 Patient
         System.out.print("Enter new Patient ID (or press Enter to keep " + appointment.getPatientId() + "): ");
         String newPatientId = sc.nextLine().trim();
         if (!newPatientId.isEmpty()) {
@@ -192,7 +192,6 @@ public class AppointmentManagement {
             }
         }
 
-        // 修改 Doctor
         System.out.print("Enter new Doctor ID (or press Enter to keep " + appointment.getDoctorId() + "): ");
         String newDoctorId = sc.nextLine().trim();
         if (!newDoctorId.isEmpty()) {
@@ -205,9 +204,8 @@ public class AppointmentManagement {
             }
         }
 
-        // 修改 Date/Time
         System.out.print("Enter new date and time (dd-MM-yyyy HH:mm) (or press Enter to keep " 
-                         + appointment.getAppointmentTime().format(java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")) + "): ");
+                         + appointment.getAppointmentTime().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")) + "): ");
         String newDateTimeStr = sc.nextLine().trim();
         if (!newDateTimeStr.isEmpty()) {
             try {
@@ -224,7 +222,6 @@ public class AppointmentManagement {
             }
         }
 
-        // 修改 Reason
         System.out.print("Enter new reason (or press Enter to keep \"" + appointment.getReason() + "\"): ");
         String newReason = sc.nextLine().trim();
         if (!newReason.isEmpty()) {
@@ -235,7 +232,7 @@ public class AppointmentManagement {
         System.out.println("Appointment modification complete.\n");
     }
 
-    public DynamicList<Appointment> getScheduledAppointments() {
+    public static DynamicList<Appointment> getScheduledAppointments() {
         return scheduledAppointments;
     }
 }
