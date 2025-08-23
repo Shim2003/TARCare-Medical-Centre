@@ -5,6 +5,7 @@
 package Boundary;
 
 import ADT.DynamicList;
+import ADT.MyList;
 import Control.QueueControl;
 import Entity.QueueEntry;
 import Utility.UtilityClass;
@@ -334,7 +335,7 @@ public class QueueUI {
     }
 
     private static void removeAllQueueRecords() {
-        DynamicList<QueueEntry> allRecords = QueueControl.getQueueList();
+        MyList<QueueEntry> allRecords = QueueControl.getQueueList();
 
         if (allRecords.isEmpty()) {
             System.out.println("No queue records to remove.");

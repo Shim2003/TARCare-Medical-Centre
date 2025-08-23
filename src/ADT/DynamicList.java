@@ -305,6 +305,7 @@ public class DynamicList<T> implements MyList<T> {
         }
     }
 
+    @Override
     public ListStatistics<T> getStatistics(Function<T, Number> numericExtractor) {
         if (isEmpty()) {
             return new ListStatistics<>(0, 0, 0, 0, 0);

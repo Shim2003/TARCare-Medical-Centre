@@ -1,10 +1,7 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package Control;
 
 import ADT.DynamicList;
+import ADT.MyList;
 import DAO.CurrentServingDAO;
 import Entity.Doctor;
 import Entity.Patient;
@@ -17,8 +14,8 @@ import Utility.UtilityClass;
  */
 public class QueueControl {
 
-    private static DynamicList<QueueEntry> queueList = new DynamicList<>();
-    private static DynamicList<CurrentServingDAO> currentServingPatient = new DynamicList<>();
+    private static MyList<QueueEntry> queueList = new DynamicList<>();
+    private static MyList<CurrentServingDAO> currentServingPatient = new DynamicList<>();
 
     public static QueueEntry addInQueue(String patientId) {
 
@@ -53,9 +50,6 @@ public class QueueControl {
 
     public static QueueEntry getNextInQueue() {
 
-        LeaveManagement.addSampleLeaves();
-        ScheduleManagement.addSampleSchedules();
-        DoctorManagement.addSampleDoctor();
         // Get all waiting patients
         DynamicList<QueueEntry> waitingPatients = queueList.findAll(qe
                 -> qe.getStatus().equals(Utility.UtilityClass.statusWaiting));
@@ -65,7 +59,7 @@ public class QueueControl {
         }
 
         // Find the patient with the lowest queue number (next in sequence)
-        QueueEntry nextPatient = waitingPatients.get(0);
+        QueueEntry nextPatient = waitingPatients.getFirst();
         for (int i = 1; i < waitingPatients.size(); i++) {
             QueueEntry current = waitingPatients.get(i);
             if (current.getQueueNumber() < nextPatient.getQueueNumber()) {
@@ -73,7 +67,6 @@ public class QueueControl {
             }
         }
 
-        // Consultation need to change the status
         DynamicList<Doctor> freeDoctors = DoctorManagement.getFreeDoctors();
 
         if (freeDoctors.isEmpty()) {
@@ -81,8 +74,9 @@ public class QueueControl {
             return null;
         }
 
-        freeDoctors.get(0).setWorkingStatus(UtilityClass.statusConsulting);
-        CurrentServingDAO newConsulattion = new CurrentServingDAO(nextPatient.getPatientId(), freeDoctors.get(0).getDoctorID());
+        Doctor firstFreeDoctors = freeDoctors.getFirst();
+        firstFreeDoctors.setWorkingStatus(UtilityClass.statusConsulting);
+        CurrentServingDAO newConsulattion = new CurrentServingDAO(nextPatient.getPatientId(), firstFreeDoctors.getDoctorID());
 
         if (currentServingPatient.size() >= 3) {
             System.out.println("Consultation is full. Please try again later.");
@@ -95,7 +89,7 @@ public class QueueControl {
         return nextPatient;
     }
 
-    public static DynamicList<CurrentServingDAO> getCurrentServingPatient() {
+    public static MyList<CurrentServingDAO> getCurrentServingPatient() {
         return currentServingPatient;
     }
 
@@ -124,7 +118,7 @@ public class QueueControl {
         return false;
     }
 
-    public static DynamicList<QueueEntry> getQueueList() {
+    public static MyList<QueueEntry> getQueueList() {
         return queueList;
     }
 

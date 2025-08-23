@@ -5,6 +5,7 @@
 package Boundary;
 
 import ADT.DynamicList;
+import ADT.MyList;
 import Control.PatientManagement;
 import DAO.AppointmentInfo;
 import Entity.Patient;
@@ -301,7 +302,7 @@ public class PatientUI {
 
     public static void displayAll() {
 
-        DynamicList<Patient> patientList = PatientManagement.getPatientList();
+        MyList<Patient> patientList = PatientManagement.getPatientList();
 
         if (patientList.isEmpty()) {
             System.out.println("No patients registered yet.");
@@ -361,7 +362,7 @@ public class PatientUI {
     }
 
     public static void generateGenderDistributionReport() {
-        DynamicList<Patient> patientList = PatientManagement.getPatientList();
+        MyList<Patient> patientList = PatientManagement.getPatientList();
 
         if (patientList.isEmpty()) {
             System.out.println("\n" + "=".repeat(50));
@@ -373,8 +374,8 @@ public class PatientUI {
             return;
         }
 
-        DynamicList<Patient> malePatients = PatientManagement.getMalePatients();
-        DynamicList<Patient> femalePatients = PatientManagement.getFemalePatients();
+        MyList<Patient> malePatients = PatientManagement.getMalePatients();
+        MyList<Patient> femalePatients = PatientManagement.getFemalePatients();
         PatientManagement.GenderStatistics genderStats = PatientManagement.getGenderStatistics();
 
         // Display the report
@@ -411,7 +412,7 @@ public class PatientUI {
     }
 
     public static void generateTotalPatientsReport() {
-        DynamicList<Patient> patientList = PatientManagement.getPatientsSortedBy("name");
+        MyList<Patient> patientList = PatientManagement.getPatientsSortedBy("name");
         int totalPatients = patientList.size();
 
         if (totalPatients == 0) {
@@ -468,7 +469,7 @@ public class PatientUI {
         }
     }
 
-    private static void displayPatientPage(DynamicList<Patient> patientList, int currentPage,
+    private static void displayPatientPage(MyList<Patient> patientList, int currentPage,
             int patientsPerPage, int totalPages, int totalPatients) {
         System.out.println("\n" + "=".repeat(86));
         System.out.printf("                    TOTAL REGISTERED PATIENTS (Page %d of %d)\n", currentPage, totalPages);
@@ -505,7 +506,7 @@ public class PatientUI {
     }
 
     public static void generateAgeStatisticsReport() {
-        DynamicList<Patient> patientList = PatientManagement.getPatientList();
+        MyList<Patient> patientList = PatientManagement.getPatientList();
 
         if (patientList.isEmpty()) {
             System.out.println("\n" + "=".repeat(60));
@@ -536,9 +537,9 @@ public class PatientUI {
         System.out.printf("|- Standard Deviation: %.1f years\n", ageStats.standardDeviation);
 
         // Age group analysis
-        DynamicList<Patient> pediatric = PatientManagement.getPatientsByAgeGroup("pediatric");
-        DynamicList<Patient> adult = PatientManagement.getPatientsByAgeGroup("adult");
-        DynamicList<Patient> geriatric = PatientManagement.getPatientsByAgeGroup("geriatric");
+        MyList<Patient> pediatric = PatientManagement.getPatientsByAgeGroup("pediatric");
+        MyList<Patient> adult = PatientManagement.getPatientsByAgeGroup("adult");
+        MyList<Patient> geriatric = PatientManagement.getPatientsByAgeGroup("geriatric");
 
         System.out.println("\nAGE GROUP BREAKDOWN:");
         System.out.printf("|- Pediatric (0-17 years): %d patients (%.1f%%)\n",
@@ -550,8 +551,8 @@ public class PatientUI {
 
         // Show top 3 oldest and youngest using sorting
         System.out.println("\nAGE EXTREMES:");
-        DynamicList<Patient> oldest = PatientManagement.getOldestPatients(3);
-        DynamicList<Patient> youngest = PatientManagement.getYoungestPatients(3);
+        MyList<Patient> oldest = PatientManagement.getOldestPatients(3);
+        MyList<Patient> youngest = PatientManagement.getYoungestPatients(3);
 
         System.out.println("Oldest Patients:");
         for (int i = 0; i < oldest.size(); i++) {

@@ -1,10 +1,7 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package Control;
 
 import ADT.DynamicList;
+import ADT.MyList;
 import DAO.AppointmentInfo;
 import Entity.Appointment;
 import Entity.Patient;
@@ -157,8 +154,7 @@ public class PatientManagement {
         }
     }
 
-    public static DynamicList<Patient> getPatientList() {
-
+    public static MyList<Patient> getPatientList() {
         return patientList;
     }
 
@@ -190,7 +186,7 @@ public class PatientManagement {
         return age;
     }
 
-    public static DynamicList<Patient> getPatientsByAgeGroup(String ageGroup) {
+    public static MyList<Patient> getPatientsByAgeGroup(String ageGroup) {
         switch (ageGroup.toLowerCase()) {
             case "pediatric":
                 return patientList.findAll(p -> calculateAge(p) < 18);
@@ -203,9 +199,9 @@ public class PatientManagement {
         }
     }
 
-    public static DynamicList<Patient> getOldestPatients(int n) {
-        DynamicList<Patient> sortedByAge = getPatientsSortedBy("age");
-        DynamicList<Patient> result = new DynamicList<>();
+    public static MyList<Patient> getOldestPatients(int n) {
+        MyList<Patient> sortedByAge = getPatientsSortedBy("age");
+        MyList<Patient> result = new DynamicList<>();
 
         int count = Math.min(n, sortedByAge.size());
         for (int i = sortedByAge.size() - count; i < sortedByAge.size(); i++) {
@@ -214,9 +210,9 @@ public class PatientManagement {
         return result;
     }
 
-    public static DynamicList<Patient> getYoungestPatients(int n) {
-        DynamicList<Patient> sortedByAge = getPatientsSortedBy("age");
-        DynamicList<Patient> result = new DynamicList<>();
+    public static MyList<Patient> getYoungestPatients(int n) {
+        MyList<Patient> sortedByAge = getPatientsSortedBy("age");
+        MyList<Patient> result = new DynamicList<>();
 
         int count = Math.min(n, sortedByAge.size());
         for (int i = 0; i < count; i++) {
@@ -225,8 +221,8 @@ public class PatientManagement {
         return result;
     }
 
-    public static DynamicList<Patient> getPatientsSortedBy(String criteria) {
-        DynamicList<Patient> sortedList = patientList.clone();
+    public static MyList<Patient> getPatientsSortedBy(String criteria) {
+        MyList<Patient> sortedList = patientList.clone();
 
         switch (criteria.toLowerCase()) {
             case "name":
@@ -251,24 +247,24 @@ public class PatientManagement {
         return sortedList;
     }
 
-    public static DynamicList<Patient> getMalePatients() {
+    public static MyList<Patient> getMalePatients() {
         return patientList.filter(patient
                 -> patient.getGender() == 'M' || patient.getGender() == 'm');
     }
 
-    public static DynamicList<Patient> getFemalePatients() {
+    public static MyList<Patient> getFemalePatients() {
         return patientList.filter(patient
                 -> patient.getGender() == 'F' || patient.getGender() == 'f');
     }
 
-    public static DynamicList<Patient> getPatientsByGender(char gender) {
+    public static MyList<Patient> getPatientsByGender(char gender) {
         return patientList.filter(patient
                 -> Character.toLowerCase(patient.getGender()) == Character.toLowerCase(gender));
     }
 
     public static GenderStatistics getGenderStatistics() {
-        DynamicList<Patient> malePatients = getMalePatients();
-        DynamicList<Patient> femalePatients = getFemalePatients();
+        MyList<Patient> malePatients = getMalePatients();
+        MyList<Patient> femalePatients = getFemalePatients();
         int totalPatients = patientList.size();
 
         return new GenderStatistics(
@@ -281,9 +277,9 @@ public class PatientManagement {
     public static AppointmentInfo checkPatientAppointments(String patientId) {
 
         // Get all appointment list 
-        DynamicList<Appointment> appointmentList = appMan.getScheduledAppointments();
+        MyList<Appointment> appointmentList = appMan.getScheduledAppointments();
 
-        DynamicList<Appointment> patientAppointments = appointmentList.filter(
+        MyList<Appointment> patientAppointments = appointmentList.filter(
                 appointment -> appointment.getPatientId().equalsIgnoreCase(patientId)
         );
 
@@ -304,7 +300,7 @@ public class PatientManagement {
                 Comparator.comparing(Appointment::getAppointmentTime)
         );
 
-        Appointment nextAppointment = upcomingAppointments.get(0);
+        Appointment nextAppointment = upcomingAppointments.getFirst();
 
         Duration duration = Duration.between(now, nextAppointment.getAppointmentTime());
         int totalHours = (int) duration.toHours();
