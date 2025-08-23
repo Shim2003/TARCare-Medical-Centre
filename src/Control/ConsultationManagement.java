@@ -184,6 +184,19 @@ public class ConsultationManagement {
         }
         System.out.println("==========================\n");
     }
+    
+    // ✅ 单独的方法：获取下一个等待的病人
+    public static QueueEntry getNextWaitingPatient() {
+        MyList<QueueEntry> queueList = QueueControl.getQueueList();
+        for (int i = 0; i < queueList.size(); i++) {
+            QueueEntry qe = queueList.get(i);
+            if (qe.getStatus().equals(UtilityClass.statusWaiting)) {
+                return qe;
+            }
+        }
+        return null; // 没有等待中的病人
+    }
+
 
     // 开始下一位咨询
     public static void startNextConsultation() {
