@@ -84,6 +84,7 @@ public class ConsultationUI {
 
     
     public static void main(String[] args) {
+        ConsultationManagement.addSampleConsultations();
         LeaveManagement.addSampleLeaves();
         ScheduleManagement.addSampleSchedules();
         DoctorManagement.addSampleDoctor();

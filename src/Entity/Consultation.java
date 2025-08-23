@@ -23,12 +23,17 @@ public class Consultation {
     private long durationSeconds;
     private static Consultation currentConsultation;
     private static DynamicList<Consultation> currentConsultationList = new DynamicList<>();
+    private static DynamicList<Consultation> completedConsultations = new DynamicList<>();
 
     public Consultation(String consultationId, String patientId, String doctorId, String symptoms) {
         this.consultationId = consultationId;
         this.patientId = patientId;
         this.doctorId = doctorId;
         this.symptoms = symptoms;
+
+        if (startTime != null && endTime != null) {
+            this.durationSeconds = Duration.between(startTime, endTime).getSeconds();
+        }
     }
 
     public String getConsultationId() { return consultationId; }
@@ -57,6 +62,9 @@ public class Consultation {
     public static DynamicList<Consultation> getCurrentConsultationList() {
         return currentConsultationList;
     }
+    
+    public static DynamicList<Consultation> getCompletedConsultations() { return completedConsultations; }
+
 
     public static void setCurrentConsultation(Consultation consultation) {
         currentConsultation = consultation;

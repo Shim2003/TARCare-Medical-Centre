@@ -6,6 +6,7 @@ package Control;
 
 import java.util.Scanner;
 import java.util.Iterator;
+import java.util.Date;
 import ADT.DynamicList;
 import ADT.MyList;
 import DAO.CurrentServingDAO;
@@ -25,7 +26,7 @@ import java.time.LocalTime;
 import java.time.LocalDate;
 import java.time.Duration;
 import java.time.DayOfWeek;
-import ADT.DynamicList.ListStatistics;
+import java.time.ZoneId;
 
 /**
  *
@@ -37,6 +38,66 @@ public class ConsultationManagement {
     private static DynamicList<Consultation> ongoingConsultations = new DynamicList<>();
     private static MyList<CurrentServingDAO> currentConsulting = QueueControl.getCurrentServingPatient();
     private static DynamicList<Consultation> completedConsultations = new DynamicList<>();
+    
+    public static void addSampleConsultations() {
+        try {
+            Consultation[] samples = new Consultation[10];
+
+            samples[0] = new Consultation("C001", "P1001", "D001", "Cough");
+            samples[0].setStartTime(LocalDateTime.of(2025, 8, 20, 9, 0));
+            samples[0].setEndTime(LocalDateTime.of(2025, 8, 20, 9, 30));
+
+            samples[1] = new Consultation("C002", "P1002", "D002", "Fever");
+            samples[1].setStartTime(LocalDateTime.of(2025, 8, 20, 10, 0));
+            samples[1].setEndTime(LocalDateTime.of(2025, 8, 20, 10, 20));
+
+            samples[2] = new Consultation("C003", "P1003", "D003", "Headache");
+            samples[2].setStartTime(LocalDateTime.of(2025, 8, 21, 11, 0));
+            samples[2].setEndTime(LocalDateTime.of(2025, 8, 21, 11, 40));
+
+            samples[3] = new Consultation("C004", "P1004", "D004", "Back Pain");
+            samples[3].setStartTime(LocalDateTime.of(2025, 8, 21, 14, 0));
+            samples[3].setEndTime(LocalDateTime.of(2025, 8, 21, 14, 25));
+
+            samples[4] = new Consultation("C005", "P1005", "D005", "Stomach Ache");
+            samples[4].setStartTime(LocalDateTime.of(2025, 8, 22, 9, 15));
+            samples[4].setEndTime(LocalDateTime.of(2025, 8, 22, 9, 50));
+
+            samples[5] = new Consultation("C006", "P1006", "D006", "Sore Throat");
+            samples[5].setStartTime(LocalDateTime.of(2025, 8, 22, 10, 30));
+            samples[5].setEndTime(LocalDateTime.of(2025, 8, 22, 11, 0));
+
+            samples[6] = new Consultation("C007", "P1007", "D007", "Allergy");
+            samples[6].setStartTime(LocalDateTime.of(2025, 8, 23, 8, 45));
+            samples[6].setEndTime(LocalDateTime.of(2025, 8, 23, 9, 15));
+
+            samples[7] = new Consultation("C008", "P1008", "D008", "Flu");
+            samples[7].setStartTime(LocalDateTime.of(2025, 8, 23, 10, 15));
+            samples[7].setEndTime(LocalDateTime.of(2025, 8, 23, 10, 50));
+
+            samples[8] = new Consultation("C009", "P1009", "D009", "Fatigue");
+            samples[8].setStartTime(LocalDateTime.of(2025, 8, 24, 13, 0));
+            samples[8].setEndTime(LocalDateTime.of(2025, 8, 24, 13, 45));
+
+            samples[9] = new Consultation("C010", "P1010", "D010", "Dizziness");
+            samples[9].setStartTime(LocalDateTime.of(2025, 8, 24, 14, 15));
+            samples[9].setEndTime(LocalDateTime.of(2025, 8, 24, 14, 55));
+
+            for (Consultation c : samples) {
+                completedConsultations.add(c);
+            }
+
+            System.out.println("Added 10 sample consultations with LocalDateTime.");
+        } catch (Exception e) {
+            System.out.println("Error adding sample consultations: " + e.getMessage());
+        }
+    }
+
+
+    // 工具方法：将 Date 转为 LocalDateTime
+    private static LocalDateTime toLocalDateTime(Date date) {
+        return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+    }
     
     // 计数器
     private static int consultationCounter = 1001; // C1001
@@ -398,8 +459,6 @@ public class ConsultationManagement {
                 System.out.println("--------------------------------------------");
                 System.out.printf("%-15s: %s\n", "Consultation ID", c.getConsultationId());
                 System.out.printf("%-15s: %s\n", "Doctor ID", c.getDoctorId());
-                System.out.printf("%-15s: %s\n", "Start Time", 
-                    c.getStartTime() != null ? c.getStartTime().format(java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")) : "-");
                 System.out.printf("%-15s: %s\n", "Start Time", c.getStartTime() != null
                         ? c.getStartTime().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")) : "-");
                 System.out.printf("%-15s: %s\n", "End Time", c.getEndTime() != null
