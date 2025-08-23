@@ -240,8 +240,8 @@ public class PharmacyUI {
         }
 
         // Create a clone and sort alphabetically by default
-        DynamicList<Medicine> medicines = (DynamicList<Medicine>) service.getAll();
-        DynamicList<Medicine> sortedMedicines = medicines.clone();
+        MyList<Medicine> medicines = (DynamicList<Medicine>) service.getAll();
+        MyList<Medicine> sortedMedicines = medicines.clone();
         sortedMedicines.quickSort(java.util.Comparator.comparing(Medicine::getMedicineName));
 
         printMedicineHeader();
@@ -1053,10 +1053,10 @@ public class PharmacyUI {
         }
 
         // Create clones for different sorting
-        DynamicList<Medicine> byQuantity = medicines.clone();
+        MyList<Medicine> byQuantity = medicines.clone();
         byQuantity.quickSort(java.util.Comparator.comparing(Medicine::getQuantity));
 
-        DynamicList<Medicine> byPrice = medicines.clone();
+        MyList<Medicine> byPrice = medicines.clone();
         byPrice.quickSort(java.util.Comparator.comparing(Medicine::getPrice).reversed());
 
         // Near expiry and expired medicines
@@ -1064,13 +1064,13 @@ public class PharmacyUI {
         java.util.Calendar cal = java.util.Calendar.getInstance();
 
         // Expired medicines
-        DynamicList<Medicine> expired = medicines.filter(m -> m.getExpiryDate().before(now));
+        MyList<Medicine> expired = medicines.filter(m -> m.getExpiryDate().before(now));
 
         // Near expiry (within 6 months)
         cal.setTime(now);
         cal.add(java.util.Calendar.MONTH, 6);
         java.util.Date sixMonthsLater = cal.getTime();
-        DynamicList<Medicine> nearExpiry = medicines.filter(m -> 
+        MyList<Medicine> nearExpiry = medicines.filter(m -> 
             m.getExpiryDate().after(now) && m.getExpiryDate().before(sixMonthsLater));
 
         System.out.println("=== INVENTORY SUMMARY ===");
@@ -1141,7 +1141,7 @@ public class PharmacyUI {
         }
 
         // Create a clone of the current inventory
-        DynamicList<Medicine> snapshot = medicines.clone();
+        MyList<Medicine> snapshot = medicines.clone();
 
         System.out.println("✅ Inventory snapshot created with " + snapshot.size() + " medicines.");
         System.out.println("This snapshot can be used for backup or comparison purposes.");
@@ -1175,7 +1175,7 @@ public class PharmacyUI {
 
         DynamicList<Medicine> medicines = (DynamicList<Medicine>) service.getAll();
         java.util.Date now = new java.util.Date();
-        DynamicList<Medicine> expired = medicines.filter(m -> m.getExpiryDate().before(now));
+        MyList<Medicine> expired = medicines.filter(m -> m.getExpiryDate().before(now));
 
         if (expired.isEmpty()) {
             System.out.println("✅ No expired medicines found.");
