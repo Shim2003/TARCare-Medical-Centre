@@ -5,6 +5,7 @@
 package Boundary;
 
 import ADT.DynamicList;
+import ADT.MyList;
 import Control.DoctorManagement;
 import Control.ScheduleManagement;
 import Entity.Doctor;
@@ -83,7 +84,7 @@ public class ScheduleUI {
 
     public static void DisplayAllSchedules() {
 
-        DynamicList<Schedule> schedulesList = ScheduleManagement.getAllSchedules();
+        MyList<Schedule> schedulesList = ScheduleManagement.getAllSchedules();
 
         System.out.println("\n-------------------------------------------------------------------");
         System.out.printf("%-10s %-10s %-12s %-10s %-10s%n",
@@ -106,8 +107,8 @@ public class ScheduleUI {
 
     public static void DisplayAllTimetable() {
 
-        DynamicList<Schedule> schedules = ScheduleManagement.getAllSchedules();
-        DynamicList<Doctor> doctors = DoctorManagement.getAllDoctors();
+        MyList<Schedule> schedules = ScheduleManagement.getAllSchedules();
+        MyList<Doctor> doctors = DoctorManagement.getAllDoctors();
 
         String[] days = {"MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"};
 
@@ -134,7 +135,7 @@ public class ScheduleUI {
                         }
                     }
 
-                    System.out.print("Dr. " + doctorName + " (" + s.getStartTime() + "-" + s.getEndTime() + ") " + "|");
+                    System.out.print("Dr. " + doctorName + " (" + s.getStartTime() + "-" + s.getEndTime() + ") " + "| ");
                     found = true;
                 }
             }

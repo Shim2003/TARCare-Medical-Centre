@@ -5,6 +5,7 @@
 package Control;
 
 import ADT.DynamicList;
+import ADT.MyList;
 import Entity.Doctor;
 import Entity.Schedule;
 import Utility.UtilityClass;
@@ -22,7 +23,7 @@ import java.util.Date;
 public class DoctorManagement {
 
     // list to store patient details
-    private static DynamicList<Doctor> doctorList = new DynamicList<>();
+    private static MyList<Doctor> doctorList = new DynamicList<>();
 
     // Constant
     public static final String DATE_FORMAT = "dd/MM/yyyy";
@@ -40,7 +41,7 @@ public class DoctorManagement {
     
     public static String generateNextDoctorId() {
         int maxId = 0;
-        DynamicList<Doctor> doctors = getAllDoctors();
+        MyList<Doctor> doctors = getAllDoctors();
 
         for (int i = 0; i < doctors.size(); i++) {
             String id = doctors.get(i).getDoctorID().trim().toUpperCase();
@@ -126,7 +127,7 @@ public class DoctorManagement {
 
 
     //Read
-    public static DynamicList getAllDoctors() {
+    public static MyList<Doctor> getAllDoctors() {
         return doctorList;
     }
 
@@ -253,7 +254,7 @@ public class DoctorManagement {
         // 2️⃣ Otherwise, check if doctor is working now
         boolean isWorkingNow = false;
 
-        DynamicList<Schedule> schedules = ScheduleManagement.findSchedulesByDoctorId(doctor.getDoctorID());
+        MyList<Schedule> schedules = ScheduleManagement.findSchedulesByDoctorId(doctor.getDoctorID());
         for (int i = 0; i < schedules.size(); i++) {
             Schedule s = schedules.get(i);
             if (s.getDayOfWeek().equals(currentDay)

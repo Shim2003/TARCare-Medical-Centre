@@ -5,6 +5,7 @@
 package Control;
 
 import ADT.DynamicList;
+import ADT.MyList;
 import Entity.Doctor;
 import Entity.DoctorLeave;
 import Entity.Schedule;
@@ -18,14 +19,14 @@ import java.time.LocalTime;
  */
 public class LeaveManagement {
 
-    private static DynamicList<DoctorLeave> leaveList = new DynamicList<>();
+    private static MyList<DoctorLeave> leaveList = new DynamicList<>();
 
     public static void addSampleLeaves() {
         addLeave(new DoctorLeave(
                 "L001", // leaveID
                 "D001", // doctorID
                 LocalDate.of(2025, 8, 14), // dateFrom
-                LocalDate.of(2025, 8, 14), // dateTo (same day leave)
+                LocalDate.of(2025, 8, 30), // dateTo (same day leave)
                 "Medical conference" // reason
         ));
 
@@ -34,6 +35,22 @@ public class LeaveManagement {
                 "D002",
                 LocalDate.of(2025, 8, 13), // multi-day leave
                 LocalDate.of(2025, 8, 16),
+                "Family vacation"
+        ));
+        
+        addLeave(new DoctorLeave(
+                "L003",
+                "D004",
+                LocalDate.of(2025, 8, 13), // multi-day leave
+                LocalDate.of(2025, 8, 25),
+                "Family vacation"
+        ));
+        
+        addLeave(new DoctorLeave(
+                "L004",
+                "D004",
+                LocalDate.of(2025, 9, 15), // multi-day leave
+                LocalDate.of(2025, 9, 25),
                 "Family vacation"
         ));
     }
@@ -55,14 +72,14 @@ public class LeaveManagement {
     }
 
     //Read
-    public static DynamicList getAllLeaves() {
+    public static MyList<DoctorLeave> getAllLeaves() {
         return leaveList;
     }
 
     public static String generateNextLeaveId() {
         int max = 0;
 
-        DynamicList<DoctorLeave> leaves = getAllLeaves();
+        MyList<DoctorLeave> leaves = getAllLeaves();
         for (int i = 0; i < leaves.size(); i++) {
             String id = leaves.get(i).getLeaveID(); // e.g., "L001"
             if (id != null && id.startsWith("L")) {

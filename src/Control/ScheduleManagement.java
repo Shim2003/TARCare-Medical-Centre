@@ -5,6 +5,7 @@
 package Control;
 
 import ADT.DynamicList;
+import ADT.MyList;
 import Entity.Doctor;
 import Entity.Schedule;
 import java.time.DayOfWeek;
@@ -16,7 +17,7 @@ import java.time.LocalTime;
  */
 public class ScheduleManagement {
 
-    private static DynamicList<Schedule> scheduleList = new DynamicList<>();
+    private static MyList<Schedule> scheduleList = new DynamicList<>();
 
     // Add schedule
 //    public static boolean addSchedule(Schedule s) {
@@ -42,7 +43,7 @@ public class ScheduleManagement {
 
     public static String generateNextScheduleId() {
         int maxId = 0;
-        DynamicList<Schedule> schedules = getAllSchedules();
+        MyList<Schedule> schedules = getAllSchedules();
 
         for (int i = 0; i < schedules.size(); i++) {
             String id = schedules.get(i).getScheduleID().trim().toUpperCase();
@@ -64,7 +65,7 @@ public class ScheduleManagement {
     }
 
     //Read
-    public static DynamicList getAllSchedules() {
+    public static MyList<Schedule> getAllSchedules() {
         return scheduleList;
     }
 
@@ -112,7 +113,7 @@ public class ScheduleManagement {
     }
 
     // Find schedules for a specific doctor
-    public static DynamicList<Schedule> findSchedulesByDoctorId(String doctorID) {
+    public static MyList<Schedule> findSchedulesByDoctorId(String doctorID) {
         return scheduleList.findAll(s -> s.getDoctorID().equals(doctorID));
     }
 
@@ -136,6 +137,19 @@ public class ScheduleManagement {
         }
 
         return availableDoctors;
+    }
+
+    // Find schedules (with doctor info) available on a given day
+    public static DynamicList<Schedule> findSchedulesByDay(DayOfWeek day) {
+        DynamicList<Schedule> availableSchedules = new DynamicList<>();
+
+        for (int i = 0; i < scheduleList.size(); i++) {
+            Schedule s = scheduleList.get(i);
+            if (s.getDayOfWeek() == day) {
+                availableSchedules.add(s);
+            }
+        }
+        return availableSchedules;
     }
 
     public static boolean editSchedule(String scheduleID, String newDoctorID,
@@ -223,8 +237,8 @@ public class ScheduleManagement {
                 LocalTime.of(9, 30), LocalTime.of(23, 45)));
         addSchedule(new Schedule("S009", "D004", DayOfWeek.SUNDAY,
                 LocalTime.of(9, 30), LocalTime.of(23, 45)));
-//        addSchedule(new Schedule("S010", "D004", DayOfWeek.SATURDAY,
-//                LocalTime.of(3, 30), LocalTime.of(23, 45)));
+        addSchedule(new Schedule("S010", "D004", DayOfWeek.SATURDAY,
+                LocalTime.of(3, 30), LocalTime.of(23, 45)));
         addSchedule(new Schedule("S020", "D005", DayOfWeek.FRIDAY,
                 LocalTime.of(9, 0), LocalTime.of(23, 45)));
     }

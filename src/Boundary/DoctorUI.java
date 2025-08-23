@@ -5,6 +5,7 @@
 package Boundary;
 
 import ADT.DynamicList;
+import ADT.MyList;
 import Control.DoctorManagement;
 import Control.LeaveManagement;
 import Control.ScheduleManagement;
@@ -112,9 +113,11 @@ public class DoctorUI {
 
         while (!validOption) {
             System.out.println("\n--- Welcome ---");
-            System.out.println("1. Check Doctors");
-            System.out.println("2. Check Schedules");
-            System.out.println("3. Back");
+            System.out.println("1. Show All Doctors");
+            System.out.println("2. Check Day of Week");
+            System.out.println("3. Check Availability (Current Week)");
+            System.out.println("4. Check Schedules");
+            System.out.println("5. Back");
             System.out.print("Enter your choice: ");
 
             String choice = scanner.nextLine();
@@ -128,11 +131,23 @@ public class DoctorUI {
                     break;
                 case "2":
                     validOption = true;
-                    ScheduleUI.DisplayAllTimetable();
+                    ShowDoctorsSchedulesByDayUI();
                     UtilityClass.pressEnterToContinue();
                     UserMode();
                     break;
                 case "3":
+                    validOption = true;
+                    DisplayAllTimetableWithLeaves();
+                    UtilityClass.pressEnterToContinue();
+                    UserMode();
+                    break;
+                case "4":
+                    validOption = true;
+                    ScheduleUI.DisplayAllTimetable();
+                    UtilityClass.pressEnterToContinue();
+                    UserMode();
+                    break;
+                case "5":
                     validOption = true;
                     DoctorModuleMenu();
                 default:
@@ -194,7 +209,7 @@ public class DoctorUI {
 
     public static void DisplayAllDoctors() {
 
-        DynamicList<Doctor> doctorList = DoctorManagement.getAllDoctors();
+        MyList<Doctor> doctorList = DoctorManagement.getAllDoctors();
         System.out.println("\n------------------------------------------------------------ DOCTOR LIST ---------------------------------------------------------------------------");
         System.out.printf("| %-5s | %-20s | %-15s | %-8s | %-15s | %-25s | %-25s |\n",
                 "ID", "Full Name", "Birth Date", "Gender", "Contact", "Email", "Qualifications");
@@ -212,19 +227,19 @@ public class DoctorUI {
         System.out.println("Total of " + doctorList.size() + " doctor(s)");
 
     }
-    
-     public static void ShowDoctors() {
 
-        DynamicList<Doctor> doctorList = DoctorManagement.getAllDoctors();
+    public static void ShowDoctors() {
+
+        MyList<Doctor> doctorList = DoctorManagement.getAllDoctors();
         System.out.println("\n------------------------------------------------ DOCTOR LIST ------------------------------------------------");
-        System.out.printf(" %-20s | %-15s | %-25s | %-25s |\n",
-                 "Full Name", "Contact", "Email", "Working Status");
+        System.out.printf(" %-20s | %-15s | %-30s | %-8s |\n",
+                "Full Name", "Contact", "Email", "Working Status");
         System.out.println("----------------------------------------------------------------------------------------------------------------");
 
         for (int i = 0; i < doctorList.size(); i++) {
             Doctor d = doctorList.get(i);
-            System.out.printf(" %-20s | %-15s | %-30s | %-10s |\n",
-                    d.getName(), 
+            System.out.printf(" %-20s | %-15s | %-30s | %-8s |\n",
+                    d.getName(),
                     d.getContactNumber(),
                     d.getEmail(), d.getWorkingStatus());
 
@@ -234,13 +249,116 @@ public class DoctorUI {
 
     }
 
+    public static void ShowDoctorsSchedulesByDayUI() {
+        DayOfWeek day = null;
+
+        while (day == null) {
+            System.out.print("\nEnter a day of the week (e.g., MONDAY, Tuesday, fri): ");
+            String input = scanner.nextLine().trim().toUpperCase();
+
+            try {
+                day = DayOfWeek.valueOf(input);  // ✅ converts string to enum
+            } catch (IllegalArgumentException e) {
+                System.out.println("❌ Invalid day entered. Please try again.");
+            }
+        }
+
+        // ✅ Call your method once input is valid
+        ShowDoctorsSchedulesByDay(day);
+    }
+
+    public static void ShowDoctorsSchedulesByDay(DayOfWeek day) {
+        DynamicList<Schedule> scheduleList = ScheduleManagement.findSchedulesByDay(day);
+
+        System.out.println("\n--------------------------------------- DOCTOR SCHEDULE LIST (" + day + ") -------------------------------------");
+        System.out.printf(" %-20s | %-15s | %-30s | %-8s | %-10s | %-10s |\n",
+                "Full Name", "Contact", "Email", "Status", "Start Time", "End Time");
+        System.out.println("----------------------------------------------------------------------------------------------------------------");
+
+        for (int i = 0; i < scheduleList.size(); i++) {
+            Schedule s = scheduleList.get(i);
+            Doctor d = DoctorManagement.findDoctorById(s.getDoctorID());
+
+            if (d != null) {
+                System.out.printf(" %-20s | %-15s | %-30s | %-8s | %-10s | %-10s |\n",
+                        d.getName(),
+                        d.getContactNumber(),
+                        d.getEmail(),
+                        d.getWorkingStatus(),
+                        s.getStartTime(), // assuming LocalTime or String
+                        s.getEndTime());
+            }
+        }
+
+        System.out.println("Total of " + scheduleList.size() + " schedule(s) found for " + day);
+    }
+
+    public static void DisplayAllTimetableWithLeaves() {
+        MyList<Schedule> schedules = ScheduleManagement.getAllSchedules();
+        MyList<Doctor> doctors = DoctorManagement.getAllDoctors();
+
+        String[] days = {"MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"};
+
+        LocalDate today = LocalDate.now();
+
+        // Find the Monday of the current week
+        LocalDate monday = today.with(DayOfWeek.MONDAY);
+
+        System.out.println("\n---------------------- DOCTOR TIMETABLE FOR THE WEEK OF " + monday + " ----------------------\n");
+
+        // Loop through all 7 days of this week
+        for (int d = 0; d < days.length; d++) {
+            LocalDate currentDate = monday.plusDays(d);       // Actual date of this weekday
+            DayOfWeek currentDay = currentDate.getDayOfWeek();
+
+            System.out.printf("%-11s (%s) | ", days[d], currentDate);
+
+            boolean found = false;
+
+            // Loop through schedules
+            for (int i = 0; i < schedules.size(); i++) {
+                Schedule s = schedules.get(i);
+
+                // Check if this schedule is for the current day
+                if (s.getDayOfWeek() == currentDay) {
+                    Doctor doctor = null;
+                    for (int j = 0; j < doctors.size(); j++) {
+                        if (doctors.get(j).getDoctorID().equals(s.getDoctorID())) {
+                            doctor = doctors.get(j);
+                            break;
+                        }
+                    }
+
+                    if (doctor != null) {
+                        // Check if doctor is on leave for this date
+                        if (LeaveManagement.isDoctorOnLeave(doctor.getDoctorID(), currentDate)) {
+                            // Skip this doctor (he's on leave that day)
+                            continue;
+                        }
+
+                        // Print doctor schedule
+                        System.out.print("Dr. " + doctor.getName() + " (" + s.getStartTime() + "-" + s.getEndTime() + ") | ");
+                        found = true;
+                    }
+                }
+            }
+
+            if (!found) {
+                System.out.print("No schedules");
+            }
+
+            System.out.println();
+            System.out.println("-------------------------------------------------------------------------------------------------");
+        }
+    }
+
     public static void addDoctorUI() {
         Scanner sc = new Scanner(System.in);
 
         try {
             System.out.println("\n=== Register New Doctor ===");
 
-           String newDoctorId = DoctorManagement.generateNextDoctorId();
+            String newDoctorId = DoctorManagement.generateNextDoctorId();
 
             // Name (not empty, not only spaces)
             String name;
@@ -447,55 +565,55 @@ public class DoctorUI {
             System.out.println(" Failed to update doctor details.");
         }
     }
-    
+
     public static void removeDoctorUI() {
 
-    while (true) {
-        System.out.println("\n=== Remove Doctor ===");
-        DisplayAllDoctors();
+        while (true) {
+            System.out.println("\n=== Remove Doctor ===");
+            DisplayAllDoctors();
 
-        System.out.print("\nEnter Doctor ID to remove (or 'xxx' to cancel): ");
-        String input = scanner.nextLine().trim();
+            System.out.print("\nEnter Doctor ID to remove (or 'xxx' to cancel): ");
+            String input = scanner.nextLine().trim();
 
-        if (input.equalsIgnoreCase("xxx")) {
-            System.out.println("Returning to menu...");
-            return; // leave the method
-        }
-
-        String doctorID = input.toUpperCase();
-        Doctor doctor = DoctorManagement.findDoctorById(doctorID);
-
-        if (doctor == null) {
-            System.out.println("❌ Doctor not found. Please try again.");
-            continue;
-        }
-
-        // Show doctor details before deleting
-        System.out.println("\nDoctor found:");
-        doctorDetail(doctor.getDoctorID());
-
-        System.out.print("Are you sure you want to remove this doctor and all their schedules? (y/n): ");
-        String confirm = scanner.nextLine().trim();
-
-        if (confirm.equalsIgnoreCase("y")) {
-            boolean removed = DoctorManagement.removeDoctorById(doctorID);
-            if (removed) {
-                System.out.println("Doctor and their schedules removed successfully.");
-            } else {
-                System.out.println("❌ Failed to remove doctor.");
+            if (input.equalsIgnoreCase("xxx")) {
+                System.out.println("Returning to menu...");
+                return; // leave the method
             }
-            return; // exit after one removal
-        } else {
-            System.out.println("Removal cancelled.");
-            return;
+
+            String doctorID = input.toUpperCase();
+            Doctor doctor = DoctorManagement.findDoctorById(doctorID);
+
+            if (doctor == null) {
+                System.out.println("❌ Doctor not found. Please try again.");
+                continue;
+            }
+
+            // Show doctor details before deleting
+            System.out.println("\nDoctor found:");
+            doctorDetail(doctor.getDoctorID());
+
+            System.out.print("Are you sure you want to remove this doctor and all their schedules? (y/n): ");
+            String confirm = scanner.nextLine().trim();
+
+            if (confirm.equalsIgnoreCase("y")) {
+                boolean removed = DoctorManagement.removeDoctorById(doctorID);
+                if (removed) {
+                    System.out.println("Doctor and their schedules removed successfully.");
+                } else {
+                    System.out.println("❌ Failed to remove doctor.");
+                }
+                return; // exit after one removal
+            } else {
+                System.out.println("Removal cancelled.");
+                return;
+            }
         }
     }
-}
-    
-    public static void doctorDetail(String doctorID){
+
+    public static void doctorDetail(String doctorID) {
         Doctor doctor;
         doctor = DoctorManagement.findDoctorById(doctorID);
-        
+
         System.out.println("-------------------------------------------------");
         System.out.printf("""
                           | Name: %-35s  %s
@@ -512,8 +630,8 @@ public class DoctorUI {
         System.out.printf("""
                           | Email: %s
                           """, doctor.getEmail());
-         System.out.println("-------------------------------------------------");
-        
+        System.out.println("-------------------------------------------------");
+
     }
 
     public static void testing() {
@@ -525,16 +643,14 @@ public class DoctorUI {
 
 //        System.out.println("Doctors available on 12/08/2025:");
 //        ScheduleManagement.findAvailableDoctors(DayOfWeek.TUESDAY);
-        DynamicList<Schedule> schedulesList = ScheduleManagement.getAllSchedules();
+        MyList<Schedule> schedulesList = ScheduleManagement.getAllSchedules();
 //        DynamicList<Doctor> availableDoctors = ScheduleManagement.findAvailableDoctors(DayOfWeek.TUESDAY);
 //        DynamicList<Doctor> freeDoctors = DoctorManagement.getFreeDoctors();
 //        boolean allBusy = DoctorManagement.areAllDoctorsBusy();
-        DynamicList<Doctor> allDoctors = DoctorManagement.getAllDoctors();
+        MyList<Doctor> allDoctors = DoctorManagement.getAllDoctors();
 
         boolean check = LeaveManagement.isDoctorOnLeave("D002", LocalDate.of(2025, 8, 15));
         System.out.println(check);
-        
-        
 
         for (int i = 0; i < schedulesList.size(); i++) {
             Schedule s = schedulesList.get(i);
@@ -556,25 +672,22 @@ public class DoctorUI {
             Doctor d = allDoctors.get(i);
             System.out.println(d);
         }
-        
+
         DoctorManagement.removeDoctorById("D001");
-        
+
         System.out.println("\n");
-        
+
         for (int i = 0; i < allDoctors.size(); i++) {
             Doctor d = allDoctors.get(i);
             System.out.println(d);
         }
-        
+
         for (int i = 0; i < schedulesList.size(); i++) {
             Schedule s = schedulesList.get(i);
             System.out.println(s);
         }
-        
-        
-        
 
 //        System.out.println("Today: " + currentDay + " " + currentTime);
     }
-    
+
 }
