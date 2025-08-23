@@ -25,6 +25,7 @@ import java.time.LocalTime;
 import java.time.LocalDate;
 import java.time.Duration;
 import java.time.DayOfWeek;
+import ADT.DynamicList.ListStatistics;
 
 /**
  *
@@ -443,6 +444,106 @@ public class ConsultationManagement {
 
         if (!deleted) {
             System.out.println("Consultation ID " + consultationId + " not found.");
+        }
+    }
+    
+    public static void insertConsultationAt(int index, Consultation consultation) {
+        if (index < 0 || index > ongoingConsultations.size()) {
+            System.out.println("Invalid index.");
+            return;
+        }
+        ongoingConsultations.add(index, consultation);
+        System.out.println("Inserted consultation at index " + index);
+    }
+    
+    public static void removeConsultationAt(int index) {
+        if (index >= 0 && index < completedConsultations.size()) {
+            Consultation removed = completedConsultations.remove(index);
+            System.out.println("Removed consultation: " + removed.getConsultationId());
+        } else {
+            System.out.println("Invalid index.");
+        }
+    }
+    
+    public static void findConsultationIndex(Consultation c) {
+        int index = completedConsultations.indexOf(c);
+        if (index != -1) {
+            System.out.println("Consultation found at index " + index);
+        } else {
+            System.out.println("Consultation not found.");
+        }
+    }
+    
+    public static boolean hasConsultation(Consultation c) {
+        return completedConsultations.contains(c);
+    }
+    
+    public static void showFirstAndLastConsultation() {
+        if (!completedConsultations.isEmpty()) {
+            System.out.println("First consultation: " + completedConsultations.getFirst());
+            System.out.println("Last consultation: " + completedConsultations.getLast());
+        } else {
+            System.out.println("No completed consultations.");
+        }
+    }
+    
+    public static void updateConsultation(int index, Consultation newConsultation) {
+        if (index >= 0 && index < completedConsultations.size()) {
+            completedConsultations.replace(index, newConsultation);
+            System.out.println("Consultation updated at index " + index);
+        } else {
+            System.out.println("Invalid index.");
+        }
+    }
+    
+    public static void exportConsultationsToArray() {
+        Consultation[] arr = completedConsultations.toArray();
+        System.out.println("Exported " + arr.length + " consultations to array.");
+    }
+    
+    public static void listConsultationsWithIterator() {
+        Iterator<Consultation> it = completedConsultations.iterator();
+        while (it.hasNext()) {
+            System.out.println(it.next());
+        }
+    }
+    
+    public static void showConsultationDurationStats() {
+        if (completedConsultations.isEmpty()) {
+            System.out.println("No completed consultations to calculate statistics.");
+            return;
+        }
+
+        // 获取统计信息：以分钟为单位
+        DynamicList.ListStatistics<Consultation> stats = completedConsultations.getStatistics(
+            c -> {
+                if (c.getStartTime() != null && c.getEndTime() != null) {
+                    return Duration.between(c.getStartTime(), c.getEndTime()).toMinutes();
+                } else {
+                    return 0L;
+                }
+            }
+        );
+
+        System.out.println("===== Consultation Duration Statistics (in minutes) =====");
+        System.out.println("Number of consultations: " + stats.count);
+        System.out.println("Average duration     : " + stats.average);
+        System.out.println("Maximum duration     : " + stats.max);
+        System.out.println("Minimum duration     : " + stats.min);
+        System.out.println("Standard deviation   : " + stats.standardDeviation);
+        System.out.println("==========================================================");
+    }
+    
+    public static void backupConsultations() {
+        MyList<Consultation> backup = completedConsultations.clone();
+        System.out.println("Backup created with " + backup.size() + " consultations.");
+    }
+    
+    public static void compareConsultations(MyList<Consultation> otherList) {
+        if (completedConsultations.equals(otherList)) {
+            System.out.println("The consultation lists are equal.");
+        } else {
+            System.out.println("The consultation lists are different.");
         }
     }
 }

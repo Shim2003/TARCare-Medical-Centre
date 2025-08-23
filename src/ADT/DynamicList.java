@@ -380,6 +380,10 @@ public class DynamicList<T> implements MyList<T> {
         public final double min;
         public final double max;
         public final double standardDeviation;
+        
+        public int getCount() {
+            return count;
+        }
 
         public ListStatistics(double count, double sum, double average, double min, double max) {
             this(count, sum, average, min, max, 0);
