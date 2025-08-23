@@ -8,6 +8,7 @@ import Control.ScheduleManagement;
 import Control.ConsultationManagement;
 import Control.LeaveManagement;
 import Control.PatientManagement;
+import DAO.ClinicData;
 import java.util.Scanner;
 
 public class ConsultationUI {
@@ -86,7 +87,7 @@ public class ConsultationUI {
         LeaveManagement.addSampleLeaves();
         ScheduleManagement.addSampleSchedules();
         DoctorManagement.addSampleDoctor();
-        PatientManagement.addSamplePatients();
+        ClinicData.run();
         
         // TODO code application logic here
         ConsultationUI ui = new ConsultationUI();
