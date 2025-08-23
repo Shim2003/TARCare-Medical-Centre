@@ -1,6 +1,7 @@
 package Entity;
 
 import ADT.DynamicList;
+import ADT.MyList;
 import java.util.Date;
 
 public class MedicalTreatment {
@@ -15,7 +16,7 @@ public class MedicalTreatment {
     private final Date treatmentDate;
     private String treatmentStatus;
     private String medicalTreatmentAdvise;
-    private DynamicList<MedicalTreatmentItem> medicineList;
+    private MyList<MedicalTreatmentItem> medicineList;
 
     // Constructor
     public MedicalTreatment() {
@@ -26,7 +27,7 @@ public class MedicalTreatment {
 
     public MedicalTreatment(String consultationId, String patientId,
     String doctorId, Date treatmentDate, String treatmentStatus, String medicalTreatmentAdvise,
-    DynamicList<MedicalTreatmentItem> medicineList) {
+    MyList<MedicalTreatmentItem> medicineList) {
         this.treatmentId = "TRMT" + treatmentIdCounter++;
         this.consultationId = consultationId;
         this.patientId = patientId;
@@ -61,7 +62,7 @@ public class MedicalTreatment {
         return medicalTreatmentAdvise;
     }
 
-    public DynamicList<MedicalTreatmentItem> getMedicineList() {
+    public MyList<MedicalTreatmentItem> getMedicineList() {
         return medicineList;
     }
 
@@ -93,7 +94,7 @@ public class MedicalTreatment {
         this.medicalTreatmentAdvise = medicalTreatmentAdvise;
     }
 
-    public void setMedicineList(DynamicList<MedicalTreatmentItem> medicineList) {
+    public void setMedicineList(MyList<MedicalTreatmentItem> medicineList) {
         this.medicineList = medicineList;
     }
 

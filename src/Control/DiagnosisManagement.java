@@ -5,6 +5,7 @@
 package Control;
 
 import ADT.DynamicList;
+import ADT.MyList;
 import Entity.Diagnosis;
 import java.util.Date;
 import java.util.Iterator;
@@ -17,11 +18,11 @@ import java.util.Iterator;
 public class DiagnosisManagement {
     
     //list to store medical treatment details
-    private static final DynamicList<Diagnosis> diagnosisList = new DynamicList<>();
+    private static final MyList<Diagnosis> diagnosisList = new DynamicList<>();
     
     // Create a new symptom list for the specific diagnosis or patient
-    public static DynamicList<String> addSymptoms(DynamicList<String> symptomInput) {
-        DynamicList<String> symptoms = new DynamicList<>();
+    public static MyList<String> addSymptoms(MyList<String> symptomInput) {
+        MyList<String> symptoms = new DynamicList<>();
         if (symptomInput != null && !symptomInput.isEmpty()) {
             for (int i = 0; i < symptomInput.size(); i++) {
                 symptoms.add(symptomInput.get(i));
@@ -79,7 +80,7 @@ public class DiagnosisManagement {
     }
 
     // display the all diagnosis list based on diagnosis ID
-    public static DynamicList<Diagnosis> getDiagnosisList() {
+    public static MyList<Diagnosis> getDiagnosisList() {
         return diagnosisList;
     }
 
@@ -122,8 +123,8 @@ public class DiagnosisManagement {
         }
     }
 
-    public static DynamicList<Diagnosis> getDiagnosesByYearAndMonth(int year, int month) {
-    DynamicList<Diagnosis> filteredDiagnoses = new DynamicList<>();
+    public static MyList<Diagnosis> getDiagnosesByYearAndMonth(int year, int month) {
+    MyList<Diagnosis> filteredDiagnoses = new DynamicList<>();
         for (int i = 0; i < diagnosisList.size(); i++) {
             Diagnosis diagnosis = diagnosisList.get(i);
             Date diagnosisDate = diagnosis.getDiagnosisDate();
@@ -136,5 +137,14 @@ public class DiagnosisManagement {
             }
         }
         return filteredDiagnoses;
+    }
+
+    public static MyList<Diagnosis> filterDiagnosisBySeverityLevel(String severityLevel) {
+        if (severityLevel == null || severityLevel.isEmpty()) {
+            System.out.println("Invalid severity level. Please try again.");
+            return new DynamicList<>();
+        }
+        
+        return DiagnosisManagement.getDiagnosisList().findAll(d -> d.getSeverityLevel().equalsIgnoreCase(severityLevel));
     }
 }

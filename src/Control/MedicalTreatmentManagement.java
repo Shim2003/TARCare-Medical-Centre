@@ -5,6 +5,7 @@
 package Control;
 
 import ADT.DynamicList;
+import ADT.MyList;
 import Entity.MedicalTreatment;
 import Entity.TreatmentHistory;
 import java.util.Date;
@@ -17,8 +18,8 @@ import java.util.Date;
 public class MedicalTreatmentManagement {
     
     //list to store medical treatment details
-    private static final DynamicList<MedicalTreatment> treatmentList = new DynamicList<>();
-    private static final DynamicList<TreatmentHistory> treatmentHistoryList = new DynamicList<>();
+    private static final MyList<MedicalTreatment> treatmentList = new DynamicList<>();
+    private static final MyList<TreatmentHistory> treatmentHistoryList = new DynamicList<>();
 
     //create a new medical treatment
     public static boolean addMedicalTreatment(MedicalTreatment treatment) {
@@ -29,7 +30,7 @@ public class MedicalTreatmentManagement {
         return false;
     }
 
-    public static DynamicList<MedicalTreatment> getMedicalTreatmentList() {
+    public static MyList<MedicalTreatment> getMedicalTreatmentList() {
         return treatmentList;
     }
 
@@ -38,11 +39,11 @@ public class MedicalTreatmentManagement {
         return treatmentList.findFirst(treatment -> treatment.getTreatmentId().equals(treatmentId));
     }
     
-    public static DynamicList<MedicalTreatment> getTreatmentList() {
+    public static MyList<MedicalTreatment> getTreatmentList() {
         return treatmentList;
     }
 
-    public static DynamicList<TreatmentHistory> getTreatmentHistoryList() {
+    public static MyList<TreatmentHistory> getTreatmentHistoryList() {
         return treatmentHistoryList;
     }
     
@@ -60,7 +61,7 @@ public class MedicalTreatmentManagement {
     }
 
     // display treatment history by patient ID
-    public static DynamicList<TreatmentHistory> getTreatmentHistoryByPatientIdList(String patientId) {
+    public static MyList<TreatmentHistory> getTreatmentHistoryByPatientIdList(String patientId) {
         return treatmentHistoryList.findAll(th -> th.getPatientId().equals(patientId));
     }
 
@@ -89,12 +90,12 @@ public class MedicalTreatmentManagement {
     }
 
     //generate monthly report
-    public static DynamicList<TreatmentHistory> generateMonthlyReport(int month) {
+    public static MyList<TreatmentHistory> generateMonthlyReport(int month) {
         return treatmentHistoryList.findAll(th -> th.getMonth().equals(month));
     }
 
     // retrieve the existing treatment history by year
-    public static DynamicList<Integer> getAvailableYears() {
+    public static MyList<Integer> getAvailableYears() {
         DynamicList<Integer> availableYears = new DynamicList<>();
         for (int i = 0; i < MedicalTreatmentManagement.getTreatmentList().size(); i++) {
             MedicalTreatment treatment = MedicalTreatmentManagement.getTreatmentList().get(i);
@@ -106,9 +107,9 @@ public class MedicalTreatmentManagement {
         return availableYears;
     }
 
-    public static DynamicList<TreatmentHistory> getMonthlyTreatments(int year, int month) {
-        DynamicList<TreatmentHistory> monthlyTreatments = new DynamicList<>();
-        DynamicList<TreatmentHistory> allTreatmentsHistory = MedicalTreatmentManagement.getTreatmentHistoryList();
+    public static MyList<TreatmentHistory> getMonthlyTreatments(int year, int month) {
+        MyList<TreatmentHistory> monthlyTreatments = new DynamicList<>();
+        MyList<TreatmentHistory> allTreatmentsHistory = MedicalTreatmentManagement.getTreatmentHistoryList();
 
         for (int i = 0; i < allTreatmentsHistory.size(); i++) {
             TreatmentHistory treatHisotry = allTreatmentsHistory.get(i);

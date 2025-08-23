@@ -4,7 +4,7 @@
  */
 package Entity;
 
-import ADT.DynamicList;
+import ADT.MyList;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -22,7 +22,7 @@ public class Diagnosis {
     private String patientId;
     private String doctorId;
     private Date diagnosisDate;
-    private DynamicList<String> symptoms;
+    private MyList<String> symptoms;
     private String diagnosisDescription;
     private String severityLevel; // Low, Medium, High, Critical
     private String recommendations;
@@ -37,7 +37,6 @@ public class Diagnosis {
     public Diagnosis(String diagnosisId, String diagnosisDescription, String severityLevel, 
                     String recommendations, String notes) {
         this.diagnosisId = diagnosisId;
-        this.symptoms = symptoms;
         this.diagnosisDescription = diagnosisDescription;
         this.severityLevel = severityLevel;
         this.recommendations = recommendations;
@@ -45,7 +44,7 @@ public class Diagnosis {
     }
     
     public Diagnosis(String patientId, String doctorId, Date diagnosisDate, 
-                    DynamicList<String> symptoms, String diagnosisDescription, String severityLevel, 
+                    MyList<String> symptoms, String diagnosisDescription, String severityLevel, 
                     String recommendations, String notes) {
         this.diagnosisId = "DIAG" + diagnosisIdCounter++;
         this.patientId = patientId;
@@ -63,7 +62,7 @@ public class Diagnosis {
     public String getPatientId() { return patientId; }
     public String getDoctorId() { return doctorId; }
     public Date getDiagnosisDate() { return diagnosisDate; }
-    public DynamicList<String> getSymptoms() { return symptoms; }
+    public MyList<String> getSymptoms() { return symptoms; }
     public String getDiagnosisDescription() { return diagnosisDescription; }
     public String getSeverityLevel() { return severityLevel; }
     public String getRecommendations() { return recommendations; }
@@ -74,7 +73,7 @@ public class Diagnosis {
     public void setPatientId(String patientId) { this.patientId = patientId; }
     public void setDoctorId(String doctorId) { this.doctorId = doctorId; }
     public void setDiagnosisDate(Date diagnosisDate) { this.diagnosisDate = diagnosisDate; }
-    public void setSymptoms(DynamicList<String> symptoms) { this.symptoms = symptoms; }
+    public void setSymptoms(MyList<String> symptoms) { this.symptoms = symptoms; }
     public void setDiagnosisDescription(String diagnosisDescription) { this.diagnosisDescription = diagnosisDescription; }
     public void setSeverityLevel(String severityLevel) { this.severityLevel = severityLevel; }
     public void setRecommendations(String recommendations) { this.recommendations = recommendations; }

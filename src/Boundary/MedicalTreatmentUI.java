@@ -4,6 +4,7 @@
  */
 package Boundary;
 
+import ADT.MyList;
 import ADT.DynamicList;
 import Control.MedicalTreatmentManagement;
 import Entity.*;
@@ -35,7 +36,7 @@ public class MedicalTreatmentUI {
             System.out.println("2. Medical Treatment Management");
             System.out.println("3. Exit to Main Menu");
 
-            System.out.print("Enter your choice (1-4): ");
+            System.out.print("Enter your choice (1-3): ");
 
             try {
                 int choice = scanner.nextInt();
@@ -75,7 +76,7 @@ public class MedicalTreatmentUI {
             System.out.println("6. Generate Overall Treatment History Report");
             System.out.println("7. Exit to Main Menu");
 
-            System.out.print("Enter your choice (1-6): ");
+            System.out.print("Enter your choice (1-7): ");
 
             try {
                 int choice = scanner.nextInt();
@@ -87,7 +88,7 @@ public class MedicalTreatmentUI {
                     case 2 ->
                         viewPatientTreatmentHistoryByPatientId();
                     case 3 ->
-                        viewSpecificTreatmentHistory();
+                        viewSpecificTreatmentHistoryByTreatmentId();
                     case 4 ->
                         updateTreatmentStatus();
                     case 5 ->
@@ -280,7 +281,7 @@ public class MedicalTreatmentUI {
         }
 
         // Get all treatment history for the patient
-        DynamicList<TreatmentHistory> treatmentHistoryList
+        MyList<TreatmentHistory> treatmentHistoryList
                 = MedicalTreatmentManagement.getTreatmentHistoryByPatientIdList(patientId);
 
         if (treatmentHistoryList.isEmpty()) {
@@ -309,7 +310,7 @@ public class MedicalTreatmentUI {
     }
 
     // New method to view a specific treatment history by Treatment ID
-    public static void viewSpecificTreatmentHistory() {
+    public static void viewSpecificTreatmentHistoryByTreatmentId() {
         System.out.println("\n=== View Specific Treatment History ===");
         System.out.print("Enter Treatment ID: ");
         String treatmentId = scanner.nextLine().trim();
@@ -469,7 +470,7 @@ public class MedicalTreatmentUI {
         System.out.println("\n\n=== Generate Monthly Treatment Report ===");
 
         // show the available year first
-        DynamicList<Integer> availableYears = MedicalTreatmentManagement.getAvailableYears();
+        MyList<Integer> availableYears = MedicalTreatmentManagement.getAvailableYears();
         if(availableYears.isEmpty()) {
             System.out.println("No treatment history found.");
             return;
@@ -526,7 +527,7 @@ public class MedicalTreatmentUI {
         System.out.printf("Reporting Period: %s | Generated: %s\n", monthYearStr, sdf.format(new Date()));
         System.out.println("===============================================================");
 
-        DynamicList<TreatmentHistory> monthlyTreatments = MedicalTreatmentManagement.getMonthlyTreatments(year, month);
+        MyList<TreatmentHistory> monthlyTreatments = MedicalTreatmentManagement.getMonthlyTreatments(year, month);
 
         if (monthlyTreatments.isEmpty()) {
             System.out.println("No treatments found for " + monthYearStr + ".");
@@ -586,7 +587,7 @@ public class MedicalTreatmentUI {
     }
 
     // Retrieve treatments for the specified year and month
-    DynamicList<TreatmentHistory> treatments = MedicalTreatmentManagement.getMonthlyTreatments(year, month);
+    MyList<TreatmentHistory> treatments = MedicalTreatmentManagement.getMonthlyTreatments(year, month);
 
     if (treatments.isEmpty()) {
         System.out.printf("No treatments found for %s %d.\n", UtilityClass.getMonthName(month), year);
