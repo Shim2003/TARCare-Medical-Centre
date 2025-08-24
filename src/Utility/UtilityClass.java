@@ -13,7 +13,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Scanner;
-import java.util.Comparator;
 
 /**
  *
@@ -144,37 +143,37 @@ public class UtilityClass {
     }
 
     //quick sort for MyList
-    public static <T> void quickSort(MyList<T> list, Comparator<T> comparator) {
-        if (list == null || list.isEmpty()) {
-            return; // No need to sort an empty or null list
-        }
-        quickSortHelper(list, 0, list.size() - 1, comparator);
-    }
+    // public static <T> void quickSort(MyList<T> list, Comparator<T> comparator) {
+    //     if (list == null || list.isEmpty()) {
+    //         return; // No need to sort an empty or null list
+    //     }
+    //     quickSortHelper(list, 0, list.size() - 1, comparator);
+    // }
 
-    private static <T> void quickSortHelper(MyList<T> list, int low, int high, Comparator<T> comparator) {
-        if (low < high) {
-            int pivotIndex = partition(list, low, high, comparator);
-            quickSortHelper(list, low, pivotIndex - 1, comparator);
-            quickSortHelper(list, pivotIndex + 1, high, comparator);
-        }
-    }
+    // private static <T> void quickSortHelper(MyList<T> list, int low, int high, Comparator<T> comparator) {
+    //     if (low < high) {
+    //         int pivotIndex = partition(list, low, high, comparator);
+    //         quickSortHelper(list, low, pivotIndex - 1, comparator);
+    //         quickSortHelper(list, pivotIndex + 1, high, comparator);
+    //     }
+    // }
 
-    private static <T> int partition(MyList<T> list, int low, int high, Comparator<T> comparator) {
-        T pivot = list.get(high);
-        int i = low - 1;
-        for (int j = low; j < high; j++) {
-            if (comparator.compare(list.get(j), pivot) <= 0) {
-                i++;
-                swap(list, i, j);
-            }
-        }
-        swap(list, i + 1, high);
-        return i + 1;
-    }
+    // private static <T> int partition(MyList<T> list, int low, int high, Comparator<T> comparator) {
+    //     T pivot = list.get(high);
+    //     int i = low - 1;
+    //     for (int j = low; j < high; j++) {
+    //         if (comparator.compare(list.get(j), pivot) <= 0) {
+    //             i++;
+    //             swap(list, i, j);
+    //         }
+    //     }
+    //     swap(list, i + 1, high);
+    //     return i + 1;
+    // }
 
-    private static <T> void swap(MyList<T> list, int i, int j) {
-        T temp = list.get(i);
-        list.set(i, list.get(j));
-        list.set(j, temp);
-    }
+    // private static <T> void swap(MyList<T> list, int i, int j) {
+    //     T temp = list.get(i);
+    //     list.set(i, list.get(j));
+    //     list.set(j, temp);
+    // }
 }
