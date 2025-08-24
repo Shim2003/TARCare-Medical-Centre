@@ -1,6 +1,5 @@
 package ADT;
 
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -393,50 +392,6 @@ public class DynamicList<T> implements MyList<T> {
             this.max = max;
             this.standardDeviation = stdDev;
         }
-    }
-
-    @Override
-    public void quickSort(Comparator<T> comparator) {
-        if (size() <= 1) return;
-        
-        // Create a temporary array with all elements in order
-        T[] tempArray = toArray();
-        
-        // Sort the temporary array
-        quickSortArray(tempArray, 0, tempArray.length - 1, comparator);
-        
-        // Clear current buffer and rebuild from sorted array
-        clear();
-        for (T item : tempArray) {
-            add(item);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private void quickSortArray(T[] arr, int low, int high, Comparator<T> comparator) {
-        if (low < high) {
-            int pi = partitionArray(arr, low, high, comparator);
-            quickSortArray(arr, low, pi - 1, comparator);
-            quickSortArray(arr, pi + 1, high, comparator);
-        }
-    }
-
-    private int partitionArray(T[] arr, int low, int high, Comparator<T> comparator) {
-        T pivot = arr[high];
-        int i = low - 1;
-
-        for (int j = low; j < high; j++) {
-            if (comparator.compare(arr[j], pivot) <= 0) {
-                i++;
-                T temp = arr[i];
-                arr[i] = arr[j];
-                arr[j] = temp;
-            }
-        }
-        T temp = arr[i + 1];
-        arr[i + 1] = arr[high];
-        arr[high] = temp;
-        return i + 1;
     }
 
     @Override

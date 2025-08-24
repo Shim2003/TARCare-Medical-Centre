@@ -13,6 +13,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Scanner;
+import java.util.Comparator;
 
 /**
  *
@@ -24,7 +25,7 @@ public class UtilityClass {
     //General
     public static final String DATE_FORMAT = "dd/MM/yyyy";
     public static final String TIME_FORMAT = "HH:mm:ss";
-    
+
     // LocalDateTime format
     public static final String DATETIME_FORMAT = "dd-MM-yyyy HH:mm:ss";
 
@@ -43,7 +44,7 @@ public class UtilityClass {
     private static final String criticalLevel = "Critical";
 
     private static final Scanner scanner = new Scanner(System.in);
-    
+
     // Display the message with a maximum length
     public static String truncate(String str, int maxLength) {
         if (str.length() <= maxLength) {
@@ -84,17 +85,21 @@ public class UtilityClass {
         String[] monthNames = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
         return monthNames[month - 1];
     }
-    
+
     // 格式化 LocalDateTime 为字符串 "dd-MM-yyyy HH:mm:ss"
     public static String formatLocalDateTime(LocalDateTime dateTime) {
-        if (dateTime == null) return "N/A";
+        if (dateTime == null) {
+            return "N/A";
+        }
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATETIME_FORMAT);
         return dateTime.format(formatter);
     }
 
     // 将字符串 "dd-MM-yyyy HH:mm:ss" 解析为 LocalDateTime
     public static LocalDateTime parseLocalDateTime(String dateTimeStr) {
-        if (dateTimeStr == null || dateTimeStr.trim().isEmpty()) return null;
+        if (dateTimeStr == null || dateTimeStr.trim().isEmpty()) {
+            return null;
+        }
         try {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATETIME_FORMAT);
             return LocalDateTime.parse(dateTimeStr, formatter);
@@ -103,25 +108,25 @@ public class UtilityClass {
             return null;
         }
     }
-    
+
     public static final String[] DOSAGE_FORMS = {
-        "tablet", "capsule", "ml", "syrup", "cream", "ointment", 
+        "tablet", "capsule", "ml", "syrup", "cream", "ointment",
         "gel", "injection", "drops", "sachet", "powder", "lotion"
     };
-    
+
     public static final int LOW_STOCK_THRESHOLD = 20;
-    
+
     public static Date addMonthsToDate(Date date, int months) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         cal.add(Calendar.MONTH, months);
         return cal.getTime();
     }
-    
+
     public static int convertMonthsToDays(int months) {
         return months * 30; // Approximate
     }
-    
+
     public static double calculateTotalValue(MyList<Medicine> medicines) {
         double total = 0.0;
         for (int i = 0; i < medicines.size(); i++) {
@@ -130,12 +135,46 @@ public class UtilityClass {
         }
         return total;
     }
-    
+
     public static Date addDaysToDate(Date date, int days) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         cal.add(Calendar.DAY_OF_MONTH, days);
         return cal.getTime();
     }
-}
 
+    //quick sort for MyList
+    public static <T> void quickSort(MyList<T> list, Comparator<T> comparator) {
+        if (list == null || list.isEmpty()) {
+            return; // No need to sort an empty or null list
+        }
+        quickSortHelper(list, 0, list.size() - 1, comparator);
+    }
+
+    private static <T> void quickSortHelper(MyList<T> list, int low, int high, Comparator<T> comparator) {
+        if (low < high) {
+            int pivotIndex = partition(list, low, high, comparator);
+            quickSortHelper(list, low, pivotIndex - 1, comparator);
+            quickSortHelper(list, pivotIndex + 1, high, comparator);
+        }
+    }
+
+    private static <T> int partition(MyList<T> list, int low, int high, Comparator<T> comparator) {
+        T pivot = list.get(high);
+        int i = low - 1;
+        for (int j = low; j < high; j++) {
+            if (comparator.compare(list.get(j), pivot) <= 0) {
+                i++;
+                swap(list, i, j);
+            }
+        }
+        swap(list, i + 1, high);
+        return i + 1;
+    }
+
+    private static <T> void swap(MyList<T> list, int i, int j) {
+        T temp = list.get(i);
+        list.set(i, list.get(j));
+        list.set(j, temp);
+    }
+}

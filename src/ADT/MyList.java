@@ -1,7 +1,6 @@
 package ADT;
 
 import ADT.DynamicList.ListStatistics;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -51,8 +50,6 @@ public interface MyList<T> {
     boolean removeIf(Predicate<T> predicate);
 
     Iterator<T> iterator();
-
-    void quickSort(Comparator<T> comparator);
 
     MyList<T> clone();
 
