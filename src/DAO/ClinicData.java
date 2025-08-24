@@ -13,6 +13,8 @@ import Control.PatientManagement;
 import Control.QueueControl;
 import Control.PharmacyManagement;
 import Control.ScheduleManagement;
+import Control.AppointmentManagement;
+import Entity.Appointment;
 import Entity.Consultation;
 import Entity.Diagnosis;
 import Entity.Medicine;
@@ -24,6 +26,7 @@ import Utility.UtilityClass;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -36,6 +39,7 @@ public class ClinicData {
     public static void run() {
         addSamplePatients();
         addSampleConsultations();
+        addSampleAppointments();
         addSampleQueueData();
         addSampleMedicine(); 
         LeaveManagement.addSampleLeaves();
@@ -165,6 +169,42 @@ public class ClinicData {
             System.out.println("Added 10 sample consultations with LocalDateTime.");
         } catch (Exception e) {
             System.out.println("Error adding sample consultations: " + e.getMessage());
+        }
+    }
+    
+    public static void addSampleAppointments() {
+        try {
+            Appointment[] samples = new Appointment[10];
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+
+            samples[0] = new Appointment("A1001", "P1001", "D001", 
+                    LocalDateTime.of(2025, 8, 20, 9, 0), "General Checkup");
+            samples[1] = new Appointment("A1002", "P1002", "D002", 
+                    LocalDateTime.of(2025, 8, 20, 10, 30), "Fever");
+            samples[2] = new Appointment("A1003", "P1003", "D003", 
+                    LocalDateTime.of(2025, 8, 21, 11, 15), "Headache");
+            samples[3] = new Appointment("A1004", "P1004", "D004", 
+                    LocalDateTime.of(2025, 8, 21, 14, 45), "Back Pain");
+            samples[4] = new Appointment("A1005", "P1005", "D005", 
+                    LocalDateTime.of(2025, 8, 22, 9, 20), "Stomach Ache");
+            samples[5] = new Appointment("A1006", "P1006", "D006", 
+                    LocalDateTime.of(2025, 8, 22, 10, 40), "Sore Throat");
+            samples[6] = new Appointment("A1007", "P1007", "D007", 
+                    LocalDateTime.of(2025, 8, 23, 8, 50), "Allergy");
+            samples[7] = new Appointment("A1008", "P1008", "D008", 
+                    LocalDateTime.of(2025, 8, 23, 10, 10), "Flu");
+            samples[8] = new Appointment("A1009", "P1009", "D009", 
+                    LocalDateTime.of(2025, 8, 24, 13, 30), "Fatigue");
+            samples[9] = new Appointment("A1010", "P1010", "D010", 
+                    LocalDateTime.of(2025, 8, 24, 14, 20), "Dizziness");
+
+            for (Appointment a : samples) {
+                AppointmentManagement.addScheduledAppointment(a);
+            }
+
+            System.out.println("Added 10 sample appointments with LocalDateTime.");
+        } catch (Exception e) {
+            System.out.println("Error adding sample appointments: " + e.getMessage());
         }
     }
 

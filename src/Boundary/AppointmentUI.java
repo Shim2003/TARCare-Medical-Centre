@@ -19,17 +19,16 @@ public class AppointmentUI {
 
     private final Scanner sc = new Scanner(System.in);
 
-    public void run() {
+    public void run1() {
         int choice;
         do {
             System.out.println("\n======================================");
             System.out.println("           Appointment Module         ");
             System.out.println("======================================");
-            System.out.println(" 1. Schedule Appointment");
-            System.out.println(" 2. View Scheduled Appointments");
-            System.out.println(" 3. View Appointments with Names");
-            System.out.println(" 4. Delete Appointment");
-            System.out.println(" 5. Modify Appointment");
+            System.out.println(" 1. MAIN FUNCTIONS (Daily Use)");
+            System.out.println(" 2. MANAGEMENT (Admin/IT Use)");
+            System.out.println(" 3. ANALYTICS & UTILITIES");
+            System.out.println("--------------------------------------");
             System.out.println(" 0. Back to Main Menu");
             System.out.println("======================================");
             System.out.print("Enter your choice: ");
@@ -38,11 +37,40 @@ public class AppointmentUI {
                 System.out.print("Invalid input! Please enter a number: ");
                 sc.next();
             }
+
             choice = sc.nextInt();
-            sc.nextLine(); // 清除换行符
+            sc.nextLine();
 
             switch (choice) {
-                case 1 -> { // Schedule Appointment
+                case 1 -> showMainFunctionsMenu();
+                case 2 -> showManagementMenu();
+                case 3 -> showAnalyticsMenu();
+                case 0 -> System.out.println("Returning to Main Menu...");
+                default -> System.out.println("Invalid choice. Please try again.");
+            }
+        } while (choice != 0);
+    }
+
+    // MAIN FUNCTIONS MENU
+    private void showMainFunctionsMenu() {
+        int choice;
+        do {
+            System.out.println("\n====== MAIN FUNCTIONS (Daily Use) ======");
+            System.out.println(" 1. Schedule Appointment");
+            System.out.println(" 2. View Appointments by ID");
+            System.out.println(" 0. Back");
+            System.out.println("======================================");
+            System.out.print("Enter your choice: ");
+
+            while (!sc.hasNextInt()) {
+                System.out.print("Invalid input! Please enter a number: ");
+                sc.next();
+            }
+            choice = sc.nextInt();
+            sc.nextLine();
+
+            switch (choice) {
+                case 1 -> {
                     System.out.print("Enter Patient ID: ");
                     String patientId = sc.nextLine();
                     System.out.print("Enter Doctor ID: ");
@@ -54,33 +82,92 @@ public class AppointmentUI {
 
                     AppointmentManagement.scheduleNextAppointment(patientId, doctorId, dateTimeStr, reason);
                 }
-                case 2 -> AppointmentManagement.viewScheduledAppointments();
-                case 3 -> AppointmentManagement.viewAppointmentsWithNames();
-                case 4 -> { // Delete Appointment
+                case 2 -> AppointmentManagement.promptAndViewAppointments();
+                case 0 -> System.out.println("Returning...");
+                default -> System.out.println("Invalid choice.");
+            }
+        } while (choice != 0);
+    }
+
+    // MANAGEMENT MENU
+    private void showManagementMenu() {
+        int choice;
+        do {
+            System.out.println("\n====== MANAGEMENT (Admin/IT Use) ======");
+            System.out.println(" 1. Delete Appointment");
+            System.out.println(" 2. Modify Appointment");
+            System.out.println(" 3. Clone Appointment List");
+            System.out.println(" 0. Back");
+            System.out.println("======================================");
+            System.out.print("Enter your choice: ");
+
+            while (!sc.hasNextInt()) {
+                System.out.print("Invalid input! Please enter a number: ");
+                sc.next();
+            }
+            choice = sc.nextInt();
+            sc.nextLine();
+
+            switch (choice) {
+                case 1 -> {
                     System.out.print("Enter Appointment ID to delete: ");
                     String appointmentId = sc.nextLine();
                     AppointmentManagement.deleteAppointmentById(appointmentId);
                 }
-                case 5 -> { // Modify Appointment
+                case 2 -> {
                     System.out.print("Enter Appointment ID to modify: ");
                     String appointmentId = sc.nextLine();
                     AppointmentManagement.modifyAppointment(appointmentId);
                 }
-                case 0 -> System.out.println("Returning to Main Menu...");
-                default -> System.out.println("Invalid choice. Please try again.");
+                case 3 -> AppointmentManagement.demoClone();
+                case 0 -> System.out.println("Returning...");
+                default -> System.out.println("Invalid choice.");
             }
+        } while (choice != 0);
+    }
 
+    // ANALYTICS MENU
+    private void showAnalyticsMenu() {
+        int choice;
+        do {
+            System.out.println("\n====== ANALYTICS & UTILITIES ======");
+            System.out.println(" 1. View Appointment Reports");
+            System.out.println(" 2. Check Doctor Appointments Next Week");
+            System.out.println(" 3. Doctor Statistics");
+            System.out.println(" 0. Back");
+            System.out.println("======================================");
+            System.out.print("Enter your choice: ");
+
+            while (!sc.hasNextInt()) {
+                System.out.print("Invalid input! Please enter a number: ");
+                sc.next();
+            }
+            choice = sc.nextInt();
+            sc.nextLine();
+
+            switch (choice) {
+                case 1 -> {
+                    System.out.print("Enter Appointment or Patient or Doctor ID: ");
+                    String id = sc.nextLine().trim();
+                    AppointmentManagement.viewConsultationReportById(id);
+                }
+                case 2 -> AppointmentManagement.checkDoctorNextWeekAppointments();
+                case 3 -> AppointmentManagement.doctorStatistics();
+                case 0 -> System.out.println("Returning...");
+                default -> System.out.println("Invalid choice.");
+            }
         } while (choice != 0);
     }
 
     public static void main(String[] args) {
         // 初始化样本数据
+        ClinicData.addSamplePatients();
         DoctorManagement.addSampleDoctor();
-        ClinicData.run();
         LeaveManagement.addSampleLeaves();
         ScheduleManagement.addSampleSchedules();
+        AppointmentManagement.addSampleAppointments();
 
         AppointmentUI ui = new AppointmentUI();
-        ui.run();
+        ui.run1();
     }
 }
