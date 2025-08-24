@@ -181,9 +181,7 @@ public class PharmacyUI {
         }
 
         // Create a clone and sort alphabetically by default
-        MyList<Medicine> medicines = (DynamicList<Medicine>) service.getAll();
-        MyList<Medicine> sortedMedicines = medicines.clone();
-        sortedMedicines.quickSort(java.util.Comparator.comparing(Medicine::getMedicineName));
+        MyList<Medicine> sortedMedicines = service.getMedicinesSortedByName();
 
         printMedicineHeader();
         for (int i = 0; i < sortedMedicines.size(); i++) {
@@ -768,13 +766,10 @@ public class PharmacyUI {
     }
 
     private static void searchByNamePattern() {
-        System.out.println("\n--- Search by Name Pattern ---");
         String pattern = readLine("Enter name pattern to search: ");
-
-        DynamicList<Medicine> results = (DynamicList<Medicine>) service.getAll()
-            .filter(m -> m.getMedicineName().toLowerCase().contains(pattern.toLowerCase()));
-
-        displaySearchResults("medicines matching '" + pattern + "'", results);
+        MyList<Medicine> results = service.searchMedicinesByPattern(pattern);
+        displaySearchResults("medicines matching '" + pattern + "'",
+                (DynamicList<Medicine>) results);
     }
 
     private static void filterByPriceRange() {
@@ -862,11 +857,8 @@ public class PharmacyUI {
         System.out.println("\n--- Find Near Expiry Medicines ---");
         int months = readInt("Enter number of months from now: ");
 
-        // Convert months to days for the control method
-        int days = months * 30; // Approximate days in months
-
         // Use control layer method instead of manual filtering
-        MyList<Medicine> results = service.getMedicinesNearExpiry(days);
+        MyList<Medicine> results = service.getMedicinesNearExpiry(months);
 
         displaySearchResults("medicines expiring within " + months + " months", (DynamicList<Medicine>) results);
     }

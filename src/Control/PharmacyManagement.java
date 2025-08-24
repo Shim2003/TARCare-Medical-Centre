@@ -432,8 +432,15 @@ public class PharmacyManagement {
         return medicines.findAll(medicine -> isMedicineExpired(medicine));
     }
     
+    public MyList<Medicine> getMedicinesExpiringInMonths(int months) {
+        int days = UtilityClass.convertMonthsToDays(months);
+        return getMedicinesNearExpiry(days);
+    }
+    
     public MyList<Medicine> getMedicinesNearExpiry(int days) {
-        return medicines.findAll(medicine -> isMedicineNearExpiry(medicine, days));
+        Date futureDate = UtilityClass.addDaysToDate(new Date(), days);
+        return medicines.filter(m -> m.getExpiryDate().before(futureDate) && 
+                                m.getExpiryDate().after(new Date()));
     }
     
     public int removeExpiredMedicines() {
@@ -484,5 +491,67 @@ public class PharmacyManagement {
         if (expired.isEmpty() && nearExpiry.isEmpty()) {
             System.out.println("✅ No expired or near-expiry medicines found!");
         }
+    }
+    
+    public double calculatePrescriptionCostForUI(Prescription prescription) {
+        return calculatePrescriptionCost(prescription);
+    }
+
+    public MyList<Medicine> getLowStockMedicines() {
+        return getLowStockMedicines(UtilityClass.LOW_STOCK_THRESHOLD);
+    }
+
+    public MyList<Medicine> searchMedicinesByPattern(String pattern) {
+        return medicines.filter(m -> 
+            m.getMedicineName().toLowerCase().contains(pattern.toLowerCase()));
+    }
+
+    public MyList<Medicine> filterByPriceRange(double minPrice, double maxPrice) {
+        return medicines.filter(m -> 
+            m.getPrice() >= minPrice && m.getPrice() <= maxPrice);
+    }
+
+    public MyList<Medicine> filterByMultipleCriteria(String namePattern, 
+        String category, String manufacturer, Double minPrice, Double maxPrice) {
+        return medicines.filter(m -> {
+            boolean matches = true;
+            if (!namePattern.isEmpty()) {
+                matches = matches && m.getMedicineName().toLowerCase()
+                    .contains(namePattern.toLowerCase());
+            }
+            if (!category.isEmpty()) {
+                matches = matches && m.getCategory().equalsIgnoreCase(category);
+            }
+            // ... rest of criteria logic
+            return matches;
+        });
+    }
+
+    public MyList<Medicine> getMedicinesSortedByName() {
+        MyList<Medicine> sorted = medicines.clone();
+        sorted.quickSort(java.util.Comparator.comparing(Medicine::getMedicineName));
+        return sorted;
+    }
+
+    public MyList<Medicine> getMedicinesSortedByQuantity() {
+        MyList<Medicine> sorted = medicines.clone();
+        sorted.quickSort(java.util.Comparator.comparing(Medicine::getQuantity));
+        return sorted;
+    }
+
+    public MyList<Medicine> getMedicinesSortedByPrice(boolean descending) {
+        MyList<Medicine> sorted = medicines.clone();
+        if (descending) {
+            sorted.quickSort(java.util.Comparator.comparing(Medicine::getPrice).reversed());
+        } else {
+            sorted.quickSort(java.util.Comparator.comparing(Medicine::getPrice));
+        }
+        return sorted;
+    }
+
+    public MyList<Medicine> getAvailableMedicinesForRequest() {
+        MyList<Medicine> lowStock = getLowStockMedicines();
+        return lowStock.filter(med -> 
+            !hasPendingRequestForMedicine(med.getMedicineID()));
     }
 }

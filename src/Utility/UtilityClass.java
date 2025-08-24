@@ -4,10 +4,13 @@
  */
 package Utility;
 
+import ADT.MyList;
+import Entity.Medicine;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Scanner;
 
@@ -107,5 +110,32 @@ public class UtilityClass {
     };
     
     public static final int LOW_STOCK_THRESHOLD = 20;
+    
+    public static Date addMonthsToDate(Date date, int months) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.add(Calendar.MONTH, months);
+        return cal.getTime();
+    }
+    
+    public static int convertMonthsToDays(int months) {
+        return months * 30; // Approximate
+    }
+    
+    public static double calculateTotalValue(MyList<Medicine> medicines) {
+        double total = 0.0;
+        for (int i = 0; i < medicines.size(); i++) {
+            Medicine med = medicines.get(i);
+            total += med.getPrice() * med.getQuantity();
+        }
+        return total;
+    }
+    
+    public static Date addDaysToDate(Date date, int days) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.add(Calendar.DAY_OF_MONTH, days);
+        return cal.getTime();
+    }
 }
 
