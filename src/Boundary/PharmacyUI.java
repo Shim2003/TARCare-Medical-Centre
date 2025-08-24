@@ -519,15 +519,15 @@ public class PharmacyUI {
     }
     
     private static void printMedicineHeader() {
-        System.out.println("ID   | Name                 | Quantity(Form)   | Category     | Price (RM) | Manufacturer | Expiry");
-        System.out.println("=".repeat(105));
+        System.out.println("ID   | Name                           | Quantity(Form)   | Category             | Price (RM)     | Manufacturer           | Expiry");
+        System.out.println("=".repeat(135));
     }
 
     // Helper function to format medicine display
     private static String formatMedicineDisplay(Medicine medicine) {
         String quantityForm = medicine.getQuantity() + "(" + medicine.getDosageForm() + ")";
         SimpleDateFormat sdf = new SimpleDateFormat(UtilityClass.DATE_FORMAT);
-        return String.format("%-4s | %-20s | %-16s | %-12s | %-10.2f | %-12s | %s",
+        return String.format("%-4s | %-30s | %-16s | %-20s | %-14.2f | %-22s | %s",
             medicine.getMedicineID(),
             medicine.getMedicineName(),
             quantityForm,
@@ -706,7 +706,7 @@ public class PharmacyUI {
         switch (action) {
             case 1:
                 if (service.approveStockRequest(requestID)) {
-                    System.out.println("✅ Request approved and stock updated!");
+                    System.out.println("Request approved and stock updated!");
                     Medicine medicine = service.findById(request.getMedicineID());
                     if (medicine != null) {
                         System.out.println("New stock level: " + medicine.getQuantity() + " " + medicine.getDosageForm());
@@ -988,8 +988,6 @@ public class PharmacyUI {
         MyList<Medicine> expired = service.getExpiredMedicines();
         MyList<Medicine> nearExpiry = service.getMedicinesNearExpiry(180); // 6 months = ~180 days
 
-        System.out.println("=== INVENTORY SUMMARY ===");
-
         System.out.println("\nLOWEST STOCK:");
         for (int i = 0; i < Math.min(3, byQuantity.size()); i++) {
             Medicine med = byQuantity.get(i);
@@ -1056,7 +1054,7 @@ public class PharmacyUI {
         // Create a clone of the current inventory
         MyList<Medicine> snapshot = medicines.clone();
 
-        System.out.println("✅ Inventory snapshot created with " + snapshot.size() + " medicines.");
+        System.out.println("Inventory snapshot created with " + snapshot.size() + " medicines.");
         System.out.println("This snapshot can be used for backup or comparison purposes.");
 
         // Show snapshot summary
@@ -1090,7 +1088,7 @@ public class PharmacyUI {
         MyList<Medicine> expired = service.getExpiredMedicines();
 
         if (expired.isEmpty()) {
-            System.out.println("✅ No expired medicines found.");
+            System.out.println("No expired medicines found.");
             return;
         }
 
@@ -1106,7 +1104,7 @@ public class PharmacyUI {
         if (confirm.equals("y") || confirm.equals("yes")) {
             // Use control layer method to remove expired medicines
             int removedCount = service.removeExpiredMedicines();
-            System.out.println("✅ " + removedCount + " expired medicines removed from inventory.");
+            System.out.println(removedCount + " expired medicines removed from inventory.");
         } else {
             System.out.println("Operation cancelled.");
         }
