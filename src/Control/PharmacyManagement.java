@@ -10,7 +10,7 @@ import Entity.Medicine;
 import Entity.MedicalTreatmentItem;
 import Entity.Prescription;
 import Entity.StockRequest;
-import java.text.ParseException;
+import Utility.UtilityClass;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Comparator;
@@ -23,20 +23,9 @@ import java.util.function.Predicate;
 public class PharmacyManagement {
     private static MyList<Medicine> medicines;
     private static MyList<Prescription> prescriptionQueue;
-    private final SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
     private static MyList<StockRequest> stockRequests;
+    SimpleDateFormat sdf = new SimpleDateFormat(UtilityClass.DATE_FORMAT);
     private int requestCounter = 1;
-    
-    // Common dosage forms for medicine selection
-    public static final String[] DOSAGE_FORMS = {
-        "tablet", "capsule", "ml", "syrup", "cream", "ointment", 
-        "gel", "injection", "drops", "sachet", "powder", "lotion"
-    };
-    
-    // Common dosage units
-    public static final String[] DOSAGE_UNITS = {
-        "mg", "g", "ml", "mcg", "mg/ml", "g/ml", "IU", "%"
-    };
     
     public PharmacyManagement() {
         this.medicines = new DynamicList<>();
@@ -75,11 +64,6 @@ public class PharmacyManagement {
     public MyList<Medicine> getAll() {
         return medicines;
     }
-    
-    public Date parseDate(String s) throws ParseException {
-        return df.parse(s);
-    }
-    
     
     /**
      * Get detailed header with dosage information
@@ -423,5 +407,82 @@ public class PharmacyManagement {
     
     public MyList<Medicine> findAll(Predicate<Medicine> predicate) {
         return medicines.findAll(predicate);
+    }
+    
+    public boolean isMedicineExpired(Medicine medicine) {
+        if (medicine == null || medicine.getExpiryDate() == null) {
+            return false;
+        }
+        return medicine.getExpiryDate().before(new Date());
+    }
+    
+    public boolean isMedicineNearExpiry(Medicine medicine, int days) {
+        if (medicine == null || medicine.getExpiryDate() == null) {
+            return false;
+        }
+        
+        long currentTime = System.currentTimeMillis();
+        long expiryTime = medicine.getExpiryDate().getTime();
+        long daysInMillis = days * 24L * 60L * 60L * 1000L;
+        
+        return (expiryTime - currentTime) <= daysInMillis && expiryTime > currentTime;
+    }
+    
+    public MyList<Medicine> getExpiredMedicines() {
+        return medicines.findAll(medicine -> isMedicineExpired(medicine));
+    }
+    
+    public MyList<Medicine> getMedicinesNearExpiry(int days) {
+        return medicines.findAll(medicine -> isMedicineNearExpiry(medicine, days));
+    }
+    
+    public int removeExpiredMedicines() {
+        MyList<Medicine> expiredMedicines = getExpiredMedicines();
+        int removedCount = 0;
+        
+        for (int i = 0; i < expiredMedicines.size(); i++) {
+            Medicine expired = expiredMedicines.get(i);
+            if (deleteMedicine(expired.getMedicineID())) {
+                removedCount++;
+            }
+        }
+        
+        return removedCount;
+    }
+    
+    public void printExpiryAlert(int daysAhead) {
+        MyList<Medicine> expired = getExpiredMedicines();
+        MyList<Medicine> nearExpiry = getMedicinesNearExpiry(daysAhead);
+        
+        if (!expired.isEmpty()) {
+            System.out.println("❌ === EXPIRED MEDICINES ===");
+            for (int i = 0; i < expired.size(); i++) {
+                Medicine med = expired.get(i);
+                System.out.printf("- %s (ID: %s): Expired on %s%n", 
+                    med.getMedicineName(), 
+                    med.getMedicineID(),
+                    sdf.format(med.getExpiryDate()));
+            }
+            System.out.println("============================");
+        }
+        
+        if (!nearExpiry.isEmpty()) {
+            System.out.println("⚠️  === MEDICINES EXPIRING WITHIN " + daysAhead + " DAYS ===");
+            for (int i = 0; i < nearExpiry.size(); i++) {
+                Medicine med = nearExpiry.get(i);
+                long daysUntilExpiry = (med.getExpiryDate().getTime() - System.currentTimeMillis()) 
+                                     / (24 * 60 * 60 * 1000);
+                System.out.printf("- %s (ID: %s): Expires in %d days (%s)%n", 
+                    med.getMedicineName(), 
+                    med.getMedicineID(),
+                    daysUntilExpiry,
+                    sdf.format(med.getExpiryDate()));
+            }
+            System.out.println("================================================");
+        }
+        
+        if (expired.isEmpty() && nearExpiry.isEmpty()) {
+            System.out.println("✅ No expired or near-expiry medicines found!");
+        }
     }
 }

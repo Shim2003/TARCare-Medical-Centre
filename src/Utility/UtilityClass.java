@@ -100,5 +100,12 @@ public class UtilityClass {
             return null;
         }
     }
+    
+    public static final String[] DOSAGE_FORMS = {
+        "tablet", "capsule", "ml", "syrup", "cream", "ointment", 
+        "gel", "injection", "drops", "sachet", "powder", "lotion"
+    };
+    
+    public static final int LOW_STOCK_THRESHOLD = 20;
 }
 
