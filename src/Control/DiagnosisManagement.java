@@ -157,17 +157,19 @@ public class DiagnosisManagement {
 
     // get the first patientID from the queue list
     public static String getCurrentServingPatient() {
-        if (currentServingList.isEmpty()) {
-            return null;
+        CurrentServingDAO latest = ConsultationManagement.getLatestCurrentConsulting();
+        if (latest != null) {
+            return latest.getPatientId();
         }
-        return currentServingList.get(0).getPatientId();        
+        return null;
     }
 
     // get the related doctor ID from the current serving list
     public static String getCurrentServingDoctor() {
-        if (currentServingList.isEmpty()) {
-            return null;
+        CurrentServingDAO latest = ConsultationManagement.getLatestCurrentConsulting();
+        if (latest != null) {
+            return latest.getDoctorId();
         }
-        return currentServingList.get(0).getDoctorId();        
+        return null; 
     }
 }
