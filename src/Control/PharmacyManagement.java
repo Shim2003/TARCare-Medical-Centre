@@ -21,17 +21,13 @@ import java.util.function.Predicate;
  * @author jecsh
  */
 public class PharmacyManagement {
-    private static MyList<Medicine> medicines;
-    private static MyList<Prescription> prescriptionQueue;
-    private static MyList<StockRequest> stockRequests;
+    private static MyList<Medicine> medicines = new DynamicList<>();
+    private static MyList<Prescription> prescriptionQueue = new DynamicList<>();
+    private static MyList<StockRequest> stockRequests = new DynamicList<>();
     SimpleDateFormat sdf = new SimpleDateFormat(UtilityClass.DATE_FORMAT);
     private int requestCounter = 1;
     
-    public PharmacyManagement() {
-        this.medicines = new DynamicList<>();
-        this.prescriptionQueue = new DynamicList<>();
-        this.stockRequests = new DynamicList<>();
-    }
+    public PharmacyManagement() {    }
     
     // ===== BASIC MEDICINE MANAGEMENT METHODS =====
     public static boolean addMedicine(Medicine m) {
