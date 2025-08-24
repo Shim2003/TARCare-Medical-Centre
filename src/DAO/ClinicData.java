@@ -8,11 +8,13 @@ import ADT.DynamicList;
 import ADT.MyList;
 import Control.DiagnosisManagement;
 import Control.PatientManagement;
+import Control.QueueControl;
 import Control.PharmacyManagement;
 import Entity.Consultation;
 import Entity.Diagnosis;
 import Entity.Medicine;
 import Entity.Patient;
+import Entity.QueueEntry;
 import Entity.Prescription;
 import Entity.StockRequest;
 import Utility.UtilityClass;
@@ -31,6 +33,7 @@ public class ClinicData {
     public static void run() {
         addSamplePatients();
         addSampleConsultations();
+        addSampleQueueData();
         addSampleMedicine();
     }
 
@@ -103,7 +106,7 @@ public class ClinicData {
             System.out.println("Error parsing date in sample data.");
         }
     }
-    
+
     public static void addSampleConsultations() {
         try {
             Consultation[] samples = new Consultation[10];
@@ -157,67 +160,67 @@ public class ClinicData {
             System.out.println("Error adding sample consultations: " + e.getMessage());
         }
     }
-    
+
     // adding the sample diagnosis based on the sample consultations above
     public static void addSampleDiagnosis() {
-    try {
-        MyList<Diagnosis> diagnosisList = DiagnosisManagement.getDiagnosisList();
+        try {
+            MyList<Diagnosis> diagnosisList = DiagnosisManagement.getDiagnosisList();
 
-        // Adding 10 sample diagnoses
-        Diagnosis d1 = new Diagnosis("P001", "D001", new Date(),
-                getSymptoms("D001"), "Common Cold", "Low",
-                "Drink warm fluids and rest for 3 days.",
-                "Patient reported mild cough and nasal congestion.");
-        Diagnosis d2 = new Diagnosis("P002", "D002", new Date(),
-                getSymptoms("D002"), "Influenza", "Medium",
-                "Take prescribed antiviral medication and monitor temperature.",
-                "High fever and body aches reported.");
-        Diagnosis d3 = new Diagnosis("P003", "D003", new Date(),
-                getSymptoms("D003"), "Migraine", "High",
-                "Avoid bright lights and take prescribed painkillers.",
-                "Severe headache localized to the right side.");
-        Diagnosis d4 = new Diagnosis("P004", "D004", new Date(),
-                getSymptoms("D004"), "Muscle Strain", "Medium",
-                "Apply ice packs and attend physical therapy sessions.",
-                "Patient experienced muscle pain after heavy lifting.");
-        Diagnosis d5 = new Diagnosis("P005", "D005", new Date(),
-                getSymptoms("D005"), "Gastritis", "Medium",
-                "Avoid spicy foods and eat smaller, frequent meals.",
-                "Patient reported stomach pain after meals.");
-        Diagnosis d6 = new Diagnosis("P006", "D006", new Date(),
-                getSymptoms("D006"), "Pharyngitis", "Low",
-                "Complete the full course of antibiotics.",
-                "Sore throat and difficulty swallowing.");
-        Diagnosis d7 = new Diagnosis("P007", "D007", new Date(),
-                getSymptoms("D007"), "Allergic Rhinitis", "Low",
-                "Take antihistamines and avoid allergens.",
-                "Patient reported sneezing and itchy eyes.");
-        Diagnosis d8 = new Diagnosis("P008", "D008", new Date(),
-                getSymptoms("D008"), "Seasonal Flu", "Medium",
-                "Stay hydrated and rest for 5 days.",
-                "Fever and fatigue reported during flu season.");
-        Diagnosis d9 = new Diagnosis("P009", "D009", new Date(),
-                getSymptoms("D009"), "Chronic Fatigue", "High",
-                "Adopt a regular sleep schedule and reduce stress.",
-                "Patient reported persistent fatigue for over a month.");
-        Diagnosis d10 = new Diagnosis("P010", "D010", new Date(),
-                getSymptoms("D010"), "Vertigo", "Critical",
-                "Attend vestibular therapy sessions.",
-                "Patient reported dizziness and balance issues.");
+            // Adding 10 sample diagnoses
+            Diagnosis d1 = new Diagnosis("P001", "D001", new Date(),
+                    getSymptoms("D001"), "Common Cold", "Low",
+                    "Drink warm fluids and rest for 3 days.",
+                    "Patient reported mild cough and nasal congestion.");
+            Diagnosis d2 = new Diagnosis("P002", "D002", new Date(),
+                    getSymptoms("D002"), "Influenza", "Medium",
+                    "Take prescribed antiviral medication and monitor temperature.",
+                    "High fever and body aches reported.");
+            Diagnosis d3 = new Diagnosis("P003", "D003", new Date(),
+                    getSymptoms("D003"), "Migraine", "High",
+                    "Avoid bright lights and take prescribed painkillers.",
+                    "Severe headache localized to the right side.");
+            Diagnosis d4 = new Diagnosis("P004", "D004", new Date(),
+                    getSymptoms("D004"), "Muscle Strain", "Medium",
+                    "Apply ice packs and attend physical therapy sessions.",
+                    "Patient experienced muscle pain after heavy lifting.");
+            Diagnosis d5 = new Diagnosis("P005", "D005", new Date(),
+                    getSymptoms("D005"), "Gastritis", "Medium",
+                    "Avoid spicy foods and eat smaller, frequent meals.",
+                    "Patient reported stomach pain after meals.");
+            Diagnosis d6 = new Diagnosis("P006", "D006", new Date(),
+                    getSymptoms("D006"), "Pharyngitis", "Low",
+                    "Complete the full course of antibiotics.",
+                    "Sore throat and difficulty swallowing.");
+            Diagnosis d7 = new Diagnosis("P007", "D007", new Date(),
+                    getSymptoms("D007"), "Allergic Rhinitis", "Low",
+                    "Take antihistamines and avoid allergens.",
+                    "Patient reported sneezing and itchy eyes.");
+            Diagnosis d8 = new Diagnosis("P008", "D008", new Date(),
+                    getSymptoms("D008"), "Seasonal Flu", "Medium",
+                    "Stay hydrated and rest for 5 days.",
+                    "Fever and fatigue reported during flu season.");
+            Diagnosis d9 = new Diagnosis("P009", "D009", new Date(),
+                    getSymptoms("D009"), "Chronic Fatigue", "High",
+                    "Adopt a regular sleep schedule and reduce stress.",
+                    "Patient reported persistent fatigue for over a month.");
+            Diagnosis d10 = new Diagnosis("P010", "D010", new Date(),
+                    getSymptoms("D010"), "Vertigo", "Critical",
+                    "Attend vestibular therapy sessions.",
+                    "Patient reported dizziness and balance issues.");
 
-        // Adding the diagnoses to the diagnosis list
-        diagnosisList.add(d1);
-        diagnosisList.add(d2);
-        diagnosisList.add(d3);
-        diagnosisList.add(d4);
-        diagnosisList.add(d5);
-        diagnosisList.add(d6);
-        diagnosisList.add(d7);
-        diagnosisList.add(d8);
-        diagnosisList.add(d9);
-        diagnosisList.add(d10);
+            // Adding the diagnoses to the diagnosis list
+            diagnosisList.add(d1);
+            diagnosisList.add(d2);
+            diagnosisList.add(d3);
+            diagnosisList.add(d4);
+            diagnosisList.add(d5);
+            diagnosisList.add(d6);
+            diagnosisList.add(d7);
+            diagnosisList.add(d8);
+            diagnosisList.add(d9);
+            diagnosisList.add(d10);
 
-        System.out.println("Added 10 sample diagnoses with auto-generated IDs.");
+            System.out.println("Added 10 sample diagnoses with auto-generated IDs.");
 
         } catch (Exception e) {
             System.out.println("Error adding sample diagnoses: " + e.getMessage());
@@ -231,7 +234,7 @@ public class ClinicData {
             case "D001":
                 symptoms.add("Cough");
                 symptoms.add("Nasal congestion");
-                symptoms.add("Mild fever");            
+                symptoms.add("Mild fever");
             case "D002":
                 symptoms.add("High fever");
                 symptoms.add("Body aches");
@@ -274,6 +277,147 @@ public class ClinicData {
         }
         return symptoms;
     }
+
+    public static void addSampleQueueData() {
+        try {
+            MyList<Patient> patientList = PatientManagement.getPatientList();
+
+            Calendar cal = Calendar.getInstance();
+
+            cal.setTime(new Date());
+
+            createQueueEntry(patientList.get(0), cal, 8, 30, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(1), cal, 9, 15, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(2), cal, 9, 45, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(3), cal, 10, 20, UtilityClass.statusConsulting);
+            createQueueEntry(patientList.get(4), cal, 11, 10, UtilityClass.statusConsulting);
+            createQueueEntry(patientList.get(5), cal, 11, 50, UtilityClass.statusWaiting);
+
+            createQueueEntry(patientList.get(6), cal, 14, 15, UtilityClass.statusWaiting);
+            createQueueEntry(patientList.get(7), cal, 14, 45, UtilityClass.statusWaiting);
+            createQueueEntry(patientList.get(8), cal, 15, 30, UtilityClass.statusWaiting);
+            createQueueEntry(patientList.get(9), cal, 16, 0, UtilityClass.statusWaiting);
+            createQueueEntry(patientList.get(10), cal, 16, 30, UtilityClass.statusWaiting);
+            createQueueEntry(patientList.get(11), cal, 17, 0, UtilityClass.statusWaiting);
+
+            cal.setTime(new Date());
+            cal.add(Calendar.DAY_OF_MONTH, -1);
+
+            createQueueEntry(patientList.get(12), cal, 8, 0, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(13), cal, 8, 30, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(14), cal, 9, 0, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(15), cal, 9, 30, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(16), cal, 10, 0, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(17), cal, 10, 30, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(18), cal, 11, 0, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(19), cal, 11, 30, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(20), cal, 14, 0, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(21), cal, 14, 30, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(22), cal, 15, 0, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(23), cal, 15, 30, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(24), cal, 16, 0, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(25), cal, 16, 30, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(26), cal, 17, 0, UtilityClass.statusCompleted);
+
+            cal.setTime(new Date());
+            cal.add(Calendar.DAY_OF_MONTH, -2);
+
+            createQueueEntry(patientList.get(0), cal, 8, 15, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(1), cal, 9, 0, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(2), cal, 9, 45, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(3), cal, 10, 30, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(4), cal, 11, 15, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(5), cal, 14, 30, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(6), cal, 15, 15, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(7), cal, 16, 0, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(8), cal, 16, 45, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(9), cal, 17, 30, UtilityClass.statusCompleted);
+
+            cal.setTime(new Date());
+            cal.add(Calendar.DAY_OF_MONTH, -3);
+
+            createQueueEntry(patientList.get(10), cal, 8, 45, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(11), cal, 9, 30, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(12), cal, 10, 15, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(13), cal, 11, 0, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(14), cal, 14, 45, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(15), cal, 15, 30, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(16), cal, 16, 15, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(17), cal, 17, 0, UtilityClass.statusCompleted);
+
+            cal.setTime(new Date());
+            cal.add(Calendar.DAY_OF_MONTH, -4);
+
+            createQueueEntry(patientList.get(18), cal, 8, 0, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(19), cal, 8, 20, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(20), cal, 8, 40, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(21), cal, 9, 0, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(22), cal, 9, 20, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(23), cal, 9, 40, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(24), cal, 10, 0, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(25), cal, 10, 20, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(26), cal, 10, 40, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(27), cal, 11, 0, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(28), cal, 11, 20, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(29), cal, 11, 40, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(0), cal, 14, 0, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(1), cal, 14, 20, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(2), cal, 14, 40, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(3), cal, 15, 0, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(4), cal, 15, 20, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(5), cal, 15, 40, UtilityClass.statusCompleted);
+
+            cal.setTime(new Date());
+            cal.add(Calendar.DAY_OF_MONTH, -5);
+
+            createQueueEntry(patientList.get(6), cal, 8, 30, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(7), cal, 9, 15, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(8), cal, 10, 0, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(9), cal, 10, 45, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(10), cal, 11, 30, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(11), cal, 14, 15, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(12), cal, 15, 0, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(13), cal, 15, 45, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(14), cal, 16, 30, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(15), cal, 17, 15, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(16), cal, 17, 45, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(17), cal, 18, 0, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(18), cal, 18, 30, UtilityClass.statusCompleted);
+
+            cal.setTime(new Date());
+            cal.add(Calendar.DAY_OF_MONTH, -6);
+
+            createQueueEntry(patientList.get(19), cal, 8, 45, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(20), cal, 9, 30, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(21), cal, 10, 15, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(22), cal, 11, 0, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(23), cal, 11, 45, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(24), cal, 14, 30, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(25), cal, 15, 15, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(26), cal, 16, 0, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(27), cal, 16, 45, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(28), cal, 17, 30, UtilityClass.statusCompleted);
+            createQueueEntry(patientList.get(29), cal, 18, 15, UtilityClass.statusCompleted);
+
+        } catch (Exception e) {
+            System.out.println("Error adding sample queue data: " + e.getMessage());
+        }
+    }
+
+    private static void createQueueEntry(Patient patient, Calendar cal, int hour, int minute, String status) {
+        QueueEntry queueEntry = new QueueEntry(patient.getPatientID());
+
+        // Set the specific time
+        cal.set(Calendar.HOUR_OF_DAY, hour);
+        cal.set(Calendar.MINUTE, minute);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+
+        queueEntry.setCheckInTime(cal.getTime());
+        queueEntry.setStatus(status);
+
+        // Add to queue list
+        QueueControl.getQueueList().add(queueEntry);
     
     public static void addSamplePrescriptions(PharmacyManagement pharmacyService) {
         SimpleDateFormat sdf = new SimpleDateFormat(UtilityClass.DATE_FORMAT);
