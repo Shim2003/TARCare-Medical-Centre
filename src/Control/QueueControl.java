@@ -36,8 +36,10 @@ public class QueueControl {
                 return null;
             }
 
-            if (queueList.anyMatch(qe -> qe.getPatientId().equals(p.getPatientID()))) {
-                System.out.println("You are already in the queue.");
+            if (queueList.anyMatch(qe -> qe.getPatientId().equals(p.getPatientID())
+                    && (qe.getStatus().equals(UtilityClass.statusWaiting)
+                    || qe.getStatus().equals(UtilityClass.statusConsulting)))) {
+                System.out.println("You are already in the queue or currently consulting.");
                 return null;
             }
 

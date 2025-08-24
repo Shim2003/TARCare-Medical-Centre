@@ -7,9 +7,12 @@ package DAO;
 import ADT.DynamicList;
 import ADT.MyList;
 import Control.DiagnosisManagement;
+import Control.DoctorManagement;
+import Control.LeaveManagement;
 import Control.PatientManagement;
 import Control.QueueControl;
 import Control.PharmacyManagement;
+import Control.ScheduleManagement;
 import Entity.Consultation;
 import Entity.Diagnosis;
 import Entity.Medicine;
@@ -34,7 +37,11 @@ public class ClinicData {
         addSamplePatients();
         addSampleConsultations();
         addSampleQueueData();
-        addSampleMedicine();
+        addSampleMedicine(); 
+        LeaveManagement.addSampleLeaves();
+        ScheduleManagement.addSampleSchedules();
+        DoctorManagement.addSampleDoctor();
+
     }
 
     public static void addSamplePatients() {

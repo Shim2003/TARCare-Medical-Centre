@@ -5,7 +5,9 @@
 package Boundary;
 
 import ADT.MyList;
+import Control.PatientManagement;
 import Control.QueueControl;
+import Entity.Patient;
 import Entity.QueueEntry;
 import Utility.UtilityClass;
 import java.util.Calendar;
@@ -85,27 +87,47 @@ public class QueueUI {
     }
 
     public static void startQueue() {
+        System.out.println("\n=== Join Consultation Queue ===");
 
-        System.out.print("Enter your Patient ID to join the queue: ");
-        String patientId = scanner.nextLine();
+        System.out.print("Enter Patient ID: ");
+        String patientId = scanner.nextLine().trim();
 
-        if (patientId == null || patientId.trim().isEmpty()) {
-            System.out.println("Invalid input. Please enter a valid Identity Number.");
+        if (patientId.isEmpty()) {
+            System.out.println("Error: Patient ID cannot be empty.");
+            UtilityClass.pressEnterToContinue();
             return;
         }
 
         QueueEntry newQueue = QueueControl.addInQueue(patientId);
 
         if (newQueue != null) {
-            System.out.println("You have successfully joined the queue.");
-            System.out.println("Queue Details");
-            System.out.println(newQueue.toString());
+            // Get patient name for display
+            Patient patient = PatientManagement.findPatientById(patientId);
+            String patientName = (patient != null) ? patient.getFullName() : "Unknown Patient";
+
+            System.out.println("\n--- Queue Success ---");
+            System.out.println("Queue Number: " + newQueue.getQueueNumber());
+            System.out.println("Patient: " + patientName + " (" + patientId + ")");
+            System.out.println("Status: " + newQueue.getStatus());
+            System.out.println("Check-in: " + UtilityClass.formatDate(newQueue.getCheckInTime()));
+
+            // Show position in queue
+            MyList<QueueEntry> waitingList = QueueControl.getQueueListByStatus(UtilityClass.statusWaiting);
+            System.out.println("Patients waiting: " + waitingList.size());
+
         } else {
-            System.out.println("You have unsuccessfully joined the queue.");
+            System.out.println("\nFailed to join queue.");
+
+            // Brief error info
+            Patient patient = PatientManagement.findPatientById(patientId);
+            if (patient == null) {
+                System.out.println("Reason: Patient ID not found. Please register first.");
+            } else {
+                System.out.println("Reason: Already in queue or system error.");
+            }
         }
 
         UtilityClass.pressEnterToContinue();
-
     }
 
     public static void getNextInQueue() {
@@ -330,7 +352,7 @@ public class QueueUI {
         }
 
         if (QueueControl.removeByStatus(selectedStatus)) {
-            System.out.println("Successfully cancelled.");
+            System.out.println("Successfully Removed.");
         } else {
             System.out.println("No queue entry found with the given Identity Number.");
         }
@@ -453,7 +475,7 @@ public class QueueUI {
         System.out.println("=".repeat(80));
 
         System.out.println("LAST 7 DAYS SUMMARY:");
-        System.out.printf("%-12s | %-6s | %-7s | %-10s | %-8s | %-10s\n",
+        System.out.printf("%-12s | %-6s | %-7s | %-10s | %-9s  | %-10s\n",
                 "Date", "Total", "Waiting", "Consulting", "Completed", "Rate");
         System.out.println("-".repeat(80));
 
@@ -467,7 +489,7 @@ public class QueueUI {
             DAO.DailyQueueStats dayStats = QueueControl.getDailyQueueStats(targetDate);
 
             if (dayStats.totalPatients > 0) {
-                System.out.printf("%-12s | %-6d | %-7d | %-10d | %-8d | %-9.1f%%\n",
+                System.out.printf("%-12s | %-6d | %-7d | %-10d | %-10d | %-9.1f%%\n",
                         UtilityClass.formatDate(targetDate),
                         dayStats.totalPatients,
                         dayStats.waitingPatients,

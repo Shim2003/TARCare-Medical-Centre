@@ -385,7 +385,7 @@ public class PatientUI {
     }
 
     public static void generateTotalPatientsReport() {
-        MyList<Patient> patientList = PatientManagement.getPatientsSortedBy("name");
+        MyList<Patient> patientList = PatientManagement.getPatientList();
         int totalPatients = patientList.size();
 
         if (totalPatients == 0) {
@@ -398,13 +398,17 @@ public class PatientUI {
             return;
         }
 
+        // Ask user for sorting preference
+        String sortBy = getSortingPreference();
+        MyList<Patient> sortedPatientList = PatientManagement.getPatientsSortedBy(sortBy);
+
         int patientsPerPage = 10;
         int totalPages = (int) Math.ceil((double) totalPatients / patientsPerPage);
         int currentPage = 1;
 
         while (true) {
             // Display current page
-            displayPatientPage(patientList, currentPage, patientsPerPage, totalPages, totalPatients);
+            displayPatientPage(sortedPatientList, currentPage, patientsPerPage, totalPages, totalPatients, getSortDisplayName(sortBy));
 
             // Navigation menu
             System.out.println("\nNavigation Options:");
@@ -414,7 +418,7 @@ public class PatientUI {
             if (currentPage < totalPages) {
                 System.out.print("N - Next Page | ");
             }
-            System.out.println("B - Back to Demographics Menu");
+            System.out.println("S - Change Sort | B - Back to Demographics Menu");
 
             System.out.print("Enter your choice: ");
             String choice = scanner.nextLine().toUpperCase();
@@ -434,6 +438,11 @@ public class PatientUI {
                         System.out.println("Already on the last page.");
                     }
                     break;
+                case "S":
+                    sortBy = getSortingPreference();
+                    sortedPatientList = PatientManagement.getPatientsSortedBy(sortBy);
+                    currentPage = 1; // Reset to first page when sorting changes
+                    break;
                 case "B":
                     return;
                 default:
@@ -442,39 +451,105 @@ public class PatientUI {
         }
     }
 
+    private static String getSortDisplayName(String sortBy) {
+        switch (sortBy) {
+            case "name":
+                return "Name (A-Z)";
+            case "id":
+                return "Patient ID";
+            case "age":
+                return "Age (Youngest first)";
+            case "age_desc":
+                return "Age (Oldest first)";
+            case "registration_desc":
+                return "Registration Date (Newest first)";
+            case "registration":
+                return "Registration Date (Oldest first)";
+            default:
+                return "Name (A-Z)";
+        }
+    }
+
+    private static String getSortingPreference() {
+        int choice = -1;
+
+        while (choice < 1 || choice > 6) {
+            System.out.println("\n--- Choose Sorting Option ---");
+            System.out.println("1. Sort by Name (A-Z)");
+            System.out.println("2. Sort by Patient ID");
+            System.out.println("3. Sort by Age (Youngest first)");
+            System.out.println("4. Sort by Age (Oldest first)");
+            System.out.println("5. Sort by Registration Date (Newest first)");
+            System.out.println("6. Sort by Registration Date (Oldest first)");
+
+            System.out.print("Enter your choice (1-6): ");
+
+            try {
+                choice = Integer.parseInt(scanner.nextLine());
+
+                if (choice < 1 || choice > 6) {
+                    System.out.println("Invalid choice. Please enter a number between 1 and 6.");
+                }
+
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a valid integer.");
+            }
+        }
+
+        switch (choice) {
+            case 1:
+                return "name";
+            case 2:
+                return "id";
+            case 3:
+                return "age";
+            case 4:
+                return "age_desc";
+            case 5:
+                return "registration_desc";
+            case 6:
+                return "registration";
+            default:
+                return "name";
+        }
+    }
+
     private static void displayPatientPage(MyList<Patient> patientList, int currentPage,
-            int patientsPerPage, int totalPages, int totalPatients) {
-        System.out.println("\n" + "=".repeat(86));
-        System.out.printf("                    TOTAL REGISTERED PATIENTS (Page %d of %d)\n", currentPage, totalPages);
-        System.out.println("=".repeat(86));
+            int patientsPerPage, int totalPages, int totalPatients, String sortBy) {
+        System.out.println("\n" + "=".repeat(96));
+        System.out.printf("              TOTAL REGISTERED PATIENTS (Page %d of %d)\n", currentPage, totalPages);
+        System.out.printf("                        Sorted by: %s\n", sortBy);
+        System.out.println("=".repeat(96));
         System.out.printf("Total Patients: %d\n", totalPatients);
-        System.out.println("-".repeat(86));
+        System.out.println("-".repeat(96));
 
         // Calculate start and end indices for current page
         int startIndex = (currentPage - 1) * patientsPerPage;
         int endIndex = Math.min(startIndex + patientsPerPage, totalPatients);
 
         // Display table header
-        System.out.printf("| %-3s | %-8s | %-20s | %-15s | %-6s | %-15s |\n",
-                "No.", "ID", "Full Name", "Identity No", "Gender", "Contact");
-        System.out.println("|" + "-".repeat(5) + "|" + "-".repeat(10) + "|" + "-".repeat(22) + "|"
-                + "-".repeat(17) + "|" + "-".repeat(8) + "|" + "-".repeat(17) + "|");
+        System.out.printf("| %-3s | %-8s | %-18s | %-13s | %-4s | %-6s | %-23s |\n",
+                "No.", "ID", "Full Name", "Identity No", "Age", "Gender", "Contact");
+        System.out.println("|" + "-".repeat(5) + "|" + "-".repeat(10) + "|" + "-".repeat(20) + "|"
+                + "-".repeat(15) + "|" + "-".repeat(6) + "|" + "-".repeat(8) + "|" + "-".repeat(25) + "|");
 
         // Display patients for current page
         for (int i = startIndex; i < endIndex; i++) {
             Patient p = patientList.get(i);
             int displayNumber = i + 1;
+            int age = PatientManagement.calculateAge(p);
 
-            System.out.printf("| %-3d | %-8s | %-20s | %-15s | %-6s | %-15s |\n",
+            System.out.printf("| %-3d | %-8s | %-18s | %-13s | %-4d | %-6s | %-23s |\n",
                     displayNumber,
                     p.getPatientID(),
-                    UtilityClass.truncate(p.getFullName(), 20),
+                    UtilityClass.truncate(p.getFullName(), 18),
                     p.getIdentityNumber(),
+                    age,
                     String.valueOf(p.getGender()),
                     p.getContactNumber());
         }
 
-        System.out.println("-".repeat(86));
+        System.out.println("-".repeat(96));
         System.out.printf("Showing patients %d-%d of %d\n", startIndex + 1, endIndex, totalPatients);
     }
 
