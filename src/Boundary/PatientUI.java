@@ -148,7 +148,15 @@ public class PatientUI {
             return;
         }
 
-        System.out.println("Patient Found: " + existingPatient.getFullName());
+        // Display current patient details
+        System.out.println("\n--- Current Patient Information ---");
+        System.out.println("Patient ID       : " + existingPatient.getPatientID());
+        System.out.println("Full Name        : " + existingPatient.getFullName());
+        System.out.println("Contact Number   : " + existingPatient.getContactNumber());
+        System.out.println("Email            : " + existingPatient.getEmail());
+        System.out.println("Address          : " + existingPatient.getAddress());
+        System.out.println("Emergency Contact: " + existingPatient.getEmergencyContact());
+        System.out.println("-----------------------------------\n");
 
         int choice = -1;
         while (choice < 1 || choice > 6) {
@@ -191,7 +199,6 @@ public class PatientUI {
         }
 
         UtilityClass.pressEnterToContinue();
-
     }
 
     public static void displayPatientInfo() {
@@ -205,9 +212,9 @@ public class PatientUI {
             System.out.println("Patient not found.");
             return;
         }
-        
+
         System.out.println("\n\n");
-        
+
         appointmentStatus(patient.getPatientID());
         System.out.println("--- Patient Details ---");
         System.out.println("Full Name: " + patient.getFullName());
