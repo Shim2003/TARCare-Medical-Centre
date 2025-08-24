@@ -8,8 +8,10 @@ import ADT.DynamicList;
 import ADT.MyList;
 import Control.DiagnosisManagement;
 import Control.PatientManagement;
+import Control.PharmacyManagement;
 import Entity.Consultation;
 import Entity.Diagnosis;
+import Entity.Medicine;
 import Entity.Patient;
 import Utility.UtilityClass;
 import java.text.ParseException;
@@ -26,6 +28,7 @@ public class ClinicData {
     public static void run() {
         addSamplePatients();
         addSampleConsultations();
+        addSampleMedicine();
     }
 
     public static void addSamplePatients() {
@@ -267,5 +270,32 @@ public class ClinicData {
                 return new DynamicList<>();
         }
         return symptoms;
+    }
+    
+    public static void addSampleMedicine(){
+        SimpleDateFormat sdf = new SimpleDateFormat(UtilityClass.DATE_FORMAT);
+        
+        try {
+            // Initialize medicine inventory with only dosage form
+            PharmacyManagement.addMedicine(new Medicine("M001", "Paracetamol", 100, "Analgesic", 0.25, "China", 
+                sdf.parse("31/12/2030"), "tablet"));
+            PharmacyManagement.addMedicine(new Medicine("M002", "Aspirin", 50, "Analgesic", 1.00, "Bayer", 
+                sdf.parse("15/11/2029"), "tablet"));
+            PharmacyManagement.addMedicine(new Medicine("M003", "Amoxicillin", 200, "Antibiotic", 1.50, "Pfizer", 
+                sdf.parse("01/07/2031"), "capsule"));
+            PharmacyManagement.addMedicine(new Medicine("M004", "Vitamin C", 150, "Supplement", 0.8, "Blackmores", 
+                sdf.parse("10/05/2028"), "tablet"));
+            PharmacyManagement.addMedicine(new Medicine("M005", "Benadryl Cough Syrup", 80, "Cold & Flu", 0.30, "Johnson", 
+                sdf.parse("20/03/2032"), "ml"));
+            PharmacyManagement.addMedicine(new Medicine("M006", "ORS Sachet", 300, "Electrolyte", 1.20, "Cipla", 
+                sdf.parse("15/08/2029"), "sachet"));
+            PharmacyManagement.addMedicine(new Medicine("M007", "Hydrocortisone Cream", 40, "Topical", 4.00, "GSK", 
+                sdf.parse("30/06/2030"), "cream"));
+            PharmacyManagement.addMedicine(new Medicine("M008", "Omeprazole", 100, "Antacid", 1.75, "AstraZeneca", 
+                sdf.parse("12/09/2031"), "capsule"));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

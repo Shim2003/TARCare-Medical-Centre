@@ -17,14 +17,14 @@ import java.util.Comparator;
 import java.util.function.Predicate;
 
 /**
- * Enhanced PharmacyManagement with dosage functionality
+ * 
  * @author jecsh
  */
 public class PharmacyManagement {
-    private final MyList<Medicine> medicines;
-    private final MyList<Prescription> prescriptionQueue;
+    private static MyList<Medicine> medicines;
+    private static MyList<Prescription> prescriptionQueue;
     private final SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-    private final MyList<StockRequest> stockRequests;
+    private static MyList<StockRequest> stockRequests;
     private int requestCounter = 1;
     
     // Common dosage forms for medicine selection
@@ -45,7 +45,7 @@ public class PharmacyManagement {
     }
     
     // ===== BASIC MEDICINE MANAGEMENT METHODS =====
-    public boolean addMedicine(Medicine m) {
+    public static boolean addMedicine(Medicine m) {
         if (findById(m.getMedicineID()) != null) {
             return false; // duplicate id
         }
@@ -64,7 +64,7 @@ public class PharmacyManagement {
         return medicines.removeIf(m -> m.getMedicineID().equalsIgnoreCase(id));
     }
     
-    public Medicine findById(String id) {
+    public static Medicine findById(String id) {
         return medicines.findFirst(m -> m.getMedicineID().equalsIgnoreCase(id));
     }
     
@@ -125,7 +125,7 @@ public class PharmacyManagement {
         for (int i = 0; i < prescription.getMedicineItems().size(); i++) {
             MedicalTreatmentItem item = prescription.getMedicineItems().get(i);
             Medicine medicine = findByName(item.getMedicineName());
-            int quantityNeeded = item.calculateQuantityNeeded();
+            int quantityNeeded = PrescriptionCalculator.calculateQuantityNeeded(item);
             
             if (medicine == null || medicine.getQuantity() < quantityNeeded) {
                 return false; // Cannot process due to insufficient stock
@@ -136,7 +136,7 @@ public class PharmacyManagement {
         for (int i = 0; i < prescription.getMedicineItems().size(); i++) {
             MedicalTreatmentItem item = prescription.getMedicineItems().get(i);
             Medicine medicine = findByName(item.getMedicineName());
-            int quantityNeeded = item.calculateQuantityNeeded();
+            int quantityNeeded = PrescriptionCalculator.calculateQuantityNeeded(item); // FIX: Use static call
             
             // Update stock using calculated quantity
             int newQuantity = medicine.getQuantity() - quantityNeeded;
@@ -151,11 +151,16 @@ public class PharmacyManagement {
     }
     
     public boolean checkStockAvailability(Prescription prescription) {
-        return !prescription.getMedicineItems().anyMatch(item -> {
+        for (int i = 0; i < prescription.getMedicineItems().size(); i++) {
+            MedicalTreatmentItem item = prescription.getMedicineItems().get(i);
             Medicine medicine = findByName(item.getMedicineName());
-            int quantityNeeded = item.calculateQuantityNeeded();
-            return medicine == null || medicine.getQuantity() < quantityNeeded;
-        });
+            int quantityNeeded = PrescriptionCalculator.calculateQuantityNeeded(item); // FIX: Use static call
+            
+            if (medicine == null || medicine.getQuantity() < quantityNeeded) {
+                return false;
+            }
+        }
+        return true;
     }
     
     public double calculatePrescriptionCost(Prescription prescription) {
@@ -166,7 +171,7 @@ public class PharmacyManagement {
             Medicine medicine = findByName(item.getMedicineName());
             
             if (medicine != null) {
-                int quantityNeeded = item.calculateQuantityNeeded();
+                int quantityNeeded = PrescriptionCalculator.calculateQuantityNeeded(item); // FIX: Use static call
                 totalCost += medicine.getPrice() * quantityNeeded;
             }
         }

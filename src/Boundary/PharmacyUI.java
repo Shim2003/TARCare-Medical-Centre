@@ -9,12 +9,14 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.Scanner;
 import Control.PharmacyManagement;
+import Control.PrescriptionCalculator;
 import Entity.Medicine;
 import Entity.MedicalTreatmentItem;
 import Entity.Prescription;
 import Entity.Patient;
 import Entity.StockRequest;
 import ADT.MyList;
+import DAO.ClinicData;
 
 public class PharmacyUI {
 
@@ -23,31 +25,8 @@ public class PharmacyUI {
 
     public static void main(String[] args) {
         
-        try {
-            // Initialize medicine inventory with only dosage form
-            service.addMedicine(new Medicine("M001", "Paracetamol", 100, "Analgesic", 0.25, "China", 
-                service.parseDate("31/12/2030"), "tablet"));
-            service.addMedicine(new Medicine("M002", "Aspirin", 50, "Analgesic", 1.00, "Bayer", 
-                service.parseDate("15/11/2029"), "tablet"));
-            service.addMedicine(new Medicine("M003", "Amoxicillin", 200, "Antibiotic", 1.50, "Pfizer", 
-                service.parseDate("01/07/2031"), "capsule"));
-            service.addMedicine(new Medicine("M004", "Vitamin C", 150, "Supplement", 0.8, "Blackmores", 
-                service.parseDate("10/05/2028"), "tablet"));
-            service.addMedicine(new Medicine("M005", "Benadryl Cough Syrup", 80, "Cold & Flu", 0.30, "Johnson", 
-                service.parseDate("20/03/2032"), "ml"));
-            service.addMedicine(new Medicine("M006", "ORS Sachet", 300, "Electrolyte", 1.20, "Cipla", 
-                service.parseDate("15/08/2029"), "sachet"));
-            service.addMedicine(new Medicine("M007", "Hydrocortisone Cream", 40, "Topical", 4.00, "GSK", 
-                service.parseDate("30/06/2030"), "cream"));
-            service.addMedicine(new Medicine("M008", "Omeprazole", 100, "Antacid", 1.75, "AstraZeneca", 
-                service.parseDate("12/09/2031"), "capsule"));
-
-            // Initialize sample prescription queue (hardcoded patients)
-            initializeSampleQueue();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+        ClinicData.addSampleMedicine();
+        
         int choice;
         do {
             printMenu();
@@ -275,11 +254,11 @@ public class PharmacyUI {
                 String dosageForm = medicine != null ? medicine.getDosageForm() : "unit";
 
                 System.out.println("  - " + item.getMedicineName() + 
-                                 " | Dosage: " + item.getCompleteDosageDescription(dosageForm) +
+                                 " | Dosage: " + PrescriptionCalculator.getCompleteDosageDescription(item, dosageForm) +
                                  " | Frequency: " + item.getFrequency() +
                                  " | Duration: " + item.getDuration() +
                                  " | Method: " + item.getMethod() +
-                                 " | Calculated Quantity: " + item.calculateQuantityNeeded());
+                                 " | Calculated Quantity: " + PrescriptionCalculator.calculateQuantityNeeded(item));
             }
             System.out.println();
         }
@@ -306,7 +285,7 @@ public class PharmacyUI {
         for (int i = 0; i < nextPrescription.getMedicineItems().size(); i++) {
             MedicalTreatmentItem item = nextPrescription.getMedicineItems().get(i);
             Medicine medicine = service.findByName(item.getMedicineName());
-            int quantityNeeded = item.calculateQuantityNeeded();
+            int quantityNeeded = PrescriptionCalculator.calculateQuantityNeeded(item);
 
             if (medicine == null) {
                 System.out.println("[X] " + item.getMedicineName() + " - MEDICINE NOT FOUND");
