@@ -2,20 +2,25 @@ package Entity;
 
 import ADT.DynamicList;
 import ADT.MyList;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class MedicalTreatment {
 
     // ID counter
     private static int treatmentIdCounter = 1001;
+    SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy");
 
     private String treatmentId;
     private String consultationId;
     private String patientId;
     private String doctorId;
     private final Date treatmentDate;
-    private String treatmentStatus;
+    private Date followUpDate;
+    private String treatmentStatus; // e.g., "Active", "Completed"
+    private String treatmentOutcome; // e.g., "Successful", "Needs Follow-up", "Failed", "Ongoing"
     private String medicalTreatmentAdvise;
+    private String notes;
     private MyList<MedicalTreatmentItem> medicineList;
 
     // Constructor
@@ -25,16 +30,19 @@ public class MedicalTreatment {
         this.medicineList = new DynamicList<>();
     }
 
-    public MedicalTreatment(String consultationId, String patientId,
-    String doctorId, Date treatmentDate, String treatmentStatus, String medicalTreatmentAdvise,
+    public MedicalTreatment(String consultationId, String patientId, String doctorId, Date treatmentDate,
+    Date followUpDate, String treatmentStatus, String treatmentOutcome, String medicalTreatmentAdvise, String notes, 
     MyList<MedicalTreatmentItem> medicineList) {
         this.treatmentId = "TRMT" + treatmentIdCounter++;
         this.consultationId = consultationId;
         this.patientId = patientId;
         this.doctorId = doctorId;
         this.treatmentDate = treatmentDate;
+        this.followUpDate = followUpDate;
         this.treatmentStatus = treatmentStatus;
+        this.treatmentOutcome = treatmentOutcome;
         this.medicalTreatmentAdvise = medicalTreatmentAdvise;
+        this.notes = notes;
         this.medicineList = medicineList;
     }
 
@@ -58,6 +66,10 @@ public class MedicalTreatment {
         return treatmentStatus;
     }
 
+    public String getTreatmentOutcome() {
+        return treatmentOutcome;
+    }
+
     public String getMedicalTreatmentAdvise() {
         return medicalTreatmentAdvise;
     }
@@ -68,6 +80,27 @@ public class MedicalTreatment {
 
     public Date getTreatmentDate() {
         return treatmentDate;
+    }
+
+    public Date getFollowUpDate() {
+        return followUpDate;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public String getMonth() {
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("MM");
+        return dateFormatter.format(treatmentDate);
+    }
+    public String getYear() {
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy");
+        return dateFormatter.format(treatmentDate);
+    }
+
+    public void setFollowUpDate(Date followUpDate) {
+        this.followUpDate = followUpDate;
     }
 
     public void setTreatmentId(String treatmentId) {
@@ -90,8 +123,16 @@ public class MedicalTreatment {
         this.treatmentStatus = treatmentStatus;
     }
 
+    public void setTreatmentOutcome(String treatmentOutcome) {
+        this.treatmentOutcome = treatmentOutcome;
+    }
+
     public void setMedicalTreatmentAdvise(String medicalTreatmentAdvise) {
         this.medicalTreatmentAdvise = medicalTreatmentAdvise;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
 
     public void setMedicineList(MyList<MedicalTreatmentItem> medicineList) {
@@ -108,8 +149,11 @@ public class MedicalTreatment {
             "Patient ID: " + patientId,
             "Doctor ID: " + doctorId,
             "Treatment Date: " + treatmentDate,
+            "Follow Up Date: " + followUpDate,
             "Status: " + treatmentStatus,
-            "Advice: " + medicalTreatmentAdvise
+            "Outcome: " + treatmentOutcome,
+            "Advice: " + medicalTreatmentAdvise,
+            "Notes: " + notes
         ));
         sb.append("Medicines:\n");
         if (medicineList != null && medicineList.size() > 0) {
