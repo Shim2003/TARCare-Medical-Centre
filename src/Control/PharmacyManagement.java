@@ -529,22 +529,22 @@ public class PharmacyManagement {
 
     public MyList<Medicine> getMedicinesSortedByName() {
         MyList<Medicine> sorted = medicines.clone();
-        sorted.quickSort(java.util.Comparator.comparing(Medicine::getMedicineName));
+        UtilityClass.quickSort(sorted, java.util.Comparator.comparing(Medicine::getMedicineName));
         return sorted;
     }
 
     public MyList<Medicine> getMedicinesSortedByQuantity() {
         MyList<Medicine> sorted = medicines.clone();
-        sorted.quickSort(java.util.Comparator.comparing(Medicine::getQuantity));
+        UtilityClass.quickSort(sorted, java.util.Comparator.comparing(Medicine::getQuantity));
         return sorted;
     }
 
     public MyList<Medicine> getMedicinesSortedByPrice(boolean descending) {
         MyList<Medicine> sorted = medicines.clone();
         if (descending) {
-            sorted.quickSort(java.util.Comparator.comparing(Medicine::getPrice).reversed());
+            UtilityClass.quickSort(sorted, java.util.Comparator.comparing(Medicine::getPrice).reversed());
         } else {
-            sorted.quickSort(java.util.Comparator.comparing(Medicine::getPrice));
+            UtilityClass.quickSort(sorted, java.util.Comparator.comparing(Medicine::getPrice));
         }
         return sorted;
     }
