@@ -182,24 +182,28 @@ public class LeaveManagement {
         return removed;
     }
 
-    public static int countLeavesForMonth(String doctorID, int year, int month) {
-        int daysCount = 0;
-        for (int i = 0; i < leaveList.size(); i++) {
-            DoctorLeave leave = leaveList.get(i);
+    // number of leave object in a month
+    public static int countLeaveRecordsInMonth(String doctorID, YearMonth month) {
+        MyList<DoctorLeave> leaves = getAllLeaves();
+        LocalDate monthStart = month.atDay(1);
+        LocalDate monthEnd = month.atEndOfMonth();
+
+        int count = 0;
+        for (int i = 0; i < leaves.size(); i++) {
+            DoctorLeave leave = leaves.get(i);
             if (leave.getDoctorID().equals(doctorID)) {
-                LocalDate current = leave.getDateFrom();
-                while (!current.isAfter(leave.getDateTo())) {
-                    if (current.getYear() == year && current.getMonthValue() == month) {
-                        daysCount++;
-                    }
-                    current = current.plusDays(1);
+                LocalDate from = leave.getDateFrom();
+                LocalDate to = leave.getDateTo();
+                // overlaps this month?
+                if (!to.isBefore(monthStart) && !from.isAfter(monthEnd)) {
+                    count++;
                 }
             }
         }
-        return daysCount;
+        return count;
     }
 
-    //total leave taken regardless of shift
+    //total leave taken regardless of shift per month
     public static int countLeaveDaysInMonth(String doctorID, YearMonth month) {
         MyList<DoctorLeave> leaves = getAllLeaves();
         LocalDate monthStart = month.atDay(1);
@@ -233,7 +237,7 @@ public class LeaveManagement {
 
         return leaveDays;
     }
-    
+
     //actual leave days (according to schedule)
     public static int countLeaveDaysForDoctor(String doctorID, YearMonth month,
             MyList<DoctorLeave> leaves, MyList<Schedule> schedules) {
@@ -269,6 +273,38 @@ public class LeaveManagement {
         }
         return leaveDays;
     }
+    
+    //helper method
+     public static MyList<LocalDate> getLeaveDaysForDoctorInMonth(String doctorId, YearMonth month) {
+        MyList<DoctorLeave> allLeaves = getAllLeaves(); // however you store leaves
+        MyList<LocalDate> leaveDays = new DynamicList<>();
 
+        int year = month.getYear();
+        int monthValue = month.getMonthValue();
+
+        for (int i = 0; i < allLeaves.size(); i++) {
+            DoctorLeave leave = allLeaves.get(i);
+
+            if (!leave.getDoctorID().equals(doctorId)) {
+                continue; // skip other doctors
+            }
+
+            // leave period
+            LocalDate from = leave.getDateFrom();
+            LocalDate to   = leave.getDateTo();
+
+            // iterate all days in the leave range
+            LocalDate d = from;
+            while (!d.isAfter(to)) {
+                // only include if same year & month
+                if (d.getYear() == year && d.getMonthValue() == monthValue) {
+                    leaveDays.add(d);
+                }
+                d = d.plusDays(1);
+            }
+        }
+
+        return leaveDays;
+    }
 
 }
