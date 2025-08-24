@@ -979,10 +979,10 @@ public class PharmacyUI {
 
         // Create clones for different sorting
         MyList<Medicine> byQuantity = medicines.clone();
-        byQuantity.quickSort(java.util.Comparator.comparing(Medicine::getQuantity));
+        UtilityClass.quickSort(byQuantity, java.util.Comparator.comparing(Medicine::getQuantity));
 
         MyList<Medicine> byPrice = medicines.clone();
-        byPrice.quickSort(java.util.Comparator.comparing(Medicine::getPrice).reversed());
+        UtilityClass.quickSort(byPrice, java.util.Comparator.comparing(Medicine::getPrice).reversed());
 
         // Use control layer methods instead of manual filtering
         MyList<Medicine> expired = service.getExpiredMedicines();

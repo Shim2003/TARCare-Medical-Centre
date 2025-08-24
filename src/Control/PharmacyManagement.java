@@ -187,28 +187,28 @@ public class PharmacyManagement {
     // Sort medicines by name
     public void sortMedicinesByName() {
         DynamicList<Medicine> medicineList = (DynamicList<Medicine>) medicines;
-        medicineList.quickSort(Comparator.comparing(Medicine::getMedicineName));
+        UtilityClass.quickSort(medicineList, Comparator.comparing(Medicine::getMedicineName));
         System.out.println("Medicines sorted by name.");
     }
     
     // Sort medicines by quantity (useful for stock management)
     public void sortMedicinesByQuantity() {
         DynamicList<Medicine> medicineList = (DynamicList<Medicine>) medicines;
-        medicineList.quickSort(Comparator.comparing(Medicine::getQuantity));
+        UtilityClass.quickSort(medicineList, Comparator.comparing(Medicine::getQuantity));
         System.out.println("Medicines sorted by quantity (ascending).");
     }
     
     // Sort medicines by price
     public void sortMedicinesByPrice() {
         DynamicList<Medicine> medicineList = (DynamicList<Medicine>) medicines;
-        medicineList.quickSort(Comparator.comparing(Medicine::getPrice));
+        UtilityClass.quickSort(medicineList, Comparator.comparing(Medicine::getPrice));
         System.out.println("Medicines sorted by price (ascending).");
     }
     
     // Sort medicines by dosage form
     public void sortMedicinesByDosageForm() {
         DynamicList<Medicine> medicineList = (DynamicList<Medicine>) medicines;
-        medicineList.quickSort(Comparator.comparing(Medicine::getDosageForm));
+        UtilityClass.quickSort(medicineList, Comparator.comparing(Medicine::getDosageForm));
         System.out.println("Medicines sorted by dosage form.");
     }
     

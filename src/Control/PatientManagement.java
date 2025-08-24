@@ -155,19 +155,19 @@ public class PatientManagement {
 
         switch (criteria.toLowerCase()) {
             case "name":
-                sortedList.quickSort(Comparator.comparing(Patient::getFullName));
+                UtilityClass.quickSort(sortedList, Comparator.comparing(Patient::getFullName));
                 break;
             case "age":
-                sortedList.quickSort(Comparator.comparingInt(PatientManagement::calculateAge));
+                UtilityClass.quickSort(sortedList, Comparator.comparingInt(PatientManagement::calculateAge));
                 break;
             case "registration":
-                sortedList.quickSort(Comparator.comparing(Patient::getRegistrationDate));
+                UtilityClass.quickSort(sortedList, Comparator.comparing(Patient::getRegistrationDate));
                 break;
             case "registration_desc":
-                sortedList.quickSort(Comparator.comparing(Patient::getRegistrationDate).reversed());
+                UtilityClass.quickSort(sortedList, Comparator.comparing(Patient::getRegistrationDate).reversed());
                 break;
             case "gender":
-                sortedList.quickSort(Comparator.comparing(Patient::getGender));
+                UtilityClass.quickSort(sortedList, Comparator.comparing(Patient::getGender));
                 break;
             default:
                 // Return unsorted if criteria not recognized
@@ -225,9 +225,7 @@ public class PatientManagement {
             return null;
         }
 
-        upcomingAppointments.quickSort(
-                Comparator.comparing(Appointment::getAppointmentTime)
-        );
+        UtilityClass.quickSort(upcomingAppointments, Comparator.comparing(Appointment::getAppointmentTime));
 
         Appointment nextAppointment = upcomingAppointments.getFirst();
 
