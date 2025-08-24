@@ -433,8 +433,8 @@ public class ClinicData {
                     new Date());
 
             Prescription prescription1 = new Prescription("RX001", patient1, "DR001");
-            prescription1.addMedicineItem("Paracetamol", "500mg", "3 times daily after meals", "5 days", "Oral");
-            prescription1.addMedicineItem("Vitamin C", "1000mg", "Once daily", "7 days", "Oral");
+            prescription1.addMedicineItem("Paracetamol", "1 tablets", "3 times daily after meals", "5 days", "Oral");
+            prescription1.addMedicineItem("Vitamin C", "2 tablets", "Once daily", "7 days", "Oral");
             pharmacyService.addToQueue(prescription1);
 
             // Sample Patient 2: Jane Smith - Infection Treatment
@@ -445,7 +445,7 @@ public class ClinicData {
                     new Date());
 
             Prescription prescription2 = new Prescription("RX002", patient2, "DR002");
-            prescription2.addMedicineItem("Amoxicillin", "250mg", "3 times daily", "7 days", "Oral");
+            prescription2.addMedicineItem("Amoxicillin", "1 capsule", "3 times daily", "7 days", "Oral");
             prescription2.addMedicineItem("Benadryl Cough Syrup", "10ml", "2 times daily", "5 days", "Oral");
             pharmacyService.addToQueue(prescription2);
 
@@ -457,7 +457,7 @@ public class ClinicData {
                     new Date());
 
             Prescription prescription3 = new Prescription("RX003", patient3, "DR003");
-            prescription3.addMedicineItem("Omeprazole", "20mg", "Once daily before breakfast", "14 days", "Oral");
+            prescription3.addMedicineItem("Omeprazole", "1 capsule", "Once daily before breakfast", "14 days", "Oral");
             prescription3.addMedicineItem("ORS Sachet", "1 sachet", "After each loose stool", "As needed", "Dissolve in water");
             pharmacyService.addToQueue(prescription3);
 
@@ -470,7 +470,7 @@ public class ClinicData {
 
             Prescription prescription4 = new Prescription("RX004", patient4, "DR004");
             prescription4.addMedicineItem("Hydrocortisone Cream", "Apply thin layer", "2 times daily", "10 days", "Topical");
-            prescription4.addMedicineItem("Aspirin", "100mg", "Once daily", "7 days", "Oral");
+            prescription4.addMedicineItem("Aspirin", "1 capsule", "Once daily", "7 days", "Oral");
             pharmacyService.addToQueue(prescription4);
 
             // Sample Patient 5: David Lee - Chronic Condition
@@ -481,9 +481,9 @@ public class ClinicData {
                     new Date());
 
             Prescription prescription5 = new Prescription("RX005", patient5, "DR005");
-            prescription5.addMedicineItem("Paracetamol", "500mg", "4 times daily as needed for pain", "10 days", "Oral");
-            prescription5.addMedicineItem("Vitamin C", "500mg", "Twice daily", "30 days", "Oral");
-            prescription5.addMedicineItem("Omeprazole", "40mg", "Once daily", "30 days", "Oral");
+            prescription5.addMedicineItem("Paracetamol", "2 tablets", "4 times daily as needed for pain", "10 days", "Oral");
+            prescription5.addMedicineItem("Vitamin C", "2 tablets", "Twice daily", "30 days", "Oral");
+            prescription5.addMedicineItem("Omeprazole", "1 capsule", "Once daily", "30 days", "Oral");
             pharmacyService.addToQueue(prescription5);
 
             System.out.println("Added 5 sample prescriptions to queue successfully.");
