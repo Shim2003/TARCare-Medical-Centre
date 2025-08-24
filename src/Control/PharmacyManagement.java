@@ -242,7 +242,7 @@ public class PharmacyManagement {
     public void printLowStockAlert(int threshold) {
         MyList<Medicine> lowStock = getLowStockMedicines(threshold);
         if (lowStock.isEmpty()) {
-            System.out.println("✓ All medicines are well-stocked!");
+            System.out.println("All medicines are well-stocked!");
         } else {
             System.out.println("⚠️  === LOW STOCK ALERT ===");
             System.out.println("Medicines with stock <= " + threshold + ":");
@@ -462,7 +462,7 @@ public class PharmacyManagement {
         MyList<Medicine> nearExpiry = getMedicinesNearExpiry(daysAhead);
         
         if (!expired.isEmpty()) {
-            System.out.println("❌ === EXPIRED MEDICINES ===");
+            System.out.println("=== EXPIRED MEDICINES ===");
             for (int i = 0; i < expired.size(); i++) {
                 Medicine med = expired.get(i);
                 System.out.printf("- %s (ID: %s): Expired on %s%n", 
@@ -474,7 +474,7 @@ public class PharmacyManagement {
         }
         
         if (!nearExpiry.isEmpty()) {
-            System.out.println("⚠️  === MEDICINES EXPIRING WITHIN " + daysAhead + " DAYS ===");
+            System.out.println("=== MEDICINES EXPIRING WITHIN " + daysAhead + " DAYS ===");
             for (int i = 0; i < nearExpiry.size(); i++) {
                 Medicine med = nearExpiry.get(i);
                 long daysUntilExpiry = (med.getExpiryDate().getTime() - System.currentTimeMillis()) 
@@ -489,7 +489,7 @@ public class PharmacyManagement {
         }
         
         if (expired.isEmpty() && nearExpiry.isEmpty()) {
-            System.out.println("✅ No expired or near-expiry medicines found!");
+            System.out.println("No expired or near-expiry medicines found!");
         }
     }
     
@@ -525,28 +525,6 @@ public class PharmacyManagement {
             // ... rest of criteria logic
             return matches;
         });
-    }
-
-    public MyList<Medicine> getMedicinesSortedByName() {
-        MyList<Medicine> sorted = medicines.clone();
-        UtilityClass.quickSort(sorted, java.util.Comparator.comparing(Medicine::getMedicineName));
-        return sorted;
-    }
-
-    public MyList<Medicine> getMedicinesSortedByQuantity() {
-        MyList<Medicine> sorted = medicines.clone();
-        UtilityClass.quickSort(sorted, java.util.Comparator.comparing(Medicine::getQuantity));
-        return sorted;
-    }
-
-    public MyList<Medicine> getMedicinesSortedByPrice(boolean descending) {
-        MyList<Medicine> sorted = medicines.clone();
-        if (descending) {
-            UtilityClass.quickSort(sorted, java.util.Comparator.comparing(Medicine::getPrice).reversed());
-        } else {
-            UtilityClass.quickSort(sorted, java.util.Comparator.comparing(Medicine::getPrice));
-        }
-        return sorted;
     }
 
     public MyList<Medicine> getAvailableMedicinesForRequest() {

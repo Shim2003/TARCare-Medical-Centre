@@ -181,11 +181,11 @@ public class PharmacyUI {
         }
 
         // Create a clone and sort alphabetically by default
-        MyList<Medicine> sortedMedicines = service.getMedicinesSortedByName();
+        MyList<Medicine> Medicines = service.getAll();
 
         printMedicineHeader();
-        for (int i = 0; i < sortedMedicines.size(); i++) {
-            Medicine medicine = sortedMedicines.get(i);
+        for (int i = 0; i < Medicines.size(); i++) {
+            Medicine medicine = Medicines.get(i);
             System.out.println(formatMedicineDisplay(medicine));
         }
     }
@@ -569,7 +569,7 @@ public class PharmacyUI {
         // Check if there are pending requests
         if (service.hasPendingRequestForMedicine(medicineID)) {
             int pendingQty = service.getTotalPendingQuantityForMedicine(medicineID);
-            System.out.println("⚠️  Warning: There are pending requests for " + pendingQty + " units of this medicine.");
+            System.out.println("!!! Warning: There are pending requests for " + pendingQty + " units of this medicine.");
         }
 
         int requestedQuantity = readInt("Enter quantity to request: ");
@@ -581,13 +581,13 @@ public class PharmacyUI {
 
         String requestID = service.createStockRequest(medicineID, requestedQuantity);
         if (requestID != null) {
-            System.out.println("✅ Stock request created successfully!");
+            System.out.println("Stock request created successfully!");
             System.out.println("Request ID: " + requestID);
             System.out.println("Medicine: " + medicine.getMedicineName());
             System.out.println("Requested quantity: " + requestedQuantity + " " + medicine.getDosageForm());
             System.out.println("Status: PENDING");
         } else {
-            System.out.println("❌ Failed to create stock request.");
+            System.out.println("Failed to create stock request.");
         }
     }
 
@@ -616,12 +616,12 @@ public class PharmacyUI {
 
         String requestID = service.createStockRequest(medicineID, requestedQuantity);
         if (requestID != null) {
-            System.out.println("✅ Stock request created successfully!");
+            System.out.println("Stock request created successfully!");
             System.out.println("Request ID: " + requestID);
             System.out.println("Requested quantity: " + requestedQuantity);
             System.out.println("Status: PENDING");
         } else {
-            System.out.println("❌ Failed to create stock request.");
+            System.out.println("Failed to create stock request.");
         }
     }
 
@@ -712,12 +712,12 @@ public class PharmacyUI {
                         System.out.println("New stock level: " + medicine.getQuantity() + " " + medicine.getDosageForm());
                     }
                 } else {
-                    System.out.println("❌ Failed to approve request.");
+                    System.out.println("Failed to approve request.");
                 }
                 break;
             case 2:
                 if (service.updateStockRequestStatus(requestID, "REJECTED")) {
-                    System.out.println("❌ Request rejected.");
+                    System.out.println("Request rejected.");
                 } else {
                     System.out.println("Failed to reject request.");
                 }
