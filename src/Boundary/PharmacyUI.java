@@ -9,12 +9,15 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.Scanner;
 import Control.PharmacyManagement;
+import Control.PrescriptionCalculator;
 import Entity.Medicine;
 import Entity.MedicalTreatmentItem;
 import Entity.Prescription;
-import Entity.Patient;
 import Entity.StockRequest;
 import ADT.MyList;
+import DAO.ClinicData;
+import Utility.UtilityClass;
+import java.text.SimpleDateFormat;
 
 public class PharmacyUI {
 
@@ -23,31 +26,10 @@ public class PharmacyUI {
 
     public static void main(String[] args) {
         
-        try {
-            // Initialize medicine inventory with only dosage form
-            service.addMedicine(new Medicine("M001", "Paracetamol", 100, "Analgesic", 0.25, "China", 
-                service.parseDate("31/12/2030"), "tablet"));
-            service.addMedicine(new Medicine("M002", "Aspirin", 50, "Analgesic", 1.00, "Bayer", 
-                service.parseDate("15/11/2029"), "tablet"));
-            service.addMedicine(new Medicine("M003", "Amoxicillin", 200, "Antibiotic", 1.50, "Pfizer", 
-                service.parseDate("01/07/2031"), "capsule"));
-            service.addMedicine(new Medicine("M004", "Vitamin C", 150, "Supplement", 0.8, "Blackmores", 
-                service.parseDate("10/05/2028"), "tablet"));
-            service.addMedicine(new Medicine("M005", "Benadryl Cough Syrup", 80, "Cold & Flu", 0.30, "Johnson", 
-                service.parseDate("20/03/2032"), "ml"));
-            service.addMedicine(new Medicine("M006", "ORS Sachet", 300, "Electrolyte", 1.20, "Cipla", 
-                service.parseDate("15/08/2029"), "sachet"));
-            service.addMedicine(new Medicine("M007", "Hydrocortisone Cream", 40, "Topical", 4.00, "GSK", 
-                service.parseDate("30/06/2030"), "cream"));
-            service.addMedicine(new Medicine("M008", "Omeprazole", 100, "Antacid", 1.75, "AstraZeneca", 
-                service.parseDate("12/09/2031"), "capsule"));
-
-            // Initialize sample prescription queue (hardcoded patients)
-            initializeSampleQueue();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+        ClinicData.addSampleMedicine();
+        ClinicData.addSamplePrescriptions(service);
+        ClinicData.addSampleStockRequests(service);
+        
         int choice;
         do {
             printMenu();
@@ -108,47 +90,6 @@ public class PharmacyUI {
                 default -> System.out.println("Invalid choice.");
             }
         } while (choice != 0);
-    }
-
-    private static void initializeSampleQueue() {
-        try {
-            // Sample patients using your existing Patient entity
-            Patient patient1 = new Patient("John Doe", "123456789012", 
-                                          service.parseDate("01/01/1990"), 'M',
-                                          "123-456-7890", "john@email.com", 
-                                          "123 Main St", "456-789-0123",
-                                          new Date());
-
-            Prescription prescription1 = new Prescription("RX001", patient1, "DR001");
-            // Updated calls - removed quantityNeeded parameter (it's now calculated)
-            prescription1.addMedicineItem("Paracetamol", "1", "3x/day after meals", "5 days", "Oral");
-            prescription1.addMedicineItem("Amoxicillin", "1", "3x/day", "7 days", "Oral");
-            service.addToQueue(prescription1);
-
-            Patient patient2 = new Patient("Jane Smith", "987654321098",
-                                          service.parseDate("15/05/1985"), 'F',
-                                          "987-654-3210", "jane@email.com",
-                                          "456 Oak Ave", "321-654-9870",
-                                          new Date());
-
-            Prescription prescription2 = new Prescription("RX002", patient2, "DR002");
-            prescription2.addMedicineItem("Benadryl Cough Syrup", "10", "2x/day", "5 days", "Oral");
-            prescription2.addMedicineItem("ORS Sachet", "1", "after each loose stool", "as needed", "dissolve in water");
-            service.addToQueue(prescription2);
-
-            Patient patient3 = new Patient("Bob Johnson", "555123456789",
-                                          service.parseDate("20/12/1975"), 'M',
-                                          "555-123-4567", "bob@email.com",
-                                          "789 Pine St", "654-321-0987",
-                                          new Date());
-
-            Prescription prescription3 = new Prescription("RX003", patient3, "DR003");
-            prescription3.addMedicineItem("Hydrocortisone Cream", "Apply thin layer", "2 times a day", "7 days", "Topical");
-            prescription3.addMedicineItem("Omeprazole", "1", "Before breakfast", "7 days", "Oral");
-            service.addToQueue(prescription3);
-        } catch (Exception e) {
-            System.err.println("Error initializing sample queue: " + e.getMessage());
-        }
     }
 
     private static void addMedicine() {
@@ -240,9 +181,7 @@ public class PharmacyUI {
         }
 
         // Create a clone and sort alphabetically by default
-        MyList<Medicine> medicines = (DynamicList<Medicine>) service.getAll();
-        MyList<Medicine> sortedMedicines = medicines.clone();
-        sortedMedicines.quickSort(java.util.Comparator.comparing(Medicine::getMedicineName));
+        MyList<Medicine> sortedMedicines = service.getMedicinesSortedByName();
 
         printMedicineHeader();
         for (int i = 0; i < sortedMedicines.size(); i++) {
@@ -275,11 +214,11 @@ public class PharmacyUI {
                 String dosageForm = medicine != null ? medicine.getDosageForm() : "unit";
 
                 System.out.println("  - " + item.getMedicineName() + 
-                                 " | Dosage: " + item.getCompleteDosageDescription(dosageForm) +
+                                 " | Dosage: " + PrescriptionCalculator.getCompleteDosageDescription(item, dosageForm) +
                                  " | Frequency: " + item.getFrequency() +
                                  " | Duration: " + item.getDuration() +
                                  " | Method: " + item.getMethod() +
-                                 " | Calculated Quantity: " + item.calculateQuantityNeeded());
+                                 " | Calculated Quantity: " + PrescriptionCalculator.calculateQuantityNeeded(item));
             }
             System.out.println();
         }
@@ -306,7 +245,7 @@ public class PharmacyUI {
         for (int i = 0; i < nextPrescription.getMedicineItems().size(); i++) {
             MedicalTreatmentItem item = nextPrescription.getMedicineItems().get(i);
             Medicine medicine = service.findByName(item.getMedicineName());
-            int quantityNeeded = item.calculateQuantityNeeded();
+            int quantityNeeded = PrescriptionCalculator.calculateQuantityNeeded(item);
 
             if (medicine == null) {
                 System.out.println("[X] " + item.getMedicineName() + " - MEDICINE NOT FOUND");
@@ -388,7 +327,7 @@ public class PharmacyUI {
 
         for (int i = 0; i < service.getAll().size(); i++) {
             Medicine medicine = service.getAll().get(i);
-            if (medicine.getQuantity() <= 20) { // Low stock threshold
+            if (medicine.getQuantity() <= UtilityClass.LOW_STOCK_THRESHOLD) { // Low stock threshold
                 lowStockMedicines.add(medicine);
                 if (!hasLowStock) {
                     System.out.println("[WARNING] LOW STOCK MEDICINES:");
@@ -450,6 +389,7 @@ public class PharmacyUI {
     }
 
     private static Medicine readMedicineData(Medicine base) {
+        SimpleDateFormat sdf = new SimpleDateFormat(UtilityClass.DATE_FORMAT);
         Medicine m = new Medicine();
 
         m.setMedicineID(readLineWithDefault("ID", base == null ? null : base.getMedicineID()));
@@ -468,7 +408,7 @@ public class PharmacyUI {
 
         // Dosage form selection (only field needed)
         System.out.println("\nSelect dosage form:");
-        String[] dosageForms = PharmacyManagement.DOSAGE_FORMS;
+        String[] dosageForms = UtilityClass.DOSAGE_FORMS;
         for (int i = 0; i < dosageForms.length; i++) {
             System.out.println((i + 1) + ". " + dosageForms[i]);
         }
@@ -489,11 +429,10 @@ public class PharmacyUI {
         // Expiry date
         while (true) {
             String prompt = "Expiry date (dd/MM/yyyy)";
-            String def = base == null || base.getExpiryDate() == null ? null
-                    : new java.text.SimpleDateFormat("dd/MM/yyyy").format(base.getExpiryDate());
+            String def = base == null || base.getExpiryDate() == null ? null : sdf.format(base.getExpiryDate());
             String s = readLineWithDefault(prompt, def);
             try {
-                Date d = service.parseDate(s);
+                Date d = sdf.parse(s);
                 m.setExpiryDate(d);
                 break;
             } catch (ParseException e) {
@@ -505,19 +444,9 @@ public class PharmacyUI {
     }
     
     private static int findFormIndex(String form) {
-        String[] forms = PharmacyManagement.DOSAGE_FORMS;
+        String[] forms = UtilityClass.DOSAGE_FORMS;
         for (int i = 0; i < forms.length; i++) {
             if (forms[i].equalsIgnoreCase(form)) {
-                return i;
-            }
-        }
-        return 0; // default to first
-    }
-    
-    private static int findUnitIndex(String unit) {
-        String[] units = PharmacyManagement.DOSAGE_UNITS;
-        for (int i = 0; i < units.length; i++) {
-            if (units[i].equalsIgnoreCase(unit)) {
                 return i;
             }
         }
@@ -597,6 +526,7 @@ public class PharmacyUI {
     // Helper function to format medicine display
     private static String formatMedicineDisplay(Medicine medicine) {
         String quantityForm = medicine.getQuantity() + "(" + medicine.getDosageForm() + ")";
+        SimpleDateFormat sdf = new SimpleDateFormat(UtilityClass.DATE_FORMAT);
         return String.format("%-4s | %-20s | %-16s | %-12s | %-10.2f | %-12s | %s",
             medicine.getMedicineID(),
             medicine.getMedicineName(),
@@ -604,7 +534,7 @@ public class PharmacyUI {
             medicine.getCategory(),
             medicine.getPrice(),
             medicine.getManufacturer(),
-            new java.text.SimpleDateFormat("dd/MM/yyyy").format(medicine.getExpiryDate())
+            sdf.format(medicine.getExpiryDate())
         );
     }
     
@@ -673,7 +603,7 @@ public class PharmacyUI {
             // Check if there are pending requests
             if (service.hasPendingRequestForMedicine(medicineID)) {
                 int pendingQty = service.getTotalPendingQuantityForMedicine(medicineID);
-                System.out.println("⚠️  Warning: There are pending requests for " + pendingQty + " units of this medicine.");
+                System.out.println("!!! Warning: There are pending requests for " + pendingQty + " units of this medicine.");
             }
         }
 
@@ -731,6 +661,7 @@ public class PharmacyUI {
 
     // Process/Approve stock request
     private static void processStockRequest() {
+        SimpleDateFormat sdf = new SimpleDateFormat(UtilityClass.DATETIME_FORMAT);
         System.out.println("\n--- Process Stock Request ---");
         MyList<StockRequest> pendingRequests = service.getPendingStockRequests();
 
@@ -763,7 +694,7 @@ public class PharmacyUI {
         System.out.println("Request ID: " + request.getRequestID());
         System.out.println("Medicine: " + request.getMedicineName() + " (ID: " + request.getMedicineID() + ")");
         System.out.println("Requested quantity: " + request.getRequestedQuantity());
-        System.out.println("Request date: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(request.getRequestDate()));
+        System.out.println("Request date: " + sdf.format(request.getRequestDate()));
 
         System.out.println("\nChoose action:");
         System.out.println("1. Approve and add stock");
@@ -835,13 +766,10 @@ public class PharmacyUI {
     }
 
     private static void searchByNamePattern() {
-        System.out.println("\n--- Search by Name Pattern ---");
         String pattern = readLine("Enter name pattern to search: ");
-
-        DynamicList<Medicine> results = (DynamicList<Medicine>) service.getAll()
-            .filter(m -> m.getMedicineName().toLowerCase().contains(pattern.toLowerCase()));
-
-        displaySearchResults("medicines matching '" + pattern + "'", results);
+        MyList<Medicine> results = service.searchMedicinesByPattern(pattern);
+        displaySearchResults("medicines matching '" + pattern + "'",
+                (DynamicList<Medicine>) results);
     }
 
     private static void filterByPriceRange() {
@@ -884,7 +812,7 @@ public class PharmacyUI {
 
         // Show available dosage forms
         System.out.println("Available dosage forms:");
-        String[] forms = PharmacyManagement.DOSAGE_FORMS;
+        String[] forms = UtilityClass.DOSAGE_FORMS;
         for (int i = 0; i < forms.length; i++) {
             System.out.println((i + 1) + ". " + forms[i]);
         }
@@ -929,14 +857,10 @@ public class PharmacyUI {
         System.out.println("\n--- Find Near Expiry Medicines ---");
         int months = readInt("Enter number of months from now: ");
 
-        java.util.Calendar cal = java.util.Calendar.getInstance();
-        cal.add(java.util.Calendar.MONTH, months);
-        java.util.Date futureDate = cal.getTime();
+        // Use control layer method instead of manual filtering
+        MyList<Medicine> results = service.getMedicinesNearExpiry(months);
 
-        DynamicList<Medicine> results = (DynamicList<Medicine>) service.getAll()
-            .filter(m -> m.getExpiryDate().before(futureDate));
-
-        displaySearchResults("medicines expiring within " + months + " months", results);
+        displaySearchResults("medicines expiring within " + months + " months", (DynamicList<Medicine>) results);
     }
 
     private static void multipleCriteriaSearch() {
@@ -1044,6 +968,7 @@ public class PharmacyUI {
     }
 
     private static void displayInventorySummary() {
+        SimpleDateFormat sdf = new SimpleDateFormat(UtilityClass.DATE_FORMAT);
         System.out.println("\n--- Inventory Summary ---");
         DynamicList<Medicine> medicines = (DynamicList<Medicine>) service.getAll();
 
@@ -1059,52 +984,40 @@ public class PharmacyUI {
         MyList<Medicine> byPrice = medicines.clone();
         byPrice.quickSort(java.util.Comparator.comparing(Medicine::getPrice).reversed());
 
-        // Near expiry and expired medicines
-        java.util.Date now = new java.util.Date();
-        java.util.Calendar cal = java.util.Calendar.getInstance();
-
-        // Expired medicines
-        MyList<Medicine> expired = medicines.filter(m -> m.getExpiryDate().before(now));
-
-        // Near expiry (within 6 months)
-        cal.setTime(now);
-        cal.add(java.util.Calendar.MONTH, 6);
-        java.util.Date sixMonthsLater = cal.getTime();
-        MyList<Medicine> nearExpiry = medicines.filter(m -> 
-            m.getExpiryDate().after(now) && m.getExpiryDate().before(sixMonthsLater));
+        // Use control layer methods instead of manual filtering
+        MyList<Medicine> expired = service.getExpiredMedicines();
+        MyList<Medicine> nearExpiry = service.getMedicinesNearExpiry(180); // 6 months = ~180 days
 
         System.out.println("=== INVENTORY SUMMARY ===");
 
-        System.out.println("\n📦 LOWEST STOCK:");
+        System.out.println("\nLOWEST STOCK:");
         for (int i = 0; i < Math.min(3, byQuantity.size()); i++) {
             Medicine med = byQuantity.get(i);
             System.out.println("  " + med.getMedicineName() + ": " + med.getQuantity() + " " + med.getDosageForm());
         }
 
-        System.out.println("\n💰 HIGHEST VALUE MEDICINES:");
+        System.out.println("\nHIGHEST VALUE MEDICINES:");
         for (int i = 0; i < Math.min(3, byPrice.size()); i++) {
             Medicine med = byPrice.get(i);
             System.out.println("  " + med.getMedicineName() + ": RM" + String.format("%.2f", med.getPrice()));
         }
 
-        System.out.println("\n⏰ NEAR EXPIRY (within 6 months): " + nearExpiry.size() + " medicines");
+        System.out.println("\nNEAR EXPIRY (within 6 months): " + nearExpiry.size() + " medicines");
         if (nearExpiry.size() > 0) {
             for (int i = 0; i < Math.min(3, nearExpiry.size()); i++) {
                 Medicine med = nearExpiry.get(i);
-                System.out.println("  " + med.getMedicineName() + " - expires " + 
-                                 new java.text.SimpleDateFormat("dd/MM/yyyy").format(med.getExpiryDate()));
+                System.out.println("  " + med.getMedicineName() + " - expires " + sdf.format(med.getExpiryDate()));
             }
             if (nearExpiry.size() > 3) {
                 System.out.println("  ... and " + (nearExpiry.size() - 3) + " more");
             }
         }
 
-        System.out.println("\n❌ EXPIRED MEDICINES: " + expired.size() + " medicines");
+        System.out.println("\nEXPIRED MEDICINES: " + expired.size() + " medicines");
         if (expired.size() > 0) {
             for (int i = 0; i < Math.min(3, expired.size()); i++) {
                 Medicine med = expired.get(i);
-                System.out.println("  " + med.getMedicineName() + " - expired " + 
-                                 new java.text.SimpleDateFormat("dd/MM/yyyy").format(med.getExpiryDate()));
+                System.out.println("  " + med.getMedicineName() + " - expired " + sdf.format(med.getExpiryDate()));
             }
             if (expired.size() > 3) {
                 System.out.println("  ... and " + (expired.size() - 3) + " more");
@@ -1173,9 +1086,8 @@ public class PharmacyUI {
     private static void removeExpiredMedicines() {
         System.out.println("\n--- Remove Expired Medicines ---");
 
-        DynamicList<Medicine> medicines = (DynamicList<Medicine>) service.getAll();
-        java.util.Date now = new java.util.Date();
-        MyList<Medicine> expired = medicines.filter(m -> m.getExpiryDate().before(now));
+        // Use control layer method to get expired medicines
+        MyList<Medicine> expired = service.getExpiredMedicines();
 
         if (expired.isEmpty()) {
             System.out.println("✅ No expired medicines found.");
@@ -1192,12 +1104,9 @@ public class PharmacyUI {
         String confirm = sc.nextLine().trim().toLowerCase();
 
         if (confirm.equals("y") || confirm.equals("yes")) {
-            boolean removed = medicines.removeIf(m -> m.getExpiryDate().before(now));
-            if (removed) {
-                System.out.println("✅ " + expired.size() + " expired medicines removed from inventory.");
-            } else {
-                System.out.println("❌ Failed to remove expired medicines.");
-            }
+            // Use control layer method to remove expired medicines
+            int removedCount = service.removeExpiredMedicines();
+            System.out.println("✅ " + removedCount + " expired medicines removed from inventory.");
         } else {
             System.out.println("Operation cancelled.");
         }

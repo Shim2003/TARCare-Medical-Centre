@@ -117,29 +117,6 @@ public class Medicine {
     public String getCompleteDosage() {
         return dosageForm;
     }
-
-    // Method to check if medicine is liquid form
-    public boolean isLiquidForm() {
-        return dosageForm.toLowerCase().contains("ml") || 
-               dosageForm.toLowerCase().contains("syrup") ||
-               dosageForm.toLowerCase().contains("liquid") ||
-               dosageForm.toLowerCase().contains("suspension");
-    }
-
-    // Method to check if medicine is solid form
-    public boolean isSolidForm() {
-        return dosageForm.toLowerCase().contains("tablet") || 
-               dosageForm.toLowerCase().contains("capsule") ||
-               dosageForm.toLowerCase().contains("pill");
-    }
-
-    // Method to check if medicine is topical
-    public boolean isTopicalForm() {
-        return dosageForm.toLowerCase().contains("cream") || 
-               dosageForm.toLowerCase().contains("ointment") ||
-               dosageForm.toLowerCase().contains("gel") ||
-               dosageForm.toLowerCase().contains("lotion");
-    }
     
     @Override
     public boolean equals(Object o) {

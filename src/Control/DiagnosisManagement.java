@@ -6,6 +6,7 @@ package Control;
 
 import ADT.DynamicList;
 import ADT.MyList;
+import DAO.CurrentServingDAO;
 import Entity.Diagnosis;
 import java.util.Date;
 import java.util.Iterator;
@@ -19,6 +20,7 @@ public class DiagnosisManagement {
     
     //list to store medical treatment details
     private static final MyList<Diagnosis> diagnosisList = new DynamicList<>();
+    private static MyList<CurrentServingDAO> currentServingList = new DynamicList<>();
     
     // Create a new symptom list for the specific diagnosis or patient
     public static MyList<String> addSymptoms(MyList<String> symptomInput) {
@@ -144,7 +146,30 @@ public class DiagnosisManagement {
             System.out.println("Invalid severity level. Please try again.");
             return new DynamicList<>();
         }
+
+        if(diagnosisList == null || diagnosisList.isEmpty()) {
+            System.out.println("No diagnoses available to filter.");
+            return new DynamicList<>();
+        }
         
         return DiagnosisManagement.getDiagnosisList().findAll(d -> d.getSeverityLevel().equalsIgnoreCase(severityLevel));
+    }
+
+    // get the first patientID from the queue list
+    public static String getCurrentServingPatient() {
+        CurrentServingDAO latest = ConsultationManagement.getLatestCurrentConsulting();
+        if (latest != null) {
+            return latest.getPatientId();
+        }
+        return null;
+    }
+
+    // get the related doctor ID from the current serving list
+    public static String getCurrentServingDoctor() {
+        CurrentServingDAO latest = ConsultationManagement.getLatestCurrentConsulting();
+        if (latest != null) {
+            return latest.getDoctorId();
+        }
+        return null; 
     }
 }

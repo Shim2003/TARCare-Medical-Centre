@@ -6,7 +6,6 @@ package Boundary;
 
 import ADT.DynamicList;
 import ADT.MyList;
-import Control.ConsultationManagement;
 import Control.DiagnosisManagement;
 import Entity.*;
 import java.text.SimpleDateFormat;
@@ -21,6 +20,7 @@ import java.util.Scanner;
 public class DiagnosisUI {
 
     public static final Scanner scanner = new Scanner(System.in);
+    public static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
     public static void diagnosisMenu() {
 
@@ -43,7 +43,7 @@ public class DiagnosisUI {
 
                 switch (choice) {
                     case 1 ->
-                        addDiagnosis();
+                        addDiagnosisTest();
                     case 2 ->
                         viewDiagnosisDetails();
                     case 3 ->
@@ -80,14 +80,13 @@ public class DiagnosisUI {
         try {
             System.out.println("\n=== Add New Diagnosis ===");
 
-            // get the first patient ID directly from the DAO current serving list
-            QueueEntry nextPatient = ConsultationManagement.getNextWaitingPatient();
-            String patientId = nextPatient.getPatientId();
+            // Get the current serving patient ID from the queue list
+            String patientId = DiagnosisManagement.getCurrentServingPatient();
             System.out.println("Patient ID: " + patientId);
 
-
-            System.out.print("Enter Doctor ID: ");
-            String doctorId = scanner.nextLine();
+            // Get the current serving doctor ID from the queue list
+            String doctorId = DiagnosisManagement.getCurrentServingDoctor();
+            System.out.println("Doctor ID: " + doctorId);
 
             // Create a diagnosis array for doctor to write the symptoms while if the doctor enter with an empty value then end the loop
             MyList<String> symptomsInput = new DynamicList<>();
@@ -116,7 +115,7 @@ public class DiagnosisUI {
             System.out.println("4. Critical");
             System.out.print("Select Severity Level(1-4): ");
             String severity = scanner.nextLine();
-            String severityLevel = null;
+            String severityLevel;
             switch (severity) {
                 case "1" ->
                     severityLevel = "Low!";
@@ -183,77 +182,7 @@ public class DiagnosisUI {
         System.out.println("Diagnosis ID: " + diagnosis.getDiagnosisId());
     }
 
-    // Update diagnosis details method
-    // This method will prompt the user for input and update the diagnosis record
-    public static void updateDiagnosisDetails() {
-        System.out.println("\n=== Update Diagnosis Details ===");
-        System.out.print("Enter Diagnosis ID: ");
-        String diagnosisId = scanner.nextLine();
-
-        Diagnosis diagnosis = DiagnosisManagement.getDiagnosisListById(diagnosisId);
-        if (diagnosis == null) {
-            return;
-        }
-
-        diagnosis.toString();
-
-        System.out.print("Enter New Diagnosis Description: ");
-        String newDiagnosisDescription = scanner.nextLine();
-
-        System.out.println("Severity Level");
-        System.out.println("1. Low");
-        System.out.println("2. Medium");
-        System.out.println("3. High");
-        System.out.println("4. Critical");
-        System.out.print("Select Severity Level(1-4): ");
-        String newSeverity = scanner.nextLine();
-        String newSeverityLevel;
-        switch (newSeverity) {
-            case "1" ->
-                newSeverityLevel = "Low";
-            case "2" ->
-                newSeverityLevel = "Medium";
-            case "3" ->
-                newSeverityLevel = "High";
-            case "4" ->
-                newSeverityLevel = "Critical";
-            default -> {
-                System.out.println("Invalid Input. Please select again.");
-                return;
-            }
-        }
-
-        System.out.print("Enter New Recommendations: ");
-        String newRecommendations = scanner.nextLine();
-
-        System.out.print("Enter New Additional Notes: ");
-        String newAdditionalNotes = scanner.nextLine();
-
-        //update the input to the certain diagnosis
-        Diagnosis updatedDiagnosis = new Diagnosis(diagnosis.getPatientId(), diagnosis.getDoctorId(), diagnosis.getDiagnosisDate(), diagnosis.getSymptoms(), newDiagnosisDescription, newSeverityLevel, newRecommendations, newAdditionalNotes);
-
-        // Update the diagnosis details
-        DiagnosisManagement.updateDiagnosisDetails(diagnosisId, updatedDiagnosis);
-        System.out.println("Diagnosis details updated successfully.");
-    }
-
-    public static void deleteDiagnosis() {
-        System.out.println("\n=== Delete Diagnosis ===");
-        System.out.print("Enter Diagnosis ID to delete: ");
-        String diagnosisId = scanner.nextLine();
-
-        if (DiagnosisManagement.removeDiagnosisById(diagnosisId)) {
-            System.out.print("Enter 'Y' to confirm deletion: ");
-            String confirmation = scanner.nextLine();
-            while (confirmation.equalsIgnoreCase("Y")) {
-                System.out.println("Diagnosis with ID " + diagnosisId + " has been deleted successfully.");
-                break;
-            }
-        } else {
-            System.out.println("No diagnosis found with ID: " + diagnosisId);
-        }
-    }
-
+    
     //View Diagnosis Details
     public static void viewDiagnosisDetails() {
         System.out.println("\n=== Diagnosis Details ===");
@@ -332,7 +261,7 @@ public class DiagnosisUI {
         // Sort symptoms alphabetically
         MyList<String> symptoms = diagnosis.getSymptoms();
         if (symptoms != null && !symptoms.isEmpty()) {
-            symptoms.quickSort(String::compareToIgnoreCase); // Assuming `quickSort` is implemented in `DynamicList`
+            // UtilityClass.quickSort(symptoms, String::compareToIgnoreCase);
         }
 
         // Display diagnosis details
@@ -353,6 +282,75 @@ public class DiagnosisUI {
             System.out.println("  No symptoms recorded.");
         }
         System.out.println("==============================================================");
+    }
+
+    // Update diagnosis details method
+    // This method will prompt the user for input and update the diagnosis record
+    public static void updateDiagnosisDetails() {
+        System.out.println("\n=== Update Diagnosis Details ===");
+        System.out.print("Enter Diagnosis ID: ");
+        String diagnosisId = scanner.nextLine();
+
+        Diagnosis diagnosis = DiagnosisManagement.getDiagnosisListById(diagnosisId);
+        if (diagnosis == null) {
+            return;
+        }
+
+        System.out.print("Enter New Diagnosis Description: ");
+        String newDiagnosisDescription = scanner.nextLine();
+
+        System.out.println("Severity Level");
+        System.out.println("1. Low");
+        System.out.println("2. Medium");
+        System.out.println("3. High");
+        System.out.println("4. Critical");
+        System.out.print("Select Severity Level(1-4): ");
+        String newSeverity = scanner.nextLine();
+        String newSeverityLevel;
+        switch (newSeverity) {
+            case "1" ->
+                newSeverityLevel = "Low";
+            case "2" ->
+                newSeverityLevel = "Medium";
+            case "3" ->
+                newSeverityLevel = "High";
+            case "4" ->
+                newSeverityLevel = "Critical";
+            default -> {
+                System.out.println("Invalid Input. Please select again.");
+                return;
+            }
+        }
+
+        System.out.print("Enter New Recommendations: ");
+        String newRecommendations = scanner.nextLine();
+
+        System.out.print("Enter New Additional Notes: ");
+        String newAdditionalNotes = scanner.nextLine();
+
+        //update the input to the certain diagnosis
+        Diagnosis updatedDiagnosis = new Diagnosis(diagnosisId, newDiagnosisDescription, newSeverityLevel, newRecommendations, newAdditionalNotes);
+
+        // Update the diagnosis details
+        DiagnosisManagement.updateDiagnosisDetails(diagnosisId, updatedDiagnosis);
+        System.out.println("Diagnosis details updated successfully.");
+    }
+
+    public static void deleteDiagnosis() {
+        System.out.println("\n=== Delete Diagnosis ===");
+        System.out.print("Enter Diagnosis ID to delete: ");
+        String diagnosisId = scanner.nextLine();
+
+        if (DiagnosisManagement.removeDiagnosisById(diagnosisId)) {
+            System.out.print("Enter 'Y' to confirm deletion: ");
+            String confirmation = scanner.nextLine();
+            while (confirmation.equalsIgnoreCase("Y")) {
+                System.out.println("Diagnosis with ID " + diagnosisId + " has been deleted successfully.");
+                break;
+            }
+        } else {
+            System.out.println("No diagnosis found with ID: " + diagnosisId);
+        }
     }
 
     // Generate diagnosis statistics report
@@ -433,7 +431,6 @@ public class DiagnosisUI {
     }
 
     public static String displayDiagnosisList() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         StringBuilder sb = new StringBuilder();
 
         System.out.print("\nEnter Diagnosis ID to view details (or press Enter to exit): ");
@@ -498,6 +495,7 @@ public class DiagnosisUI {
 
     // Allow users to enter the severity level to filter the diagnosis list and display the diagnosis ID and its patient ID
     public static void filterDiagnosisBySeverityLevel() {
+        System.out.println("\n\n=== Filter Diagnosis by Severity Level ===");
         int year = 0;
         int month = 0;
         MyList<Diagnosis> filteredList = EnterYearAndMonth(year, month);
@@ -507,22 +505,19 @@ public class DiagnosisUI {
             return;
         }
 
-        System.out.println("Enter the severity level to filter the diagnosis list (e.g., High, Medium, Low): ");
-        String severityLevel = scanner.nextLine();
+        System.out.print("Enter the severity level to filter the diagnosis list: ");
+        String severityLevel = scanner.nextLine().trim();
 
         MyList<Diagnosis> filteredDiagnosisList = DiagnosisManagement.filterDiagnosisBySeverityLevel(severityLevel);
 
-
-        if (filteredDiagnosisList.isEmpty()) {
-            System.out.println("No diagnoses found with severity level: " + severityLevel);
-        } 
-        else if (filteredList == filteredDiagnosisList) {
+        if(filteredDiagnosisList.isEmpty()) {
+            System.out.println("No diagnoses available to filter.");
+        } else {
             System.out.println("Filtered Diagnosis List by Severity Level (" + severityLevel + "):");
             System.out.println("--------------------------------------------------");
             for (int i = 0; i < filteredDiagnosisList.size(); i++) {
                 Diagnosis diagnosis = filteredDiagnosisList.get(i);
-                System.out.printf("Diagnosis ID: %s\n", diagnosis.getDiagnosisId());
-                System.out.printf("Patient ID: %s\n", diagnosis.getPatientId());
+                System.out.printf("[" + (i + 1) + "]" + "Diagnosis ID: %s, Patient ID: %s\n", diagnosis.getDiagnosisId(), diagnosis.getPatientId());
                 
             }
             System.out.println("--------------------------------------------------");
