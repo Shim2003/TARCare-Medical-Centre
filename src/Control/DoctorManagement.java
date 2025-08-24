@@ -247,7 +247,7 @@ public class DoctorManagement {
 
         // 1️⃣ Check if doctor is on leave today
         if (LeaveManagement.isDoctorOnLeave(doctor.getDoctorID(), today)) {
-            doctor.setWorkingStatus("On Leave");  // Or a constant in UtilityClass
+            doctor.setWorkingStatus(UtilityClass.statusOnLeave);  // Or a constant in UtilityClass
             return; // No need to check schedule
         }
 

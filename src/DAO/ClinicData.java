@@ -4,8 +4,12 @@
  */
 package DAO;
 
+import ADT.DynamicList;
+import ADT.MyList;
+import Control.DiagnosisManagement;
 import Control.PatientManagement;
 import Entity.Consultation;
+import Entity.Diagnosis;
 import Entity.Patient;
 import Utility.UtilityClass;
 import java.text.ParseException;
@@ -147,5 +151,121 @@ public class ClinicData {
             System.out.println("Error adding sample consultations: " + e.getMessage());
         }
     }
+    
+    // adding the sample diagnosis based on the sample consultations above
+    public static void addSampleDiagnosis() {
+    try {
+        MyList<Diagnosis> diagnosisList = DiagnosisManagement.getDiagnosisList();
 
+        // Adding 10 sample diagnoses
+        Diagnosis d1 = new Diagnosis("P001", "D001", new Date(),
+                getSymptoms("D001"), "Common Cold", "Low",
+                "Drink warm fluids and rest for 3 days.",
+                "Patient reported mild cough and nasal congestion.");
+        Diagnosis d2 = new Diagnosis("P002", "D002", new Date(),
+                getSymptoms("D002"), "Influenza", "Medium",
+                "Take prescribed antiviral medication and monitor temperature.",
+                "High fever and body aches reported.");
+        Diagnosis d3 = new Diagnosis("P003", "D003", new Date(),
+                getSymptoms("D003"), "Migraine", "High",
+                "Avoid bright lights and take prescribed painkillers.",
+                "Severe headache localized to the right side.");
+        Diagnosis d4 = new Diagnosis("P004", "D004", new Date(),
+                getSymptoms("D004"), "Muscle Strain", "Medium",
+                "Apply ice packs and attend physical therapy sessions.",
+                "Patient experienced muscle pain after heavy lifting.");
+        Diagnosis d5 = new Diagnosis("P005", "D005", new Date(),
+                getSymptoms("D005"), "Gastritis", "Medium",
+                "Avoid spicy foods and eat smaller, frequent meals.",
+                "Patient reported stomach pain after meals.");
+        Diagnosis d6 = new Diagnosis("P006", "D006", new Date(),
+                getSymptoms("D006"), "Pharyngitis", "Low",
+                "Complete the full course of antibiotics.",
+                "Sore throat and difficulty swallowing.");
+        Diagnosis d7 = new Diagnosis("P007", "D007", new Date(),
+                getSymptoms("D007"), "Allergic Rhinitis", "Low",
+                "Take antihistamines and avoid allergens.",
+                "Patient reported sneezing and itchy eyes.");
+        Diagnosis d8 = new Diagnosis("P008", "D008", new Date(),
+                getSymptoms("D008"), "Seasonal Flu", "Medium",
+                "Stay hydrated and rest for 5 days.",
+                "Fever and fatigue reported during flu season.");
+        Diagnosis d9 = new Diagnosis("P009", "D009", new Date(),
+                getSymptoms("D009"), "Chronic Fatigue", "High",
+                "Adopt a regular sleep schedule and reduce stress.",
+                "Patient reported persistent fatigue for over a month.");
+        Diagnosis d10 = new Diagnosis("P010", "D010", new Date(),
+                getSymptoms("D010"), "Vertigo", "Critical",
+                "Attend vestibular therapy sessions.",
+                "Patient reported dizziness and balance issues.");
+
+        // Adding the diagnoses to the diagnosis list
+        diagnosisList.add(d1);
+        diagnosisList.add(d2);
+        diagnosisList.add(d3);
+        diagnosisList.add(d4);
+        diagnosisList.add(d5);
+        diagnosisList.add(d6);
+        diagnosisList.add(d7);
+        diagnosisList.add(d8);
+        diagnosisList.add(d9);
+        diagnosisList.add(d10);
+
+        System.out.println("Added 10 sample diagnoses with auto-generated IDs.");
+
+        } catch (Exception e) {
+            System.out.println("Error adding sample diagnoses: " + e.getMessage());
+        }
+    }
+
+    private static MyList<String> getSymptoms(String diagnosisId) {
+        MyList<String> symptoms = new DynamicList<>();
+
+        switch (diagnosisId) {
+            case "D001":
+                symptoms.add("Cough");
+                symptoms.add("Nasal congestion");
+                symptoms.add("Mild fever");            
+            case "D002":
+                symptoms.add("High fever");
+                symptoms.add("Body aches");
+                symptoms.add("Fatigue");
+            case "D003":
+                symptoms.add("Severe headache");
+                symptoms.add("Sensitivity to light");
+                symptoms.add("Nausea");
+            case "D004":
+                symptoms.add("Muscle pain");
+                symptoms.add("Stiffness");
+                symptoms.add("Weakness");
+            case "D005":
+                symptoms.add("Stomach pain");
+                symptoms.add("Nausea");
+                symptoms.add("Bloating");
+                break;
+            case "D006":
+                symptoms.add("Sore throat");
+                symptoms.add("Difficulty swallowing");
+                symptoms.add("Swollen lymph nodes");
+            case "D007":
+                symptoms.add("Sneezing");
+                symptoms.add("Itchy eyes");
+                symptoms.add("Runny nose");
+            case "D008":
+                symptoms.add("Fever");
+                symptoms.add("Chills");
+                symptoms.add("Fatigue");
+            case "D009":
+                symptoms.add("Persistent fatigue");
+                symptoms.add("Muscle aches");
+                symptoms.add("Memory issues");
+            case "D010":
+                symptoms.add("Dizziness");
+                symptoms.add("Balance issues");
+                symptoms.add("Nausea");
+            default:
+                return new DynamicList<>();
+        }
+        return symptoms;
+    }
 }
