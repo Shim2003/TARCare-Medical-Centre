@@ -27,6 +27,7 @@ import java.time.LocalDate;
 import java.time.Duration;
 import java.time.DayOfWeek;
 import java.time.ZoneId;
+import Boundary.MedicalTreatmentUI;
 
 /**
  *
@@ -177,7 +178,14 @@ public class ConsultationManagement {
         }
         return null; // 没有等待中的病人
     }
-
+    
+    // ✅ 获取最新的 CurrentServingDAO（即刚分配的病人和医生）
+    public static CurrentServingDAO getLatestCurrentConsulting() {
+        if (currentConsulting.isEmpty()) {
+            return null; // 没有正在咨询的
+        }
+        return currentConsulting.get(currentConsulting.size() - 1); 
+    }
 
     // 开始下一位咨询
     public static void startNextConsultation() {
@@ -255,6 +263,8 @@ public class ConsultationManagement {
 
         // 打印所有医生状态（调试用）
         printAllDoctorsStatus("All Doctors Status After Assignment");
+        
+        MedicalTreatmentUI.medicalTreatmentMainMenu();
     }
     
     // 计算咨询已经进行多久
