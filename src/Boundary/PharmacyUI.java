@@ -36,17 +36,14 @@ public class PharmacyUI {
             choice = readInt("Choose: ");
 
             switch (choice) {
-                case 1 -> addMedicine();
-                case 2 -> updateMedicine();
-                case 3 -> deleteMedicine();
-                case 4 -> displayMedicines();
-                case 5 -> displayPrescriptionQueue();
-                case 6 -> processPrescription();
-                case 7 -> displayLowStockAlert();
-                case 8 -> stockRequestMenu();
-                case 9 -> advancedSearchMenu();
-                case 10 -> statisticsReportsMenu();
-                case 11 -> bulkOperationsMenu();
+                case 1 -> medicineManagementMenu();
+                case 2 -> displayPrescriptionQueue();
+                case 3 -> processPrescription();
+                case 4 -> displayLowStockAlert();
+                case 5 -> stockRequestMenu();
+                case 6 -> advancedSearchMenu();
+                case 7 -> statisticsReportsMenu();
+                case 8 -> bulkOperationsMenu();
                 case 0 -> System.out.println("Bye!");
                 default -> System.out.println("Invalid choice.");
             }
@@ -55,18 +52,38 @@ public class PharmacyUI {
 
     private static void printMenu() {
         System.out.println("\n===== Pharmacy Management System =====");
-        System.out.println("1. Add medicine");
-        System.out.println("2. Update medicine");
-        System.out.println("3. Delete medicine");
-        System.out.println("4. Display all medicines");
-        System.out.println("5. Display prescription queue");
-        System.out.println("6. Process prescription (Distribute medicines)");
-        System.out.println("7. Display low stock alert");
-        System.out.println("8. Stock Request Management");
-        System.out.println("9. Advanced Search & Filter"); // NEW
-        System.out.println("10. Statistics & Reports"); // NEW
-        System.out.println("11. Bulk Operations"); // NEW
+        System.out.println("1. Medicine Management");
+        System.out.println("2. Display prescription queue");
+        System.out.println("3. Process prescription (Distribute medicines)");
+        System.out.println("4. Display low stock alert");
+        System.out.println("5. Stock Request Management");
+        System.out.println("6. Advanced Search & Filter");
+        System.out.println("7. Statistics & Reports");
+        System.out.println("8. Bulk Operations");
         System.out.println("0. Exit");
+    }
+    
+    private static void medicineManagementMenu() {
+        int choice;
+        do {
+            System.out.println("\n===== Medicine Management =====");
+            System.out.println("1. Add medicine");
+            System.out.println("2. Update medicine");
+            System.out.println("3. Delete medicine");
+            System.out.println("4. Display all medicines");
+            System.out.println("0. Back to main menu");
+
+            choice = readInt("Choose: ");
+
+            switch (choice) {
+                case 1 -> addMedicine();
+                case 2 -> updateMedicine();
+                case 3 -> deleteMedicine();
+                case 4 -> displayMedicines();
+                case 0 -> System.out.println("Returning to main menu...");
+                default -> System.out.println("Invalid choice.");
+            }
+        } while (choice != 0);
     }
     
     private static void stockRequestMenu() {
