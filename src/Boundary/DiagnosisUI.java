@@ -8,6 +8,7 @@ import ADT.DynamicList;
 import ADT.MyList;
 import Control.DiagnosisManagement;
 import Entity.*;
+import Utility.UtilityClass;
 import java.text.SimpleDateFormat;
 import java.time.Year;
 import java.util.Date;
@@ -261,7 +262,7 @@ public class DiagnosisUI {
         // Sort symptoms alphabetically
         MyList<String> symptoms = diagnosis.getSymptoms();
         if (symptoms != null && !symptoms.isEmpty()) {
-            // UtilityClass.quickSort(symptoms, String::compareToIgnoreCase);
+            UtilityClass.quickSort(symptoms, String::compareToIgnoreCase);
         }
 
         // Display diagnosis details

@@ -7,8 +7,7 @@ package Control;
 import ADT.DynamicList;
 import ADT.MyList;
 import Entity.MedicalTreatment;
-import Entity.TreatmentHistory;
-import java.util.Date;
+import java.util.Date;;
 
 /**
 * 
@@ -19,7 +18,6 @@ public class MedicalTreatmentManagement {
     
     //list to store medical treatment details
     private static final MyList<MedicalTreatment> treatmentList = new DynamicList<>();
-    private static final MyList<TreatmentHistory> treatmentHistoryList = new DynamicList<>();
 
     //create a new medical treatment
     public static boolean addMedicalTreatment(MedicalTreatment treatment) {
@@ -42,31 +40,19 @@ public class MedicalTreatmentManagement {
     public static MyList<MedicalTreatment> getTreatmentList() {
         return treatmentList;
     }
-
-    public static MyList<TreatmentHistory> getTreatmentHistoryList() {
-        return treatmentHistoryList;
-    }
-    
-    public static boolean addTreatmentHistory(TreatmentHistory history) {
-        if(history != null) {
-            treatmentHistoryList.add(history);
-            return true;
-        }
-        return false;
-    }
     
     // find the treatment history by ID
-    public static TreatmentHistory getTreatmentHistoryByPatientId(String patientId) {
-        return treatmentHistoryList.findFirst(th -> th.getPatientId().equals(patientId));
+    public static MedicalTreatment getTreatmentHistoryByPatientId(String patientId) {
+        return treatmentList.findFirst(th -> th.getPatientId().equals(patientId));
     }
 
     // display treatment history by patient ID
-    public static MyList<TreatmentHistory> getTreatmentHistoryByPatientIdList(String patientId) {
-        return treatmentHistoryList.findAll(th -> th.getPatientId().equals(patientId));
+    public static MyList<MedicalTreatment> getTreatmentHistoryByPatientIdList(String patientId) {
+        return treatmentList.findAll(th -> th.getPatientId().equals(patientId));
     }
 
-    public static TreatmentHistory getTreatmentHistoryById(String treatmentId) {
-        TreatmentHistory result = treatmentHistoryList.findFirst(th -> th.getTreatmentId().equals(treatmentId));
+    public static MedicalTreatment getTreatmentHistoryById(String treatmentId) {
+        MedicalTreatment result = treatmentList.findFirst(th -> th.getTreatmentId().equals(treatmentId));
         if (result == null) {
             System.out.println("Treatment history not found for ID: " + treatmentId);
         } else {
@@ -77,7 +63,7 @@ public class MedicalTreatmentManagement {
 
     //get the consultation ID from the treatment history
     public static String getConsultationIdFromHistory(String treatmentId) {
-        TreatmentHistory history = getTreatmentHistoryById(treatmentId);
+        MedicalTreatment history = getTreatmentHistoryById(treatmentId);
         if (history != null) {
             return history.getConsultationId();
         }
@@ -86,12 +72,12 @@ public class MedicalTreatmentManagement {
     
     // remove treatment history by ID
     public static boolean removeTreatmentHistoryById(String treatmentId) {
-        return treatmentHistoryList.removeIf(th -> th.getTreatmentId().equals(treatmentId));
+        return treatmentList.removeIf(th -> th.getTreatmentId().equals(treatmentId));
     }
 
     //generate monthly report
-    public static MyList<TreatmentHistory> generateMonthlyReport(int month) {
-        return treatmentHistoryList.findAll(th -> th.getMonth().equals(month));
+    public static MyList<MedicalTreatment> generateMonthlyReport(int month) {
+        return treatmentList.findAll(th -> th.getMonth().equals(month));
     }
 
     // retrieve the existing treatment history by year
@@ -107,13 +93,13 @@ public class MedicalTreatmentManagement {
         return availableYears;
     }
 
-    public static MyList<TreatmentHistory> getMonthlyTreatments(int year, int month) {
-        MyList<TreatmentHistory> monthlyTreatments = new DynamicList<>();
-        MyList<TreatmentHistory> allTreatmentsHistory = MedicalTreatmentManagement.getTreatmentHistoryList();
+    public static MyList<MedicalTreatment> getMonthlyTreatments(int year, int month) {
+        MyList<MedicalTreatment> monthlyTreatments = new DynamicList<>();
+        MyList<MedicalTreatment> allTreatmentsHistory = MedicalTreatmentManagement.getTreatmentList();
 
         for (int i = 0; i < allTreatmentsHistory.size(); i++) {
-            TreatmentHistory treatHisotry = allTreatmentsHistory.get(i);
-            Date treatmentDate = treatHisotry.getTreatmentDate();
+            MedicalTreatment treatHistory = allTreatmentsHistory.get(i);
+            Date treatmentDate = treatHistory.getTreatmentDate();
 
             if(treatmentDate != null) {
                 java.util.Calendar cal = java.util.Calendar.getInstance();
@@ -123,7 +109,7 @@ public class MedicalTreatmentManagement {
                 int treatmentMonth = cal.get(java.util.Calendar.MONTH) + 1; // the month value start form 0
 
                 if (treatmentYear == year && treatmentMonth == month) {
-                    monthlyTreatments.add(treatHisotry);
+                    monthlyTreatments.add(treatHistory);
                 }
 
             }
@@ -131,22 +117,11 @@ public class MedicalTreatmentManagement {
         return monthlyTreatments;
     }
 
-    // method to call in order to set the treatment history status
-    public static void setDistributionStatusToCompleted(String treatmentId) {
-        if (distributionStatus(treatmentId, "Completed")) {
-            System.out.println("Distribution status set to Completed for treatment ID: " + treatmentId);
-        } else {
-            System.out.println("Failed to set distribution status for treatment ID: " + treatmentId);
+    // get the current treatment ID
+    public static String getCurrentTreatmentId() {
+        if (treatmentList.isEmpty()) {
+            return null;
         }
-    }
-
-    // set the distribution status to completed
-    private static boolean distributionStatus(String treatmentId, String status) {
-        TreatmentHistory history = getTreatmentHistoryById(treatmentId);
-        if (history != null) {
-            history.setDistributionStatus(status);
-            return true;
-        }
-        return false;
+        return treatmentList.get(treatmentList.size() - 1).getTreatmentId();
     }
 }

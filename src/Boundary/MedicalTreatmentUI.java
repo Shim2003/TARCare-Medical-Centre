@@ -4,8 +4,8 @@
  */
 package Boundary;
 
-import ADT.MyList;
 import ADT.DynamicList;
+import ADT.MyList;
 import Control.MedicalTreatmentManagement;
 import Entity.*;
 import Utility.UtilityClass;
@@ -139,21 +139,14 @@ public class MedicalTreatmentUI {
         String consultationId = "C001";
         String patientId = "P001";
         String doctorId = "D001";
+        String notes = "Patient responded well to initial consultation. No allergic reactions reported.";
 
         // Create a new MedicalTreatment object
         MedicalTreatment treatment = new MedicalTreatment(consultationId, patientId, doctorId,
-                treatmentDate, "Active", treatmentAdvice, medicineList);
+                treatmentDate, treatmentDate, "Active", "Ongoing", treatmentAdvice, notes, medicineList);
 
         // Add the new MedicalTreatment object to the treatmentList
         MedicalTreatmentManagement.addMedicalTreatment(treatment);
-
-        String notes = "Patient responded well to initial consultation. No allergic reactions reported.";
-
-        TreatmentHistory history = new TreatmentHistory(treatment.getTreatmentId(), consultationId, patientId, doctorId,
-                treatmentDate, null, "Ongoing", "Active", treatmentAdvice, notes, medicineList, "Pending");
-
-        // Add the new TreatmentHistory object to the historyList
-        MedicalTreatmentManagement.addTreatmentHistory(history);
 
         // Display creation summary
         System.out.println("Treatment Date: " + sdf.format(treatmentDate));
@@ -242,6 +235,9 @@ public class MedicalTreatmentUI {
         System.out.print("Enter Medical Treatment Advice(s): ");
         // String treatmentAdvice = scanner.nextLine();
 
+        System.out.print("Enter Additional Notes: ");
+        // String notes = scanner.nextLine();
+
         // Consultation currentConsultation = Consultation.getCurrentConsultation();
         // String consultationId = currentConsultation.getConsultationId();
         // String patientId = currentConsultation.getPatientId();
@@ -251,26 +247,21 @@ public class MedicalTreatmentUI {
         String patientId = "P001";
         String doctorId = "D001";
         String treatmentAdvice = "Follow the prescribed dosage and frequency. Drink plenty of water.";
+        String notes = "Patient responded well to initial consultation. No allergic reactions reported.";
 
         // Create a new MedicalTreatment object
         MedicalTreatment treatment = new MedicalTreatment(consultationId, patientId, doctorId,
-                treatmentDate, "Active", treatmentAdvice, medicineList);
+                treatmentDate, treatmentDate, "Active", "Ongoing", treatmentAdvice, notes, medicineList);
 
         // Add the new MedicalTreatment object to the treatmentList
         MedicalTreatmentManagement.addMedicalTreatment(treatment);
-
-        // Create treatment history
-        TreatmentHistory history = new TreatmentHistory(treatment.getTreatmentId(), consultationId, patientId, doctorId,
-                treatmentDate, null, "Ongoing", "Active", treatmentAdvice, medicineList, "Pending");
-
-        // Add the new TreatmentHistory object to the historyList
-        MedicalTreatmentManagement.addTreatmentHistory(history);
 
         System.out.println("Medical Treatment created successfully! Treatment ID: " + treatment.getTreatmentId());
     }
 
     //View Patient Treatment History
     public static void viewPatientTreatmentHistoryByPatientId() {
+        StringBuilder sb = new StringBuilder();
         System.out.println("\n=== Patient Treatment History ===");
         System.out.print("Enter Treatment ID: ");
         String patientId = scanner.nextLine().trim();
@@ -281,7 +272,7 @@ public class MedicalTreatmentUI {
         }
 
         // Get all treatment history for the patient
-        MyList<TreatmentHistory> treatmentHistoryList
+        MyList<MedicalTreatment> treatmentHistoryList
                 = MedicalTreatmentManagement.getTreatmentHistoryByPatientIdList(patientId);
 
         if (treatmentHistoryList.isEmpty()) {
@@ -295,7 +286,7 @@ public class MedicalTreatmentUI {
         System.out.println("=".repeat(68));
 
         for (int i = 0; i < treatmentHistoryList.size(); i++) {
-            TreatmentHistory history = treatmentHistoryList.get(i);
+            MedicalTreatment history = treatmentHistoryList.get(i);
             System.out.println("\nRecord " + (i + 1) + " of " + treatmentHistoryList.size() + ":");
             System.out.println(history.toString()); // Using the enhanced toString method
 
@@ -320,7 +311,7 @@ public class MedicalTreatmentUI {
             return;
         }
 
-        TreatmentHistory history = MedicalTreatmentManagement.getTreatmentHistoryById(treatmentId);
+        MedicalTreatment history = MedicalTreatmentManagement.getTreatmentHistoryById(treatmentId);
 
         if (history == null) {
             System.out.println("No treatment history found for Treatment ID: " + treatmentId);
@@ -344,7 +335,7 @@ public class MedicalTreatmentUI {
             return;
         }
 
-        TreatmentHistory treatment = MedicalTreatmentManagement.getTreatmentHistoryById(treatmentId);
+        MedicalTreatment treatment = MedicalTreatmentManagement.getTreatmentHistoryById(treatmentId);
 
         if (treatment == null) {
             System.out.println("No treatment found with ID: " + treatmentId);
@@ -388,7 +379,7 @@ public class MedicalTreatmentUI {
                     return;
                 }
             }
-            treatment.setStatus(newStatus);
+            treatment.setTreatmentStatus(newStatus);
             System.out.println(">> Treatment status updated to: " + newStatus);
 
         } catch (Exception e) {
@@ -400,7 +391,7 @@ public class MedicalTreatmentUI {
         // Update Treatment Outcome
         System.out.println("\nUpdate Treatment Outcome:");
         System.out.println("[1] Successful");
-        System.out.println("[2] Partial");
+        System.out.println("[2] Needs Follow-up");
         System.out.println("[3] Failed");
         System.out.println("[4] Ongoing");
         System.out.print("Enter new outcome (1-4): ");
@@ -414,7 +405,7 @@ public class MedicalTreatmentUI {
                 case 1 ->
                     newOutcome = "Successful";
                 case 2 ->
-                    newOutcome = "Partial";
+                    newOutcome = "Needs Follow-up";
                 case 3 ->
                     newOutcome = "Failed";
                 case 4 ->
@@ -527,7 +518,7 @@ public class MedicalTreatmentUI {
         System.out.printf("Reporting Period: %s | Generated: %s\n", monthYearStr, sdf.format(new Date()));
         System.out.println("===============================================================");
 
-        MyList<TreatmentHistory> monthlyTreatments = MedicalTreatmentManagement.getMonthlyTreatments(year, month);
+        MyList<MedicalTreatment> monthlyTreatments = MedicalTreatmentManagement.getMonthlyTreatments(year, month);
 
         if (monthlyTreatments.isEmpty()) {
             System.out.println("No treatments found for " + monthYearStr + ".");
@@ -538,7 +529,7 @@ public class MedicalTreatmentUI {
         System.out.println("===============================================================");
         
         for(int i = 0;i<monthlyTreatments.size();i++) {
-            TreatmentHistory treatment = monthlyTreatments.get(i);
+            MedicalTreatment treatment = monthlyTreatments.get(i);
             System.out.println("\nTreatment Record " + (i + 1) + ":");
             System.out.println(treatment.toString());
         }
@@ -587,7 +578,7 @@ public class MedicalTreatmentUI {
     }
 
     // Retrieve treatments for the specified year and month
-    MyList<TreatmentHistory> treatments = MedicalTreatmentManagement.getMonthlyTreatments(year, month);
+    MyList<MedicalTreatment> treatments = MedicalTreatmentManagement.getMonthlyTreatments(year, month);
 
     if (treatments.isEmpty()) {
         System.out.printf("No treatments found for %s %d.\n", UtilityClass.getMonthName(month), year);
@@ -601,7 +592,7 @@ public class MedicalTreatmentUI {
     StringBuilder cancelledTreatments = new StringBuilder();
 
     for (int i = 0; i < treatments.size(); i++) {
-        TreatmentHistory treatment = treatments.get(i);
+        MedicalTreatment treatment = treatments.get(i);
         String treatmentDetails = String.format(
             "Treatment ID: %s | Patient ID: %s | Doctor ID: %s | Date: %s\n",
             treatment.getTreatmentId(),
@@ -610,7 +601,7 @@ public class MedicalTreatmentUI {
             sdf.format(treatment.getTreatmentDate())
         );
 
-        switch (treatment.getStatus()) {
+        switch (treatment.getTreatmentStatus()) {
             case "Active" -> {
                 activeCount++;
                 activeTreatments.append(treatmentDetails);
@@ -624,7 +615,7 @@ public class MedicalTreatmentUI {
                 cancelledTreatments.append(treatmentDetails);
             }
             default -> {
-                System.out.println("Unknown treatment status: " + treatment.getStatus());
+                System.out.println("Unknown treatment status: " + treatment.getTreatmentStatus());
             }
         }
     }
@@ -656,5 +647,96 @@ public class MedicalTreatmentUI {
 
     System.out.println("==============================================================");
     System.out.println(">> Treatment summary report generated successfully!");
-}
+    }
+
+    public static void treatmentHistoryDisplayForm(String treatmentId) {
+
+        StringBuilder sb = new StringBuilder();
+        SimpleDateFormat dateFormatter = new SimpleDateFormat(UtilityClass.DATE_FORMAT);
+        MedicalTreatment treatment = MedicalTreatmentManagement.getTreatmentHistoryById(treatmentId);
+
+        sb.append("==================================================================\n");
+        sb.append(">                    TREATMENT HISTORY RECORD                    <\n");
+        sb.append("==================================================================\n");
+        sb.append(String.format("> Treatment ID    : %-44s <\n", treatment.getTreatmentId()));
+        sb.append(String.format("> Consultation ID : %-44s <\n", treatment.getConsultationId()));
+        sb.append(String.format("> Patient ID      : %-44s <\n", treatment.getPatientId()));
+        sb.append(String.format("> Doctor ID       : %-44s <\n", treatment.getDoctorId()));
+        sb.append("==================================================================\n");
+        sb.append(String.format("> Treatment Date  : %-44s <\n", 
+            treatment.getTreatmentDate() != null ? dateFormatter.format(treatment.getTreatmentDate()) : "Not specified"));
+        sb.append(String.format("> Follow-up Date  : %-44s <\n", 
+            treatment.getFollowUpDate() != null ? dateFormatter.format(treatment.getFollowUpDate()) : "Not scheduled"));
+        sb.append("==================================================================\n");
+        sb.append(String.format("> Status          : %-44s <\n", treatment.getTreatmentStatus()));
+        sb.append(String.format("> Outcome         : %-44s <\n", treatment.getTreatmentOutcome()));
+        sb.append("==================================================================\n");
+        
+        // Treatment Advice
+        sb.append("> Treatment Advice:                                              <\n");
+        if (treatment.getMedicalTreatmentAdvise() != null && !treatment.getMedicalTreatmentAdvise().trim().isEmpty()) {
+            String[] adviceLines = wrapText(treatment.getMedicalTreatmentAdvise(), 60);
+            for (String line : adviceLines) {
+                sb.append(String.format("> %-62s <\n", line));
+            }
+        } else {
+            sb.append("> No advice provided                                             <\n");
+        }
+        
+        // Notes
+        if (treatment.getNotes() != null && !treatment.getNotes().trim().isEmpty()) {
+            sb.append("==================================================================\n");
+            sb.append("> Additional Notes:                                              <\n");
+            String[] notesLines = wrapText(treatment.getNotes(), 60);
+            for (String line : notesLines) {
+                sb.append(String.format("> %-62s <\n", line));
+            }
+        }
+        
+        // Medicine List
+        sb.append("==================================================================\n");
+        sb.append("> PRESCRIBED MEDICATIONS:                                        <\n");
+        sb.append("==================================================================\n");
+        
+        if (treatment.getMedicineList() != null && !treatment.getMedicineList().isEmpty()) {
+            for (int i = 0; i < treatment.getMedicineList().size(); i++) {
+                MedicalTreatmentItem medicine = treatment.getMedicineList().get(i);
+                sb.append(String.format("> %d. %-59s <\n", (i + 1), medicine.getMedicineName()));
+                sb.append(String.format(">    Dosage    : %-48s <\n", medicine.getDosage()));
+                sb.append(String.format(">    Frequency : %-48s <\n", medicine.getFrequency()));
+                sb.append(String.format(">    Duration  : %-48s <\n", medicine.getDuration()));
+                sb.append(String.format(">    Method    : %-48s <\n", medicine.getMethod()));
+                if (i < treatment.getMedicineList().size() - 1) {
+                    sb.append(">                                                                <\n");
+                }
+            }
+        } else {
+            sb.append("> No medications prescribed                                      <\n");
+        }
+        
+        sb.append("==================================================================\n");
+    }
+
+    private static String[] wrapText(String text, int maxLineLength) {
+        String[] words = text.split(" ");
+        StringBuilder line = new StringBuilder();
+        java.util.List<String> lines = new java.util.ArrayList<>();
+
+        for (String word : words) {
+            if (line.length() + word.length() + 1 > maxLineLength) {
+                lines.add(line.toString());
+                line = new StringBuilder(word);
+            } else {
+                if (line.length() > 0) {
+                    line.append(" ");
+                }
+                line.append(word);
+            }
+        }
+        if (line.length() > 0) {
+            lines.add(line.toString());
+        }
+
+        return lines.toArray(new String[0]);
+    }
 }
