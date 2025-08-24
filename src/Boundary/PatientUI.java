@@ -27,11 +27,10 @@ public class PatientUI {
             System.out.println("\n--- Admin Patient Management Menu ---");
             System.out.println("1. Register New Patient");
             System.out.println("2. Update Patient Profile");
-            System.out.println("3. Search Patient by Identity Number");
-            System.out.println("4. Display All Patients");
-            System.out.println("5. Remove Patient");
-            System.out.println("6. Generate Patient Report");
-            System.out.println("7. Back to Admin Main Menu");
+            System.out.println("3. Search Patient by Patient ID");
+            System.out.println("4. Remove Patient");
+            System.out.println("5. Generate Patient Report");
+            System.out.println("6. Back to Admin Main Menu");
 
             System.out.print("Enter your choice (1-7): ");
             String choice = scanner.nextLine();
@@ -47,15 +46,12 @@ public class PatientUI {
                     displayPatientInfo();
                     break;
                 case "4":
-                    displayAll();
-                    break;
-                case "5":
                     removePatient();
                     break;
-                case "6":
+                case "5":
                     generateDemographicsReport();
                     break;
-                case "7":
+                case "6":
                     return;
                 default:
                     System.out.println("Invalid choice. Please enter 1-7.");
@@ -297,36 +293,6 @@ public class PatientUI {
             System.out.println("Removal cancelled.");
         }
 
-        UtilityClass.pressEnterToContinue();
-    }
-
-    public static void displayAll() {
-
-        MyList<Patient> patientList = PatientManagement.getPatientList();
-
-        if (patientList.isEmpty()) {
-            System.out.println("No patients registered yet.");
-            return;
-        }
-
-        System.out.println("\n---------------------------------------------------- PATIENT LIST ----------------------------------------------------");
-        System.out.printf("| %-5s | %-20s | %-15s | %-10s | %-6s | %-15s | %-25s |\n",
-                "ID", "Full Name", "Identity No", "Birth Date", "Gender", "Contact", "Email");
-        System.out.println("----------------------------------------------------------------------------------------------------------------------");
-
-        for (int i = 0; i < patientList.size(); i++) {
-            Patient p = patientList.get(i);
-            System.out.printf("| %-5s | %-20s | %-15s | %-10s | %-6s | %-15s | %-25s |\n",
-                    p.getPatientID(),
-                    UtilityClass.truncate(p.getFullName(), 20),
-                    p.getIdentityNumber(),
-                    UtilityClass.formatDate(p.getDateOfBirth()),
-                    String.valueOf(p.getGender()),
-                    p.getContactNumber(),
-                    UtilityClass.truncate(p.getEmail(), 25));
-        }
-
-        System.out.println("----------------------------------------------------------------------------------------------------------------------");
         UtilityClass.pressEnterToContinue();
     }
 

@@ -3,10 +3,13 @@ package Control;
 import ADT.DynamicList;
 import ADT.MyList;
 import DAO.CurrentServingDAO;
+import DAO.DailyQueueStats;
 import Entity.Doctor;
 import Entity.Patient;
 import Entity.QueueEntry;
 import Utility.UtilityClass;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  *
@@ -180,6 +183,36 @@ public class QueueControl {
 
     public static void clearAllQueueRecords() {
         queueList.clear();
+    }
+
+    public static MyList<QueueEntry> getQueueByDate(Date date) {
+        Calendar targetCal = Calendar.getInstance();
+        targetCal.setTime(date);
+
+        return queueList.findAll(entry -> {
+            Calendar entryCal = Calendar.getInstance();
+            entryCal.setTime(entry.getCheckInTime());
+
+            return targetCal.get(Calendar.YEAR) == entryCal.get(Calendar.YEAR)
+                    && targetCal.get(Calendar.DAY_OF_YEAR) == entryCal.get(Calendar.DAY_OF_YEAR);
+        });
+    }
+
+    public static DAO.DailyQueueStats getDailyQueueStats(Date date) {
+        MyList<QueueEntry> dayEntries = getQueueByDate(date);
+
+        if (dayEntries.isEmpty()) {
+            return new DAO.DailyQueueStats(date, 0, 0, 0, 0, 0.0);
+        }
+
+        int total = dayEntries.size();
+        int waiting = dayEntries.findAll(e -> e.getStatus().equals(UtilityClass.statusWaiting)).size();
+        int consulting = dayEntries.findAll(e -> e.getStatus().equals(UtilityClass.statusConsulting)).size();
+        int completed = dayEntries.findAll(e -> e.getStatus().equals(UtilityClass.statusCompleted)).size();
+
+        double completionRate = total > 0 ? (double) completed / total * 100 : 0;
+
+        return new DailyQueueStats(date, total, waiting, consulting, completed, completionRate);
     }
 
 }

@@ -4,11 +4,12 @@
  */
 package Boundary;
 
-import ADT.DynamicList;
 import ADT.MyList;
 import Control.QueueControl;
 import Entity.QueueEntry;
 import Utility.UtilityClass;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Scanner;
 
 /**
@@ -27,25 +28,29 @@ public class QueueUI {
             System.out.println("2. Get Next Queue Patient");
             System.out.println("3. Display Queue By Status");
             System.out.println("4. Remove Queue Records");
-            System.out.println("5. Back to Admin Main Menu");
+            System.out.println("5. Generate Queue Reports");
+            System.out.println("6. Back to Admin Main Menu");
 
-            System.out.print("Enter your choice (1-5): ");
+            System.out.print("Enter your choice (1-6): ");
             String choice = scanner.nextLine();
 
             switch (choice) {
                 case "1":
-                    QueueUI.startQueue();
+                    startQueue();
                     break;
                 case "2":
-                    QueueUI.getNextInQueue();
+                    getNextInQueue();
                     break;
                 case "3":
-                    QueueUI.displayQueueByStatus();
+                    displayQueueByStatus();
                     break;
                 case "4":
-                    QueueUI.removeQueueRecord();
+                    removeQueueRecord();
                     break;
                 case "5":
+                    generateQueueReports();
+                    break;
+                case "6":
                     return;
                 default:
                     System.out.println("Invalid choice. Please enter 1-4.");
@@ -366,4 +371,156 @@ public class QueueUI {
         UtilityClass.pressEnterToContinue();
 
     }
+
+    public static void generateQueueReports() {
+        while (true) {
+            System.out.println("\n" + "=".repeat(50));
+            System.out.println("           QUEUE REPORTING SYSTEM");
+            System.out.println("=".repeat(50));
+            System.out.println("1. Daily Queue Summary");
+            System.out.println("2. Historical Queue Data");
+            System.out.println("3. Back to Queue Menu");
+
+            System.out.print("Enter your choice (1-3): ");
+            String choice = scanner.nextLine();
+
+            switch (choice) {
+                case "1":
+                    generateDailyQueueSummary();
+                    break;
+                case "2":
+                    generateHistoricalQueueData();
+                    break;
+                case "3":
+                    return;
+                default:
+                    System.out.println("Invalid choice. Please enter 1-3.");
+            }
+        }
+    }
+
+    private static void generateDailyQueueSummary() {
+        System.out.println("\n" + "=".repeat(70));
+        System.out.println("                  DAILY QUEUE SUMMARY");
+        System.out.println("=".repeat(70));
+
+        DAO.DailyQueueStats todayStats = QueueControl.getDailyQueueStats(new Date());
+
+        if (todayStats.totalPatients == 0) {
+            System.out.println("No queue entries found for today.");
+            System.out.println("=".repeat(70));
+            UtilityClass.pressEnterToContinue();
+            return;
+        }
+
+        System.out.printf("Date: %s\n", UtilityClass.formatDate(new Date()));
+        System.out.printf("Total Queue Entries: %d\n", todayStats.totalPatients);
+        System.out.println("-".repeat(70));
+
+        System.out.println("STATUS DISTRIBUTION:");
+        System.out.printf("|- Waiting: %d (%.1f%%)\n", todayStats.waitingPatients,
+                (double) todayStats.waitingPatients / todayStats.totalPatients * 100);
+        System.out.printf("|- Consulting: %d (%.1f%%)\n", todayStats.consultingPatients,
+                (double) todayStats.consultingPatients / todayStats.totalPatients * 100);
+        System.out.printf("|- Completed: %d (%.1f%%)\n", todayStats.completedPatients,
+                todayStats.completionRate);
+
+        // Visual representation
+        System.out.println("\nVISUAL BREAKDOWN:");
+        displayStatusBar("Waiting", todayStats.waitingPatients, todayStats.totalPatients);
+        displayStatusBar("Consulting", todayStats.consultingPatients, todayStats.totalPatients);
+        displayStatusBar("Completed", todayStats.completedPatients, todayStats.totalPatients);
+
+        // Performance indicator
+        System.out.println("\nPERFORMANCE INDICATOR:");
+        if (todayStats.completionRate >= 80) {
+            System.out.println("Excellent - High completion rate");
+        } else if (todayStats.completionRate >= 60) {
+            System.out.println("Good - Moderate completion rate");
+        } else if (todayStats.completionRate >= 40) {
+            System.out.println("Fair - Consider optimizing workflow");
+        } else {
+            System.out.println("Needs Attention - Low completion rate");
+        }
+
+        System.out.println("=".repeat(70));
+        UtilityClass.pressEnterToContinue();
+    }
+
+    public static void generateHistoricalQueueData() {
+        System.out.println("\n" + "=".repeat(80));
+        System.out.println("                    HISTORICAL QUEUE DATA");
+        System.out.println("=".repeat(80));
+
+        System.out.println("LAST 7 DAYS SUMMARY:");
+        System.out.printf("%-12s | %-6s | %-7s | %-10s | %-8s | %-10s\n",
+                "Date", "Total", "Waiting", "Consulting", "Completed", "Rate");
+        System.out.println("-".repeat(80));
+
+        Calendar cal = Calendar.getInstance();
+
+        for (int i = 6; i >= 0; i--) {
+            cal.setTime(new Date());
+            cal.add(Calendar.DAY_OF_MONTH, -i);
+            Date targetDate = cal.getTime();
+
+            DAO.DailyQueueStats dayStats = QueueControl.getDailyQueueStats(targetDate);
+
+            if (dayStats.totalPatients > 0) {
+                System.out.printf("%-12s | %-6d | %-7d | %-10d | %-8d | %-9.1f%%\n",
+                        UtilityClass.formatDate(targetDate),
+                        dayStats.totalPatients,
+                        dayStats.waitingPatients,
+                        dayStats.consultingPatients,
+                        dayStats.completedPatients,
+                        dayStats.completionRate);
+            } else {
+                System.out.printf("%-12s | %-6s | %-7s | %-10s | %-8s | %-10s\n",
+                        UtilityClass.formatDate(targetDate),
+                        "0", "0", "0", "0", "N/A");
+            }
+        }
+
+        // Weekly summary
+        System.out.println("-".repeat(80));
+
+        // Calculate weekly totals
+        int weeklyTotal = 0, weeklyCompleted = 0;
+        for (int i = 6; i >= 0; i--) {
+            cal.setTime(new Date());
+            cal.add(Calendar.DAY_OF_MONTH, -i);
+            DAO.DailyQueueStats dayStats = QueueControl.getDailyQueueStats(cal.getTime());
+            weeklyTotal += dayStats.totalPatients;
+            weeklyCompleted += dayStats.completedPatients;
+        }
+
+        double weeklyRate = weeklyTotal > 0 ? (double) weeklyCompleted / weeklyTotal * 100 : 0;
+
+        System.out.println("WEEKLY SUMMARY:");
+        System.out.printf("Total Patients (7 days): %d\n", weeklyTotal);
+        System.out.printf("Completed Patients: %d\n", weeklyCompleted);
+        System.out.printf("Weekly Completion Rate: %.1f%%\n", weeklyRate);
+
+        System.out.println("=".repeat(80));
+        UtilityClass.pressEnterToContinue();
+    }
+
+    private static void displayStatusBar(String status, int count, int total) {
+        if (total == 0) {
+            return;
+        }
+
+        double percentage = (double) count / total * 100;
+        int barLength = (int) (percentage / 2);
+
+        System.out.printf("%-12s [", status);
+        for (int i = 0; i < barLength; i++) {
+            System.out.print("#");
+        }
+        for (int i = barLength; i < 50; i++) {
+            System.out.print(" ");
+        }
+        System.out.printf("] %d (%.1f%%)\n", count, percentage);
+    }
+
 }
