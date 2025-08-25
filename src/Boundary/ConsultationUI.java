@@ -162,11 +162,7 @@ public class ConsultationUI {
     }
 
     public static void main(String[] args) {
-        ClinicData.addSamplePatients();
-        ConsultationManagement.addSampleConsultations();
-        LeaveManagement.addSampleLeaves();
-        ScheduleManagement.addSampleSchedules();
-        DoctorManagement.addSampleDoctor();
+        ClinicData.run();
         
         // TODO code application logic here
         ConsultationUI ui = new ConsultationUI();

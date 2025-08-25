@@ -6,6 +6,7 @@ package Control;
 
 import ADT.DynamicList;
 import ADT.MyList;
+import java.util.Comparator;
 import Entity.Appointment;
 import Entity.Patient;
 import Entity.Doctor;
@@ -29,44 +30,22 @@ public class AppointmentManagement {
     // Counter
     private static int appointmentCounter = 1001; // A1001
 
-    private static String generateNextAppointmentId() {
-        return "A" + appointmentCounter++;
+    public static String generateNextAppointmentId() {
+        String id;
+        do {
+            id = "A" + (appointmentCounter++);
+        } while (appointmentIdExists(id));  // if exists
+        return id;
     }
-    
-    public static void addSampleAppointments() {
-        try {
-            Appointment[] samples = new Appointment[10];
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
 
-            samples[0] = new Appointment("A1001", "P1001", "D001", 
-                    LocalDateTime.of(2025, 8, 20, 9, 0), "General Checkup");
-            samples[1] = new Appointment("A1002", "P1002", "D002", 
-                    LocalDateTime.of(2025, 8, 20, 10, 30), "Fever");
-            samples[2] = new Appointment("A1003", "P1003", "D003", 
-                    LocalDateTime.of(2025, 8, 21, 11, 15), "Headache");
-            samples[3] = new Appointment("A1004", "P1004", "D004", 
-                    LocalDateTime.of(2025, 8, 21, 14, 45), "Back Pain");
-            samples[4] = new Appointment("A1005", "P1005", "D005", 
-                    LocalDateTime.of(2025, 8, 22, 9, 20), "Stomach Ache");
-            samples[5] = new Appointment("A1006", "P1006", "D006", 
-                    LocalDateTime.of(2025, 8, 22, 10, 40), "Sore Throat");
-            samples[6] = new Appointment("A1007", "P1007", "D007", 
-                    LocalDateTime.of(2025, 8, 23, 8, 50), "Allergy");
-            samples[7] = new Appointment("A1008", "P1008", "D008", 
-                    LocalDateTime.of(2025, 8, 23, 10, 10), "Flu");
-            samples[8] = new Appointment("A1009", "P1009", "D009", 
-                    LocalDateTime.of(2025, 8, 24, 13, 30), "Fatigue");
-            samples[9] = new Appointment("A1010", "P1010", "D010", 
-                    LocalDateTime.of(2025, 8, 24, 14, 20), "Dizziness");
-
-            for (Appointment a : samples) {
-                scheduledAppointments.add(a);
+    // Check if the appointment ID exists
+    private static boolean appointmentIdExists(String id) {
+        for (int i = 0; i < scheduledAppointments.size(); i++) {
+            if (scheduledAppointments.get(i).getAppointmentId().equalsIgnoreCase(id)) {
+                return true;
             }
-
-            System.out.println("Added 10 sample appointments with LocalDateTime.");
-        } catch (Exception e) {
-            System.out.println("Error adding sample appointments: " + e.getMessage());
         }
+        return false;
     }
     
     public static void addScheduledAppointment(Appointment a) {
@@ -120,7 +99,7 @@ public class AppointmentManagement {
                 return;
             }
             
-            // ✅ Check for conflicting appointments (same doctor at the same time)
+            // Check for conflicting appointments (same doctor at the same time)
             for (int i = 0; i < scheduledAppointments.size(); i++) {
                 Appointment existing = scheduledAppointments.get(i);
                 if (existing.getDoctorId().equals(doctorId) &&
@@ -234,7 +213,7 @@ public class AppointmentManagement {
     
     // Automatically determine ID type (Appointment / Patient / Doctor) and display
     public static void viewAppointmentsById(String id) {
-        // 先检查是否为 Appointment ID
+        // check if it is an Appointment ID
         for (int i = 0; i < scheduledAppointments.size(); i++) {
             Appointment a = scheduledAppointments.get(i);
             if (a.getAppointmentId().equalsIgnoreCase(id)) {
@@ -539,4 +518,32 @@ public class AppointmentManagement {
             System.out.println("Doctor " + doctorId + " is free next week.");
         }
     }
+ 
+
+    public static void displayAppointmentsByTime() {
+        // Make a copy to prevent modifying the original data
+        DynamicList<Appointment> sortedList = (DynamicList<Appointment>) scheduledAppointments.clone();
+
+        // Call the sorting method we used earlier
+        sortedList.sortByDateTime(Appointment::getAppointmentTime);
+
+        LocalDateTime now = LocalDateTime.now();
+
+        System.out.println("\n--- Future Appointments ---");
+        for (int i = 0; i < sortedList.size(); i++) {
+            Appointment a = sortedList.get(i);
+            if (a.getAppointmentTime().isAfter(now)) {
+                displayAppointment(a);
+            }
+        }
+
+        System.out.println("\n--- Past Appointments ---");
+        for (int i = 0; i < sortedList.size(); i++) {
+            Appointment a = sortedList.get(i);
+            if (!a.getAppointmentTime().isAfter(now)) {
+                displayAppointment(a);
+            }
+        }
+    }
+
 }

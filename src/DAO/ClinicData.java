@@ -14,6 +14,7 @@ import Control.QueueControl;
 import Control.PharmacyManagement;
 import Control.ScheduleManagement;
 import Control.AppointmentManagement;
+import Control.ConsultationManagement;
 import Entity.Appointment;
 import Entity.Consultation;
 import Entity.Diagnosis;
@@ -42,6 +43,7 @@ public class ClinicData {
         addSampleAppointments();
         addSampleQueueData();
         addSampleMedicine(); 
+        ConsultationManagement.initializeConsultationCounter();
         LeaveManagement.addSampleLeaves();
         ScheduleManagement.addSampleSchedules();
         DoctorManagement.addSampleDoctor();
@@ -162,8 +164,10 @@ public class ClinicData {
             samples[9].setStartTime(LocalDateTime.of(2025, 8, 24, 14, 15));
             samples[9].setEndTime(LocalDateTime.of(2025, 8, 24, 14, 55));
 
+             // Added to ConsultationManagement's completedConsultations
+            DynamicList<Consultation> completedList = ConsultationManagement.getCompletedConsultations();
             for (Consultation c : samples) {
-                Consultation.getCompletedConsultations().add(c);
+                completedList.add(c);
             }
 
             System.out.println("Added 10 sample consultations with LocalDateTime.");

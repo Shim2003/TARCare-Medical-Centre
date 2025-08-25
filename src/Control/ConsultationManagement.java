@@ -21,6 +21,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Scanner;
+import java.util.List;
 
 /**
  *
@@ -33,60 +34,9 @@ public class ConsultationManagement {
     private static MyList<CurrentServingDAO> currentConsulting = QueueControl.getCurrentServingPatient();
     private static DynamicList<Consultation> completedConsultations = new DynamicList<>();
     
-    public static void addSampleConsultations() {
-        try {
-            Consultation[] samples = new Consultation[10];
-
-            samples[0] = new Consultation("C1001", "P1001", "D001", "Cough");
-            samples[0].setStartTime(LocalDateTime.of(2025, 8, 20, 9, 0));
-            samples[0].setEndTime(LocalDateTime.of(2025, 8, 20, 9, 30));
-
-            samples[1] = new Consultation("C1002", "P1002", "D002", "Fever");
-            samples[1].setStartTime(LocalDateTime.of(2025, 8, 20, 10, 0));
-            samples[1].setEndTime(LocalDateTime.of(2025, 8, 20, 10, 20));
-
-            samples[2] = new Consultation("C1003", "P1003", "D003", "Headache");
-            samples[2].setStartTime(LocalDateTime.of(2025, 8, 21, 11, 0));
-            samples[2].setEndTime(LocalDateTime.of(2025, 8, 21, 11, 40));
-
-            samples[3] = new Consultation("C1004", "P1004", "D004", "Back Pain");
-            samples[3].setStartTime(LocalDateTime.of(2025, 8, 21, 14, 0));
-            samples[3].setEndTime(LocalDateTime.of(2025, 8, 21, 14, 25));
-
-            samples[4] = new Consultation("C1005", "P1005", "D005", "Stomach Ache");
-            samples[4].setStartTime(LocalDateTime.of(2025, 8, 22, 9, 15));
-            samples[4].setEndTime(LocalDateTime.of(2025, 8, 22, 9, 50));
-
-            samples[5] = new Consultation("C1006", "P1006", "D006", "Sore Throat");
-            samples[5].setStartTime(LocalDateTime.of(2025, 8, 22, 10, 30));
-            samples[5].setEndTime(LocalDateTime.of(2025, 8, 22, 11, 0));
-
-            samples[6] = new Consultation("C1007", "P1007", "D007", "Allergy");
-            samples[6].setStartTime(LocalDateTime.of(2025, 8, 23, 8, 45));
-            samples[6].setEndTime(LocalDateTime.of(2025, 8, 23, 9, 15));
-
-            samples[7] = new Consultation("C1008", "P1008", "D008", "Flu");
-            samples[7].setStartTime(LocalDateTime.of(2025, 8, 23, 10, 15));
-            samples[7].setEndTime(LocalDateTime.of(2025, 8, 23, 10, 50));
-
-            samples[8] = new Consultation("C1009", "P1009", "D009", "Fatigue");
-            samples[8].setStartTime(LocalDateTime.of(2025, 8, 24, 13, 0));
-            samples[8].setEndTime(LocalDateTime.of(2025, 8, 24, 13, 45));
-
-            samples[9] = new Consultation("C1010", "P1010", "D010", "Dizziness");
-            samples[9].setStartTime(LocalDateTime.of(2025, 8, 24, 14, 15));
-            samples[9].setEndTime(LocalDateTime.of(2025, 8, 24, 14, 55));
-
-            for (Consultation c : samples) {
-                completedConsultations.add(c);
-            }
-
-            System.out.println("Added 10 sample consultations with LocalDateTime.");
-        } catch (Exception e) {
-            System.out.println("Error adding sample consultations: " + e.getMessage());
-        }
+    public static DynamicList<Consultation> getAllConsultations() {
+        return Consultation.getCompletedConsultations();
     }
-
 
     // Utility method: convert Date to LocalDateTime
     private static LocalDateTime toLocalDateTime(Date date) {
@@ -96,10 +46,46 @@ public class ConsultationManagement {
     // Counter
     private static int consultationCounter = 1001; // C1001
     
-    private static String generateNextConsultationId() {
-        return "C" + consultationCounter++;
+    public static void initializeConsultationCounter() {
+        int maxId = 1000;
+        DynamicList<Consultation> completedList = getCompletedConsultations();
+
+        for (int i = 0; i < completedList.size(); i++) {
+            String id = completedList.get(i).getConsultationId();
+            if (id != null && id.length() > 1) {
+                int num = Integer.parseInt(id.substring(1));
+                if (num > maxId) maxId = num;
+            }
+        }
+
+        consultationCounter = maxId + 1;
     }
-    
+
+    private static String generateNextConsultationId() {
+        return "C" + (consultationCounter++);
+    }
+
+
+    // 检查ID是否存在于已完成或正在进行的咨询
+    private static boolean isConsultationIdExists(String id) {
+        // 检查已完成
+        for (int i = 0; i < completedConsultations.size(); i++) {
+            Consultation c = completedConsultations.get(i);
+            if (c.getConsultationId().equalsIgnoreCase(id)) {
+                return true;
+            }
+        }
+        // 检查正在进行的
+        for (int i = 0; i < ongoingConsultations.size(); i++) {
+            Consultation c = ongoingConsultations.get(i);
+            if (c.getConsultationId().equalsIgnoreCase(id)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
     private static Scanner sc = new Scanner(System.in); 
 
     public static void showCompletedConsultations() {
@@ -590,4 +576,5 @@ public class ConsultationManagement {
             System.out.println("The consultation lists are different.");
         }
     }
+
 }

@@ -59,9 +59,11 @@ public class TARCareMedicalCentre {
             QueueUI.displayCurrentQueue();
             System.out.println("1. Patient Management");
             System.out.println("2. Queue Management");
-            System.out.println("3. Medical Treatment Management");
-            System.out.println("4. Prescription Management");
-            System.out.println("5. Back to Role Selection");
+            System.out.println("3. Consultation Management");
+            System.out.println("4. Appointment Management");
+            System.out.println("5. Medical Treatment Management");
+            System.out.println("6. Prescription Management");
+            System.out.println("7. Back to Role Selection");
 
             System.out.print("Enter your choice (1-3): ");
             String choice = scanner.nextLine();
@@ -74,8 +76,16 @@ public class TARCareMedicalCentre {
                     QueueUI.adminQueueMenu();
                     break;
                 case "3":
-                    MedicalTreatmentUI.medicalTreatmentMainMenu();
+                    ConsultationUI.run();
+                    break;
                 case "4":
+                    AppointmentUI.run1();
+                    break;
+                case "5":
+                    MedicalTreatmentUI.medicalTreatmentMainMenu();
+                case "6":
+                    MedicalTreatmentUI.medicalTreatmentMainMenu();
+                case "7":
                     return;
                 default:
                     System.out.println("Invalid choice. Please enter 1-3.");

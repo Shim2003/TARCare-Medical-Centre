@@ -4,6 +4,7 @@
  */
 package ADT;
 
+import java.time.LocalDateTime;
 import java.util.Iterator;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -470,4 +471,19 @@ public class DynamicList<T> implements MyList<T> {
             maxBlocks = newMaxBlocks;
         }
     }
+    
+    public void sortByDateTime(Function<T, LocalDateTime> dateExtractor) {
+        int n = this.size();
+        for (int i = 0; i < n - 1; i++) {
+            for (int j = 0; j < n - i - 1; j++) {
+                T current = this.get(j);
+                T next = this.get(j + 1);
+                if (dateExtractor.apply(current).isAfter(dateExtractor.apply(next))) {
+                    this.replace(j, next);
+                    this.replace(j + 1, current);
+                }
+            }
+        }
+    }
+
 }

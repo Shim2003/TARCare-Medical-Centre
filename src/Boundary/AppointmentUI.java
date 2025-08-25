@@ -58,6 +58,7 @@ public class AppointmentUI {
             System.out.println("\n====== MAIN FUNCTIONS (Daily Use) ======");
             System.out.println(" 1. Schedule Appointment");
             System.out.println(" 2. View Appointments by ID");
+            System.out.println(" 3. View Appointments by Time");
             System.out.println(" 0. Back");
             System.out.println("======================================");
             System.out.print("Enter your choice: ");
@@ -71,6 +72,8 @@ public class AppointmentUI {
 
             switch (choice) {
                 case 1 -> {
+                    String nextAppointmentId = AppointmentManagement.generateNextAppointmentId();
+                    System.out.println("Next available Appointment ID: " + nextAppointmentId);
                     System.out.print("Enter Patient ID: ");
                     String patientId = sc.nextLine();
                     System.out.print("Enter Doctor ID: ");
@@ -83,6 +86,7 @@ public class AppointmentUI {
                     AppointmentManagement.scheduleNextAppointment(patientId, doctorId, dateTimeStr, reason);
                 }
                 case 2 -> AppointmentManagement.promptAndViewAppointments();
+                case 3 -> AppointmentManagement.displayAppointmentsByTime();
                 case 0 -> System.out.println("Returning...");
                 default -> System.out.println("Invalid choice.");
             }
@@ -159,14 +163,4 @@ public class AppointmentUI {
         } while (choice != 0);
     }
 
-    public static void main(String[] args) {
-        ClinicData.addSamplePatients();
-        DoctorManagement.addSampleDoctor();
-        LeaveManagement.addSampleLeaves();
-        ScheduleManagement.addSampleSchedules();
-        AppointmentManagement.addSampleAppointments();
-
-        AppointmentUI ui = new AppointmentUI();
-        ui.run1();
-    }
 }
