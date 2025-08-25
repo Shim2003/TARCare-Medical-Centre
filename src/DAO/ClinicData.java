@@ -6,6 +6,7 @@ package DAO;
 
 import ADT.DynamicList;
 import ADT.MyList;
+import Boundary.PharmacyUI;
 import Control.AppointmentManagement;
 import Control.ConsultationManagement;
 import Control.DiagnosisManagement;
@@ -56,6 +57,8 @@ public class ClinicData {
         addSampleLeaves();
         addSampleSchedules();
         addSampleDoctor();
+        addSamplePrescriptions();
+        addSampleStockRequests();
     }
 
     public static void addSamplePatients() {
@@ -624,56 +627,56 @@ public class ClinicData {
         QueueControl.getQueueList().add(queueEntry);
     }
 
-    public static void addSamplePrescriptions(PharmacyManagement pharmacyService) {
+    public static void addSamplePrescriptions() {
         try {
             // Sample Prescription 1: Common Cold Treatment
             Prescription prescription1 = new Prescription("RX001", "P1100", "DR001");
             prescription1.addMedicineItem("Paracetamol", "1 tablet", "3 times daily after meals", "5 days", "Oral");
             prescription1.addMedicineItem("Vitamin C", "2 tablets", "Once daily", "7 days", "Oral");
-            pharmacyService.addToQueue(prescription1);
+            PharmacyManagement.addToQueue(prescription1);
 
             // Sample Prescription 2: Infection Treatment
             Prescription prescription2 = new Prescription("RX002", "P1101", "DR002");
             prescription2.addMedicineItem("Amoxicillin", "1 capsule", "3 times daily", "7 days", "Oral");
             prescription2.addMedicineItem("Benadryl Cough Syrup", "10ml", "2 times daily", "5 days", "Oral");
-            pharmacyService.addToQueue(prescription2);
+            PharmacyManagement.addToQueue(prescription2);
 
             // Sample Prescription 3: Stomach Issues
             Prescription prescription3 = new Prescription("RX003", "P1102", "DR003");
             prescription3.addMedicineItem("Omeprazole", "1 capsule", "Once daily before breakfast", "14 days", "Oral");
             prescription3.addMedicineItem("ORS Sachet", "1 sachet", "After each loose stool", "As needed", "Dissolve in water");
-            pharmacyService.addToQueue(prescription3);
+            PharmacyManagement.addToQueue(prescription3);
 
             // Sample Prescription 4: Skin Treatment
             Prescription prescription4 = new Prescription("RX004", "P1103", "DR004");
             prescription4.addMedicineItem("Hydrocortisone Cream", "Apply thin layer", "2 times daily", "10 days", "Topical");
             prescription4.addMedicineItem("Aspirin", "1 capsule", "Once daily", "7 days", "Oral");
-            pharmacyService.addToQueue(prescription4);
+            PharmacyManagement.addToQueue(prescription4);
 
             // Sample Prescription 5: Chronic Condition Management
             Prescription prescription5 = new Prescription("RX005", "P1104", "DR005");
             prescription5.addMedicineItem("Paracetamol", "2 tablets", "4 times daily as needed for pain", "10 days", "Oral");
             prescription5.addMedicineItem("Vitamin C", "2 tablets", "Twice daily", "30 days", "Oral");
             prescription5.addMedicineItem("Omeprazole", "1 capsule", "Once daily", "30 days", "Oral");
-            pharmacyService.addToQueue(prescription5);
+            PharmacyManagement.addToQueue(prescription5);
 
             // Sample Prescription 6: Respiratory Issues
             Prescription prescription6 = new Prescription("RX006", "P1105", "DR001");
             prescription6.addMedicineItem("Benadryl Cough Syrup", "5ml", "3 times daily", "7 days", "Oral");
             prescription6.addMedicineItem("Paracetamol", "1 tablet", "As needed for fever", "5 days", "Oral");
-            pharmacyService.addToQueue(prescription6);
+            PharmacyManagement.addToQueue(prescription6);
 
             // Sample Prescription 7: Pain Management
             Prescription prescription7 = new Prescription("RX007", "P1106", "DR002");
             prescription7.addMedicineItem("Aspirin", "2 capsules", "Twice daily with food", "14 days", "Oral");
             prescription7.addMedicineItem("Hydrocortisone Cream", "Apply as needed", "Up to 3 times daily", "7 days", "Topical");
-            pharmacyService.addToQueue(prescription7);
+            PharmacyManagement.addToQueue(prescription7);
 
             // Sample Prescription 8: Nutritional Support
             Prescription prescription8 = new Prescription("RX008", "P1107", "DR003");
             prescription8.addMedicineItem("Vitamin C", "1 tablet", "Twice daily", "30 days", "Oral");
             prescription8.addMedicineItem("ORS Sachet", "1 sachet", "Once daily", "10 days", "Dissolve in water");
-            pharmacyService.addToQueue(prescription8);
+            PharmacyManagement.addToQueue(prescription8);
 
         } catch (Exception e) {
             System.err.println("Error adding sample prescriptions: " + e.getMessage());
@@ -727,7 +730,7 @@ public class ClinicData {
         }
     }
 
-    public static void addSampleStockRequests(PharmacyManagement pharmacyService) {
+    public static void addSampleStockRequests() {
         Calendar cal = Calendar.getInstance();
 
         try {
@@ -736,60 +739,60 @@ public class ClinicData {
             // Request 1: Paracetamol restocked 2 weeks ago
             cal.add(Calendar.DAY_OF_MONTH, -14);
             StockRequest request1 = new StockRequest("REQ001", "M001", "Paracetamol", 200, cal.getTime(), "COMPLETED");
-            pharmacyService.getAllStockRequests().add(request1);
+            PharmacyManagement.getAllStockRequests().add(request1);
 
             // Request 2: Vitamin C restocked 10 days ago
             cal = Calendar.getInstance();
             cal.add(Calendar.DAY_OF_MONTH, -10);
             StockRequest request2 = new StockRequest("REQ002", "M004", "Vitamin C", 100, cal.getTime(), "COMPLETED");
-            pharmacyService.getAllStockRequests().add(request2);
+            PharmacyManagement.getAllStockRequests().add(request2);
 
             // Request 3: Aspirin restocked 1 week ago
             cal = Calendar.getInstance();
             cal.add(Calendar.DAY_OF_MONTH, -7);
             StockRequest request3 = new StockRequest("REQ003", "M002", "Aspirin", 150, cal.getTime(), "COMPLETED");
-            pharmacyService.getAllStockRequests().add(request3);
+            PharmacyManagement.getAllStockRequests().add(request3);
 
             // Request 4: Benadryl rejected 5 days ago (supplier issue)
             cal = Calendar.getInstance();
             cal.add(Calendar.DAY_OF_MONTH, -5);
             StockRequest request4 = new StockRequest("REQ004", "M005", "Benadryl Cough Syrup", 50, cal.getTime(), "REJECTED");
-            pharmacyService.getAllStockRequests().add(request4);
+            PharmacyManagement.getAllStockRequests().add(request4);
 
             // Request 5: Amoxicillin restocked 3 days ago
             cal = Calendar.getInstance();
             cal.add(Calendar.DAY_OF_MONTH, -3);
             StockRequest request5 = new StockRequest("REQ005", "M003", "Amoxicillin", 100, cal.getTime(), "COMPLETED");
-            pharmacyService.getAllStockRequests().add(request5);
+            PharmacyManagement.getAllStockRequests().add(request5);
 
             // === PENDING STOCK REQUESTS (Current) ===
             // Request 6: Hydrocortisone Cream - Low stock, requested yesterday
             cal = Calendar.getInstance();
             cal.add(Calendar.DAY_OF_MONTH, -1);
             StockRequest request6 = new StockRequest("REQ006", "M007", "Hydrocortisone Cream", 80, cal.getTime(), "PENDING");
-            pharmacyService.getAllStockRequests().add(request6);
+            PharmacyManagement.getAllStockRequests().add(request6);
 
             // Request 7: ORS Sachet - High demand, requested today
             cal = Calendar.getInstance();
             StockRequest request7 = new StockRequest("REQ007", "M006", "ORS Sachet", 200, cal.getTime(), "PENDING");
-            pharmacyService.getAllStockRequests().add(request7);
+            PharmacyManagement.getAllStockRequests().add(request7);
 
             // Request 8: Omeprazole - Chronic condition patients, requested today
             cal = Calendar.getInstance();
             StockRequest request8 = new StockRequest("REQ008", "M008", "Omeprazole", 120, cal.getTime(), "PENDING");
-            pharmacyService.getAllStockRequests().add(request8);
+            PharmacyManagement.getAllStockRequests().add(request8);
 
             // Request 9: Benadryl Cough Syrup - Retry after previous rejection, requested 2 hours ago
             cal = Calendar.getInstance();
             cal.add(Calendar.HOUR, -2);
             StockRequest request9 = new StockRequest("REQ009", "M005", "Benadryl Cough Syrup", 100, cal.getTime(), "PENDING");
-            pharmacyService.getAllStockRequests().add(request9);
+            PharmacyManagement.getAllStockRequests().add(request9);
 
             // Request 10: Paracetamol - Popular item, requested 1 hour ago
             cal = Calendar.getInstance();
             cal.add(Calendar.HOUR, -1);
             StockRequest request10 = new StockRequest("REQ010", "M001", "Paracetamol", 250, cal.getTime(), "PENDING");
-            pharmacyService.getAllStockRequests().add(request10);
+            PharmacyManagement.getAllStockRequests().add(request10);
         } catch (Exception e) {
             System.err.println("❌ Error adding sample stock requests: " + e.getMessage());
         }
@@ -833,7 +836,7 @@ public class ClinicData {
         ScheduleManagement.addSchedule(new Schedule("S001", "D001", DayOfWeek.MONDAY,
                 LocalTime.of(9, 0), LocalTime.of(13, 0)));
         ScheduleManagement.addSchedule(new Schedule("S002", "D002", DayOfWeek.MONDAY,
-                LocalTime.of(9, 0), LocalTime.of(13, 0)));
+                LocalTime.of(9, 0), LocalTime.of(23, 0)));
         ScheduleManagement.addSchedule(new Schedule("S003", "D003", DayOfWeek.MONDAY,
                 LocalTime.of(9, 0), LocalTime.of(13, 0)));
         ScheduleManagement.addSchedule(new Schedule("S004", "D004", DayOfWeek.MONDAY,

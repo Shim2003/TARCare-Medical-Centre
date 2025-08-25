@@ -15,7 +15,6 @@ import Entity.MedicalTreatmentItem;
 import Entity.Prescription;
 import Entity.StockRequest;
 import ADT.MyList;
-import DAO.ClinicData;
 import Utility.UtilityClass;
 import java.text.SimpleDateFormat;
 
@@ -24,11 +23,7 @@ public class PharmacyUI {
     private static final Scanner sc = new Scanner(System.in);
     private static final PharmacyManagement service = new PharmacyManagement();
 
-    public static void main(String[] args) {
-        
-        ClinicData.addSampleMedicine();
-        ClinicData.addSamplePrescriptions(service);
-        ClinicData.addSampleStockRequests(service);
+    public static void PharmacyMainMenu() {
         
         int choice;
         do {

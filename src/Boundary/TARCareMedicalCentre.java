@@ -67,7 +67,7 @@ public class TARCareMedicalCentre {
             System.out.println("7. Prescription Management");
             System.out.println("8. Back to Role Selection");
 
-            System.out.print("Enter your choice (1-3): ");
+            System.out.print("Enter your choice (1-8): ");
             String choice = scanner.nextLine();
 
             switch (choice) {
@@ -90,7 +90,7 @@ public class TARCareMedicalCentre {
                     MedicalTreatmentUI.medicalTreatmentMainMenu();
                     break;
                 case "7":
-                    MedicalTreatmentUI.medicalTreatmentMainMenu();
+                    PharmacyUI.PharmacyMainMenu();
                     break;
                 case "8":
                     mainMenu();
@@ -112,7 +112,7 @@ public class TARCareMedicalCentre {
             System.out.println("5. Doctor(s) & Timetable info");
             System.out.println("6. Back to Role Selection");
 
-            System.out.print("Enter your choice (1-3): ");
+            System.out.print("Enter your choice (1-6): ");
             String choice = scanner.nextLine();
 
             switch (choice) {

@@ -8,6 +8,7 @@ import ADT.DynamicList;
 import ADT.MyList;
 import Control.DiagnosisManagement;
 import Control.MedicalTreatmentManagement;
+import Control.PharmacyManagement;
 import Control.PrescriptionCalculator;
 import Entity.*;
 import Utility.UtilityClass;
@@ -51,7 +52,6 @@ public class MedicalTreatmentUI {
                         medicalTreatmentMenu();
                     case 3 -> {
                         System.out.println("Exiting to Main Menu...");
-                        scanner.close(); // Close the scanner before exiting
                         return; // Exit to main menu
                     }
                     default -> {
@@ -329,7 +329,7 @@ public class MedicalTreatmentUI {
         Prescription prescription = new Prescription(PrescriptionCalculator.generateNewPrescriptionId(), patientId,
         doctorId, medicineList, "PENDING");
 
-        PrescriptionCalculator.addPrescription(prescription);
+        PharmacyManagement.addToQueue(prescription);
 
         // Add the new MedicalTreatment object to the treatmentList
         MedicalTreatmentManagement.addMedicalTreatment(treatment);

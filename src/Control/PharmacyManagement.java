@@ -22,7 +22,7 @@ import java.util.function.Predicate;
  */
 public class PharmacyManagement {
     private static MyList<Medicine> medicines = new DynamicList<>();
-    private static MyList<Prescription> prescriptionQueue = new DynamicList<>();
+    public static MyList<Prescription> prescriptionQueue = new DynamicList<>();
     private static MyList<StockRequest> stockRequests = new DynamicList<>();
     SimpleDateFormat sdf = new SimpleDateFormat(UtilityClass.DATE_FORMAT);
     private int requestCounter = 1;
@@ -71,7 +71,7 @@ public class PharmacyManagement {
     
     // ===== EXISTING METHODS (keeping all original functionality) =====
     
-    public void addToQueue(Prescription prescription) {
+    public static void addToQueue(Prescription prescription) {
         prescriptionQueue.add(prescription);
     }
     
@@ -313,7 +313,7 @@ public class PharmacyManagement {
         return "REQ" + String.format("%03d", requestCounter++);
     }
     
-    public MyList<StockRequest> getAllStockRequests() {
+    public static MyList<StockRequest> getAllStockRequests() {
         return stockRequests;
     }
     
