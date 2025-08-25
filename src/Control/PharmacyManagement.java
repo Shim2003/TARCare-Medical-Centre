@@ -24,7 +24,6 @@ public class PharmacyManagement {
     private static MyList<Medicine> medicines = new DynamicList<>();
     public static MyList<Prescription> prescriptionQueue = new DynamicList<>();
     private static MyList<StockRequest> stockRequests = new DynamicList<>();
-    SimpleDateFormat sdf = new SimpleDateFormat(UtilityClass.DATE_FORMAT);
     private int requestCounter = 1;
     
     public PharmacyManagement() {    }
@@ -130,19 +129,6 @@ public class PharmacyManagement {
         return true;
     }
     
-    public boolean checkStockAvailability(Prescription prescription) {
-        for (int i = 0; i < prescription.getMedicineItems().size(); i++) {
-            MedicalTreatmentItem item = prescription.getMedicineItems().get(i);
-            Medicine medicine = findByName(item.getMedicineName());
-            int quantityNeeded = PrescriptionCalculator.calculateQuantityNeeded(item); // FIX: Use static call
-            
-            if (medicine == null || medicine.getQuantity() < quantityNeeded) {
-                return false;
-            }
-        }
-        return true;
-    }
-    
     public double calculatePrescriptionCost(Prescription prescription) {
         double totalCost = 0.0;
         
@@ -162,17 +148,6 @@ public class PharmacyManagement {
     // Find medicines with low stock
     public MyList<Medicine> getLowStockMedicines(int threshold) {
         return medicines.findAll(m -> m.getQuantity() <= threshold);
-    }
-    
-    // Get medicines by price range
-    public MyList<Medicine> getMedicinesByPriceRange(double minPrice, double maxPrice) {
-        return medicines.findAll(m -> m.getPrice() >= minPrice && m.getPrice() <= maxPrice);
-    }
-    
-    // Get medicines by name pattern (contains search)
-    public MyList<Medicine> searchMedicinesByName(String namePattern) {
-        return medicines.findAll(m -> m.getMedicineName().toLowerCase()
-                                    .contains(namePattern.toLowerCase()));
     }
     
     // Calculate total inventory value
@@ -276,64 +251,23 @@ public class PharmacyManagement {
         return total;
     }
     
-    // Check if medicine exists by name (case-insensitive)
-    public boolean medicineExists(String medicineName) {
-        return medicines.anyMatch(m -> m.getMedicineName().equalsIgnoreCase(medicineName));
-    }
-    
     // Get medicine count
     public int getMedicineCount() {
         return medicines.size();
     }
     
-    // Clear all prescriptions from queue
-    public void clearPrescriptionQueue() {
-        prescriptionQueue.clear();
-        System.out.println("Prescription queue cleared.");
-    }
-    
-    // Get all pending prescriptions
-    public MyList<Prescription> getPendingPrescriptions() {
-        return prescriptionQueue.findAll(p -> "PENDING".equals(p.getStatus()));
-    }
-    
     // ===== SEARCH FUNCTIONALITY =====
-    public Medicine findFirst(Predicate<Medicine> predicate) {
-        return medicines.findFirst(predicate);
-    }
-    
-    public MyList<Medicine> findAll(Predicate<Medicine> predicate) {
-        return medicines.findAll(predicate);
-    }
-    
     public boolean isMedicineExpired(Medicine medicine) {
         if (medicine == null || medicine.getExpiryDate() == null) {
             return false;
         }
         return medicine.getExpiryDate().before(new Date());
     }
-    
-    public boolean isMedicineNearExpiry(Medicine medicine, int days) {
-        if (medicine == null || medicine.getExpiryDate() == null) {
-            return false;
-        }
-        
-        long currentTime = System.currentTimeMillis();
-        long expiryTime = medicine.getExpiryDate().getTime();
-        long daysInMillis = days * 24L * 60L * 60L * 1000L;
-        
-        return (expiryTime - currentTime) <= daysInMillis && expiryTime > currentTime;
-    }
-    
+
     public MyList<Medicine> getExpiredMedicines() {
         return medicines.findAll(medicine -> isMedicineExpired(medicine));
     }
-    
-    public MyList<Medicine> getMedicinesExpiringInMonths(int months) {
-        int days = UtilityClass.convertMonthsToDays(months);
-        return getMedicinesNearExpiry(days);
-    }
-    
+
     public MyList<Medicine> getMedicinesNearExpiry(int days) {
         Date futureDate = UtilityClass.addDaysToDate(new Date(), days);
         return medicines.filter(m -> m.getExpiryDate().before(futureDate) && 
@@ -358,10 +292,6 @@ public class PharmacyManagement {
         return calculatePrescriptionCost(prescription);
     }
 
-    public MyList<Medicine> getLowStockMedicines() {
-        return getLowStockMedicines(UtilityClass.LOW_STOCK_THRESHOLD);
-    }
-
     public MyList<Medicine> searchMedicinesByPattern(String pattern) {
         return medicines.filter(m -> 
             m.getMedicineName().toLowerCase().contains(pattern.toLowerCase()));
@@ -371,39 +301,50 @@ public class PharmacyManagement {
         return medicines.filter(m -> 
             m.getPrice() >= minPrice && m.getPrice() <= maxPrice);
     }
-
-    public MyList<Medicine> filterByMultipleCriteria(String namePattern,
-            String category, String manufacturer, Double minPrice, Double maxPrice) {
-        return medicines.filter(m -> {
-            boolean matches = true;
-
-            // Check name pattern (case-insensitive)
-            if (namePattern != null && !namePattern.trim().isEmpty()) {
-                matches = matches && m.getMedicineName().toLowerCase()
-                        .contains(namePattern.toLowerCase().trim());
-            }
-
-            // Check category (case-insensitive)
-            if (category != null && !category.trim().isEmpty()) {
-                matches = matches && m.getCategory().equalsIgnoreCase(category.trim());
-            }
-
-            // Check manufacturer (case-insensitive)
-            if (manufacturer != null && !manufacturer.trim().isEmpty()) {
-                matches = matches && m.getManufacturer().equalsIgnoreCase(manufacturer.trim());
-            }
-
-            // Check minimum price
-            if (minPrice != null) {
-                matches = matches && m.getPrice() >= minPrice;
-            }
-
-            // Check maximum price
-            if (maxPrice != null) {
-                matches = matches && m.getPrice() <= maxPrice;
-            }
-
-            return matches;
-        });
+    
+    public MyList<Medicine> filterByCategory(String category) {
+        return medicines.filter(m
+                -> m.getCategory().equalsIgnoreCase(category));
     }
+
+    public MyList<Medicine> filterByDosageForm(String dosageForm) {
+        return medicines.filter(m
+                -> m.getDosageForm().equalsIgnoreCase(dosageForm));
+    }
+
+    public MyList<Medicine> filterByManufacturer(String manufacturer) {
+        return medicines.filter(m
+                -> m.getManufacturer().equalsIgnoreCase(manufacturer));
+    }
+
+    public MyList<Medicine> filterByMultipleCriteria(
+            String namePattern,
+            String category,
+            String manufacturer,
+            Double minPrice,
+            Double maxPrice) {
+
+        MyList<Medicine> results = medicines;
+
+        if (namePattern != null && !namePattern.trim().isEmpty()) {
+            results = searchMedicinesByPattern(namePattern);
+        }
+        if (category != null && !category.trim().isEmpty()) {
+            results = ((DynamicList<Medicine>) results)
+                    .filter(m -> m.getCategory().equalsIgnoreCase(category.trim()));
+        }
+        if (manufacturer != null && !manufacturer.trim().isEmpty()) {
+            results = ((DynamicList<Medicine>) results)
+                    .filter(m -> m.getManufacturer().equalsIgnoreCase(manufacturer.trim()));
+        }
+        if (minPrice != null || maxPrice != null) {
+            double min = (minPrice == null) ? Double.MIN_VALUE : minPrice;
+            double max = (maxPrice == null) ? Double.MAX_VALUE : maxPrice;
+            results = ((DynamicList<Medicine>) results)
+                    .filter(m -> m.getPrice() >= min && m.getPrice() <= max);
+        }
+
+        return results;
+    }
+
 }
