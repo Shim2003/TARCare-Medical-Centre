@@ -21,20 +21,6 @@ import java.time.temporal.TemporalAdjusters;
 public class ScheduleManagement {
 
     private static MyList<Schedule> scheduleList = new DynamicList<>();
-
-//    public static boolean addSchedule(Schedule s) {
-//        if (s != null) {
-//            scheduleList.add(s);
-//
-//            // Update doctor status right after adding schedule
-//            Doctor doctor = DoctorManagement.findDoctorById(s.getDoctorID());
-//            if (doctor != null) {
-//                DoctorManagement.updateWorkingStatus(doctor);
-//            }
-//            return true;
-//        }
-//        return false;
-//    }
     
     public static boolean addSchedule(Schedule s) {
         if (s != null) {

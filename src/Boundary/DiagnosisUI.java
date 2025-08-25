@@ -462,7 +462,7 @@ public class DiagnosisUI {
         sb.append("=================================================================\n");
 
         // Symptoms
-        sb.append("> Symptoms:                                                    <\n");
+        sb.append("> Symptoms:                                                     <\n");
         if (diagnosis.getSymptoms() != null && !diagnosis.getSymptoms().isEmpty()) {
             for (int i = 0; i < diagnosis.getSymptoms().size(); i++) {
                 sb.append(String.format(">   [%d] %-56s<\n", i + 1, diagnosis.getSymptoms().get(i)));
