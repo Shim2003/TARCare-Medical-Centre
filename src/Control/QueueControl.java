@@ -116,11 +116,6 @@ public class QueueControl {
         return queueList;
     }
 
-    public static QueueEntry currentConsulting() {
-        return queueList.findFirst(qe
-                -> qe.getStatus().equals(Utility.UtilityClass.statusConsulting));
-    }
-
     public static boolean markAsCompleted(String patientId) {
         QueueEntry target = queueList.findFirst(qe -> qe.getPatientId().equals(patientId)
                 && qe.getStatus().equals(Utility.UtilityClass.statusConsulting));
@@ -165,7 +160,7 @@ public class QueueControl {
 
         int removedCount = recordsToRemove.size();
         boolean success = queueList.removeIf(entry -> entry.getStatus().equalsIgnoreCase(selectedStatus));
-        
+
         if (success) {
             return new RemovalResult(true, "Successfully removed " + removedCount + " queue records", removedCount);
         } else {
@@ -206,4 +201,30 @@ public class QueueControl {
 
         return new DailyQueueStats(date, total, waiting, consulting, completed, completionRate);
     }
+
+    public static boolean removeFromCurrentServing(String patientId) {
+        if (patientId == null || patientId.trim().isEmpty()) {
+            return false;
+        }
+
+        // Find index of the patient in the serving list
+        int index = currentServingPatient.findIndex(cs -> cs.getPatientId().equals(patientId));
+
+        if (index != -1) {
+            currentServingPatient.remove(index);
+
+            // Also update the doctor's status back to "Free"
+            Doctor doctor = DoctorManagement.findDoctorById(
+                    currentServingPatient.get(index).getDoctorId()
+            );
+            if (doctor != null) {
+                doctor.setWorkingStatus(UtilityClass.statusFree);
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
 }

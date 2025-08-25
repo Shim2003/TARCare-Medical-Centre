@@ -12,8 +12,6 @@ import java.util.Calendar;
 import java.util.Comparator;
 
 /**
- * PatientManagement - Control layer for patient operations Contains only
- * business logic and data operations, no display logic
  *
  * @author Lee Wei Hao
  */

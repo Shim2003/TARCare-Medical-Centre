@@ -7,6 +7,7 @@ package Boundary;
 import ADT.MyList;
 import Control.PatientManagement;
 import Control.QueueControl;
+import DAO.CurrentServingDAO;
 import DAO.QueueOperationResult;
 import DAO.NextPatientResult;
 import DAO.RemovalResult;
@@ -182,27 +183,31 @@ public class QueueUI {
     }
 
     public static void displayCurrentQueue() {
-        System.out.println("--- Current Patient Being Served ---");
+        System.out.println("--- Current Patients Being Served ---");
 
-        QueueEntry current = QueueControl.currentConsulting();
+        MyList<CurrentServingDAO> servingList = QueueControl.getCurrentServingPatient();
 
-        if (current != null) {
-            String queueNum = "Current Queue Number: " + current.getQueueNumber();
-            int width = queueNum.length();
-            String border = "+" + "-".repeat(width + 2) + "+";
-
-            System.out.println(border);
-            System.out.printf("| %s |\n", queueNum);
-            System.out.println(border);
-        } else {
-            String msg = "No patient is currently being served.";
+        if (servingList.isEmpty()) {
+            String msg = "No patients are currently being served.";
             int width = msg.length();
             String border = "+" + "-".repeat(width + 2) + "+";
 
             System.out.println(border);
             System.out.printf("| %s |\n", msg);
             System.out.println(border);
+            return;
         }
+
+        String header = "+-------------------------------------------+";
+        System.out.println(header);
+        System.out.printf("| %-15s | %-15s |\n", "Patient ID", "Doctor ID");
+        System.out.println(header);
+
+        for (int i = 0; i < servingList.size(); i++) {
+            CurrentServingDAO cs = servingList.get(i);
+            System.out.printf("| %-15s | %-15s |\n", cs.getPatientId(), cs.getDoctorId());
+        }
+        System.out.println(header);
     }
 
     public static void displayQueueByStatus() {
@@ -347,7 +352,7 @@ public class QueueUI {
         }
 
         RemovalResult result = QueueControl.removeByStatus(selectedStatus);
-        
+
         if (result.isSuccess()) {
             System.out.println("Successfully Removed: " + result.getMessage());
         } else {
@@ -551,7 +556,7 @@ public class QueueUI {
     // Additional helper methods for queue status management
     public static void markPatientAsCompleted(String patientId) {
         boolean success = QueueControl.markAsCompleted(patientId);
-        
+
         if (success) {
             System.out.println("Patient ID : " + patientId + " marked as COMPLETED.");
         } else {
@@ -561,11 +566,13 @@ public class QueueUI {
 
     public static void updateQueueStatus(String patientId) {
         boolean success = QueueControl.updateQueueStatus(patientId);
-        
+
         if (success) {
             System.out.println("Queue status updated successfully for patient: " + patientId);
         } else {
             System.out.println("Invalid patient ID or patient not found in queue.");
         }
     }
+    
+    
 }
