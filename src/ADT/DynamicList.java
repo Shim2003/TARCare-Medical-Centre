@@ -6,127 +6,230 @@ import java.util.function.Predicate;
 
 public class DynamicList<T> implements MyList<T> {
 
-    private Object[] buffer;
-    private int gapStart;
-    private int gapEnd;
-    private int capacity;
+    private static final int BLOCK_SIZE = 1024; // Block size for better memory management
+    private static final int INITIAL_BLOCKS = 4;
     
-    private static final int INITIAL_CAPACITY = 16;
+    private Object[][] blocks;
+    private int size;
+    private int blockCount;
+    private int maxBlocks;
 
     public DynamicList() {
-        capacity = INITIAL_CAPACITY;
-        buffer = new Object[capacity];
-        gapStart = 0;
-        gapEnd = capacity;
+        maxBlocks = INITIAL_BLOCKS;
+        blocks = new Object[maxBlocks][];
+        blocks[0] = new Object[BLOCK_SIZE];
+        blockCount = 1;
+        size = 0;
     }
 
     public DynamicList(int initialCapacity) {
         if (initialCapacity < 0) {
             throw new IllegalArgumentException("Illegal Capacity: " + initialCapacity);
         }
-        capacity = Math.max(initialCapacity, INITIAL_CAPACITY);
-        buffer = new Object[capacity];
-        gapStart = 0;
-        gapEnd = capacity;
+        
+        int neededBlocks = Math.max(1, (initialCapacity + BLOCK_SIZE - 1) / BLOCK_SIZE);
+        maxBlocks = Math.max(neededBlocks, INITIAL_BLOCKS);
+        blocks = new Object[maxBlocks][];
+        blocks[0] = new Object[BLOCK_SIZE];
+        blockCount = 1;
+        size = 0;
     }
 
     @Override
     public void add(T item) {
-        add(size(), item);
+        add(size, item);
     }
 
     @Override
     public void add(int index, T item) {
-        if (index < 0 || index > size()) {
-            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size());
+        if (index < 0 || index > size) {
+            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
         }
         
-        moveGapTo(index);
+        if (index == size) {
+            // Fast path: append to end
+            appendElement(item);
+        } else {
+            // Insert at specific position
+            insertElement(index, item);
+        }
+        size++;
+    }
+
+    private void appendElement(T item) {
+        int blockIndex = size / BLOCK_SIZE;
+        int innerIndex = size % BLOCK_SIZE;
         
-        if (gapStart == gapEnd) {
-            expandGap();
+        ensureBlock(blockIndex);
+        blocks[blockIndex][innerIndex] = item;
+    }
+
+    private void insertElement(int index, T item) {
+        int blockIndex = index / BLOCK_SIZE;
+        int innerIndex = index % BLOCK_SIZE;
+        
+        ensureBlock(blockIndex);
+        
+        // If current block would overflow, split it
+        if (needsBlockSplit(blockIndex)) {
+            splitBlock(blockIndex);
+            
+            // Recalculate position after split
+            if (innerIndex >= BLOCK_SIZE / 2) {
+                blockIndex++;
+                innerIndex -= BLOCK_SIZE / 2;
+            }
         }
         
-        buffer[gapStart] = item;
-        gapStart++;
+        // Shift elements within block to make space
+        shiftElementsRight(blockIndex, innerIndex);
+        blocks[blockIndex][innerIndex] = item;
+    }
+
+    private boolean needsBlockSplit(int blockIndex) {
+        // Check if adding one more element would require shifting across blocks
+        int elementsInBlock = 0;
+        if (blockIndex < blockCount - 1) {
+            elementsInBlock = BLOCK_SIZE;
+        } else {
+            elementsInBlock = size % BLOCK_SIZE;
+            if (elementsInBlock == 0 && size > 0) {
+                elementsInBlock = BLOCK_SIZE;
+            }
+        }
+        
+        return elementsInBlock == BLOCK_SIZE;
+    }
+
+    private void splitBlock(int blockIndex) {
+        ensureBlockCapacity(blockCount + 1);
+        
+        // Shift all blocks after blockIndex to the right
+        for (int i = blockCount; i > blockIndex + 1; i--) {
+            blocks[i] = blocks[i - 1];
+        }
+        
+        // Create new block
+        Object[] newBlock = new Object[BLOCK_SIZE];
+        blocks[blockIndex + 1] = newBlock;
+        blockCount++;
+        
+        // Move half of the elements from old block to new block
+        Object[] oldBlock = blocks[blockIndex];
+        int half = BLOCK_SIZE / 2;
+        
+        System.arraycopy(oldBlock, half, newBlock, 0, half);
+        
+        // Clear moved elements in old block
+        for (int i = half; i < BLOCK_SIZE; i++) {
+            oldBlock[i] = null;
+        }
+    }
+
+    private void shiftElementsRight(int blockIndex, int innerIndex) {
+        // First, shift elements within the target block
+        if (innerIndex < BLOCK_SIZE - 1) {
+            System.arraycopy(
+                blocks[blockIndex], innerIndex,
+                blocks[blockIndex], innerIndex + 1,
+                BLOCK_SIZE - innerIndex - 1
+            );
+        }
+        
+        // If we have a carry-over, handle it
+        Object carryOver = blocks[blockIndex][BLOCK_SIZE - 1];
+        blocks[blockIndex][BLOCK_SIZE - 1] = null;
+        
+        if (carryOver != null) {
+            // Propagate the carry-over to subsequent blocks
+            for (int i = blockIndex + 1; i < blockCount && carryOver != null; i++) {
+                Object temp = blocks[i][BLOCK_SIZE - 1];
+                System.arraycopy(
+                    blocks[i], 0,
+                    blocks[i], 1,
+                    BLOCK_SIZE - 1
+                );
+                blocks[i][0] = carryOver;
+                carryOver = temp;
+            }
+            
+            // If we still have carry-over, we need a new block
+            if (carryOver != null) {
+                ensureBlock(blockCount);
+                blocks[blockCount - 1][0] = carryOver;
+            }
+        }
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public T get(int index) {
-        if (index < 0 || index >= size()) {
-            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size());
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
         }
         
-        if (index < gapStart) {
-            return (T) buffer[index];
-        } else {
-            return (T) buffer[index + gapSize()];
-        }
+        int blockIndex = index / BLOCK_SIZE;
+        int innerIndex = index % BLOCK_SIZE;
+        return (T) blocks[blockIndex][innerIndex];
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public T remove(int index) {
-        if (index < 0 || index >= size()) {
-            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size());
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
         }
         
-        T removed;
+        int blockIndex = index / BLOCK_SIZE;
+        int innerIndex = index % BLOCK_SIZE;
         
-        if (index < gapStart) {
-            removed = (T) buffer[index];
-            System.arraycopy(buffer, index + 1, buffer, index, gapStart - index - 1);
-            gapStart--;
-            buffer[gapStart] = null;
-        } else {
-            int actualIndex = index + gapSize();
-            removed = (T) buffer[actualIndex];
-            System.arraycopy(buffer, actualIndex + 1, buffer, actualIndex, capacity - actualIndex - 1);
-            gapEnd++;
-            buffer[capacity - 1] = null;
-        }
+        T removed = (T) blocks[blockIndex][innerIndex];
         
+        // Shift elements left within the block
+        System.arraycopy(
+            blocks[blockIndex], innerIndex + 1,
+            blocks[blockIndex], innerIndex,
+            BLOCK_SIZE - innerIndex - 1
+        );
+        
+        // Handle elements from subsequent blocks
+        shiftElementsLeft(blockIndex);
+        
+        size--;
         return removed;
+    }
+
+    private void shiftElementsLeft(int fromBlockIndex) {
+        for (int i = fromBlockIndex; i < blockCount - 1; i++) {
+            // Move first element of next block to end of current block
+            blocks[i][BLOCK_SIZE - 1] = blocks[i + 1][0];
+            
+            // Shift all elements in next block left
+            System.arraycopy(
+                blocks[i + 1], 1,
+                blocks[i + 1], 0,
+                BLOCK_SIZE - 1
+            );
+            blocks[i + 1][BLOCK_SIZE - 1] = null;
+        }
     }
 
     @Override
     public boolean isEmpty() {
-        return size() == 0;
+        return size == 0;
     }
 
     @Override
     public int size() {
-        return capacity - gapSize();
+        return size;
     }
 
     @Override
     public int indexOf(T item) {
-        if (item == null) {
-            // Check before gap
-            for (int i = 0; i < gapStart; i++) {
-                if (buffer[i] == null) {
-                    return i;
-                }
-            }
-            // Check after gap
-            for (int i = gapEnd; i < capacity; i++) {
-                if (buffer[i] == null) {
-                    return i - gapSize();
-                }
-            }
-        } else {
-            // Check before gap
-            for (int i = 0; i < gapStart; i++) {
-                if (item.equals(buffer[i])) {
-                    return i;
-                }
-            }
-            // Check after gap
-            for (int i = gapEnd; i < capacity; i++) {
-                if (item.equals(buffer[i])) {
-                    return i - gapSize();
-                }
+        for (int i = 0; i < size; i++) {
+            T element = get(i);
+            if (item == null ? element == null : item.equals(element)) {
+                return i;
             }
         }
         return -1;
@@ -139,46 +242,34 @@ public class DynamicList<T> implements MyList<T> {
 
     @Override
     public void clear() {
-        // Clear all elements and reset gap to cover entire buffer
-        for (int i = 0; i < capacity; i++) {
-            buffer[i] = null;
+        // Clear all blocks
+        for (int i = 0; i < blockCount; i++) {
+            if (blocks[i] != null) {
+                for (int j = 0; j < BLOCK_SIZE; j++) {
+                    blocks[i][j] = null;
+                }
+            }
         }
-        gapStart = 0;
-        gapEnd = capacity;
+        
+        // Reset to initial state
+        blockCount = 1;
+        size = 0;
     }
 
     @Override
     public T getFirst() {
-        if (isEmpty()) {
-            return null;
-        } else {
-            return get(0);
-        }
+        return isEmpty() ? null : get(0);
     }
 
     @Override
     public T getLast() {
-        if (isEmpty()) {
-            return null;
-        } else {
-            return get(size() - 1);
-        }
+        return isEmpty() ? null : get(size - 1);
     }
 
     @Override
     public T findFirst(Predicate<T> predicate) {
-        // Check before gap
-        for (int i = 0; i < gapStart; i++) {
-            @SuppressWarnings("unchecked")
-            T item = (T) buffer[i];
-            if (predicate.test(item)) {
-                return item;
-            }
-        }
-        // Check after gap
-        for (int i = gapEnd; i < capacity; i++) {
-            @SuppressWarnings("unchecked")
-            T item = (T) buffer[i];
+        for (int i = 0; i < size; i++) {
+            T item = get(i);
             if (predicate.test(item)) {
                 return item;
             }
@@ -193,19 +284,9 @@ public class DynamicList<T> implements MyList<T> {
 
     @Override
     public MyList<T> findAll(Predicate<T> predicate) {
-        DynamicList<T> result = new DynamicList<>();
-        // Check before gap
-        for (int i = 0; i < gapStart; i++) {
-            @SuppressWarnings("unchecked")
-            T item = (T) buffer[i];
-            if (predicate.test(item)) {
-                result.add(item);
-            }
-        }
-        // Check after gap
-        for (int i = gapEnd; i < capacity; i++) {
-            @SuppressWarnings("unchecked")
-            T item = (T) buffer[i];
+        MyList<T> result = new DynamicList<>();
+        for (int i = 0; i < size; i++) {
+            T item = get(i);
             if (predicate.test(item)) {
                 result.add(item);
             }
@@ -215,33 +296,21 @@ public class DynamicList<T> implements MyList<T> {
 
     @Override
     public void replace(int index, T newItem) {
-        if (index < 0 || index >= size()) {
-            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size());
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
         }
         
-        if (index < gapStart) {
-            buffer[index] = newItem;
-        } else {
-            buffer[index + gapSize()] = newItem;
-        }
+        int blockIndex = index / BLOCK_SIZE;
+        int innerIndex = index % BLOCK_SIZE;
+        blocks[blockIndex][innerIndex] = newItem;
     }
 
     @Override
     public int findIndex(Predicate<T> predicate) {
-        // Check before gap
-        for (int i = 0; i < gapStart; i++) {
-            @SuppressWarnings("unchecked")
-            T item = (T) buffer[i];
+        for (int i = 0; i < size; i++) {
+            T item = get(i);
             if (predicate.test(item)) {
                 return i;
-            }
-        }
-        // Check after gap
-        for (int i = gapEnd; i < capacity; i++) {
-            @SuppressWarnings("unchecked")
-            T item = (T) buffer[i];
-            if (predicate.test(item)) {
-                return i - gapSize();
             }
         }
         return -1;
@@ -250,8 +319,7 @@ public class DynamicList<T> implements MyList<T> {
     @Override
     public boolean removeIf(Predicate<T> predicate) {
         boolean removed = false;
-        // Remove from back to front to avoid index shifting issues
-        for (int i = size() - 1; i >= 0; i--) {
+        for (int i = size - 1; i >= 0; i--) {
             if (predicate.test(get(i))) {
                 remove(i);
                 removed = true;
@@ -262,19 +330,10 @@ public class DynamicList<T> implements MyList<T> {
 
     @SuppressWarnings("unchecked")
     public T[] toArray() {
-        T[] result = (T[]) new Object[size()];
-        int resultIndex = 0;
-        
-        // Copy elements before gap
-        for (int i = 0; i < gapStart; i++) {
-            result[resultIndex++] = (T) buffer[i];
+        T[] result = (T[]) new Object[size];
+        for (int i = 0; i < size; i++) {
+            result[i] = get(i);
         }
-        
-        // Copy elements after gap
-        for (int i = gapEnd; i < capacity; i++) {
-            result[resultIndex++] = (T) buffer[i];
-        }
-        
         return result;
     }
 
@@ -288,7 +347,7 @@ public class DynamicList<T> implements MyList<T> {
 
         @Override
         public boolean hasNext() {
-            return currentIndex < size();
+            return currentIndex < size;
         }
 
         @Override
@@ -309,24 +368,8 @@ public class DynamicList<T> implements MyList<T> {
         double sum = 0, min = Double.MAX_VALUE, max = Double.MIN_VALUE;
         int count = 0;
 
-        // Process elements before gap
-        for (int i = 0; i < gapStart; i++) {
-            @SuppressWarnings("unchecked")
-            T item = (T) buffer[i];
-            Number value = numericExtractor.apply(item);
-            if (value != null) {
-                double doubleValue = value.doubleValue();
-                sum += doubleValue;
-                min = Math.min(min, doubleValue);
-                max = Math.max(max, doubleValue);
-                count++;
-            }
-        }
-        
-        // Process elements after gap
-        for (int i = gapEnd; i < capacity; i++) {
-            @SuppressWarnings("unchecked")
-            T item = (T) buffer[i];
+        for (int i = 0; i < size; i++) {
+            T item = get(i);
             Number value = numericExtractor.apply(item);
             if (value != null) {
                 double doubleValue = value.doubleValue();
@@ -341,21 +384,8 @@ public class DynamicList<T> implements MyList<T> {
         double variance = 0;
 
         if (count > 1) {
-            // Calculate variance - process elements before gap
-            for (int i = 0; i < gapStart; i++) {
-                @SuppressWarnings("unchecked")
-                T item = (T) buffer[i];
-                Number value = numericExtractor.apply(item);
-                if (value != null) {
-                    double diff = value.doubleValue() - average;
-                    variance += diff * diff;
-                }
-            }
-            
-            // Calculate variance - process elements after gap
-            for (int i = gapEnd; i < capacity; i++) {
-                @SuppressWarnings("unchecked")
-                T item = (T) buffer[i];
+            for (int i = 0; i < size; i++) {
+                T item = get(i);
                 Number value = numericExtractor.apply(item);
                 if (value != null) {
                     double diff = value.doubleValue() - average;
@@ -396,75 +426,17 @@ public class DynamicList<T> implements MyList<T> {
 
     @Override
     public MyList<T> clone() {
-        MyList<T> clonedList = new DynamicList<>(this.capacity);
-        
-        // Copy all elements in order
-        for (int i = 0; i < size(); i++) {
+        MyList<T> clonedList = new DynamicList<>(this.size);
+        for (int i = 0; i < size; i++) {
             clonedList.add(get(i));
         }
-        
         return clonedList;
     }
 
-    // Gap buffer specific helper methods
-    private int gapSize() {
-        return gapEnd - gapStart;
-    }
-
-    private void moveGapTo(int index) {
-        if (index == gapStart) return;
-        
-        if (index < gapStart) {
-            // Move gap left
-            int moveCount = gapStart - index;
-            System.arraycopy(buffer, index, buffer, gapEnd - moveCount, moveCount);
-            gapStart = index;
-            gapEnd -= moveCount;
-        } else {
-            // Move gap right
-            int moveCount = index - gapStart;
-            System.arraycopy(buffer, gapEnd, buffer, gapStart, moveCount);
-            gapStart += moveCount;
-            gapEnd += moveCount;
-        }
-    }
-
-    private void expandGap() {
-        int newCapacity = nextFibonacci(capacity + 1);
-        Object[] newBuffer = new Object[newCapacity];
-
-        // Copy elements before gap
-        System.arraycopy(buffer, 0, newBuffer, 0, gapStart);
-
-        // Copy elements after gap
-        int afterGapCount = capacity - gapEnd;
-        System.arraycopy(buffer, gapEnd, newBuffer, newCapacity - afterGapCount, afterGapCount);
-
-        buffer = newBuffer;
-        gapEnd = newCapacity - afterGapCount;
-        capacity = newCapacity;
-    }
-    
-    private int nextFibonacci(int n) {
-        int a = 1, b = 2;
-        while (b < n) {
-            int temp = a + b;
-            a = b;
-            b = temp;
-        }
-        return b;
-    }
-
-    // filter method that allow users to extract and view specific elements based on a predefined predicate
-    // normally used in term of narrowing down data to meet some specific criteria
-    // Use Case:
-    // DynamicList<Patient> criticalPatients = patients.filter(p -> p.getSeverityLevel().equals("Critical"));
-    // Filter treatment records based on a specific condition like last 30 days or last 3 months in MTManagement
-    @SuppressWarnings("unchecked")
     @Override
     public MyList<T> filter(Predicate<T> predicate) {
         MyList<T> result = new DynamicList<>();
-        for (int i = 0; i < size(); i++) {
+        for (int i = 0; i < size; i++) {
             T item = get(i);
             if (predicate.test(item)) {
                 result.add(item);
@@ -473,5 +445,25 @@ public class DynamicList<T> implements MyList<T> {
         return result;
     }
 
-    
+    // Helper methods for block management
+    private void ensureBlock(int blockIndex) {
+        ensureBlockCapacity(blockIndex + 1);
+        
+        if (blockIndex >= blockCount) {
+            for (int i = blockCount; i <= blockIndex; i++) {
+                blocks[i] = new Object[BLOCK_SIZE];
+            }
+            blockCount = blockIndex + 1;
+        }
+    }
+
+    private void ensureBlockCapacity(int requiredBlocks) {
+        if (requiredBlocks > maxBlocks) {
+            int newMaxBlocks = Math.max(maxBlocks * 2, requiredBlocks);
+            Object[][] newBlocks = new Object[newMaxBlocks][];
+            System.arraycopy(blocks, 0, newBlocks, 0, blockCount);
+            blocks = newBlocks;
+            maxBlocks = newMaxBlocks;
+        }
+    }
 }

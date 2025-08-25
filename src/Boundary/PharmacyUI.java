@@ -218,8 +218,7 @@ public class PharmacyUI {
             Prescription p = service.getQueueAt(i);
             System.out.println("=== Queue Position " + (i + 1) + " ===");
             System.out.println("Prescription ID: " + p.getPrescriptionID());
-            System.out.println("Patient: " + p.getPatient().getFullName() + " (ID: " + p.getPatient().getPatientID() + ")");
-            System.out.println("Phone: " + p.getPatient().getContactNumber());
+            System.out.println("Patient ID: " + p.getPatientID()); // Changed from getPatient().getFullName()
             System.out.println("Doctor ID: " + p.getDoctorId());
             System.out.println("Status: " + p.getStatus());
             System.out.println("Medicine Items:");
@@ -250,7 +249,7 @@ public class PharmacyUI {
 
         // Show next prescription in queue
         Prescription nextPrescription = service.getNextInQueue();
-        System.out.println("Processing prescription for: " + nextPrescription.getPatient().getFullName());
+        System.out.println("Processing prescription for Patient ID: " + nextPrescription.getPatientID()); // Changed
         System.out.println("Prescription ID: " + nextPrescription.getPrescriptionID());
         System.out.println("\nRequired medicines:");
 
@@ -325,7 +324,7 @@ public class PharmacyUI {
                 System.out.println("[SUCCESS] Prescription processed successfully!");
                 System.out.println("[$] Total amount charged: $" + String.format("%.2f", totalCost));
                 System.out.println("[INFO] Medicine stock has been updated based on calculated quantities.");
-                System.out.println("[PATIENT] Patient " + nextPrescription.getPatient().getFullName() + " can collect medicines.");
+                System.out.println("[PATIENT] Patient " + nextPrescription.getPatientID() + " can collect medicines."); // Changed
             } else {
                 System.out.println("[ERROR] Failed to process prescription.");
             }

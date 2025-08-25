@@ -468,77 +468,60 @@ public class ClinicData {
     }
     
 
-    public static void addSamplePrescriptions(PharmacyManagement pharmacyService) {
-        SimpleDateFormat sdf = new SimpleDateFormat(UtilityClass.DATE_FORMAT);
-
+        public static void addSamplePrescriptions(PharmacyManagement pharmacyService) {
         try {
-            // Sample Patient 1: John Doe - Common Cold Treatment
-            Patient patient1 = new Patient("John Doe", "123456789012",
-                    sdf.parse("01/01/1990"), 'M',
-                    "0123456789", "john@email.com",
-                    "123 Main St, KL", "0112233445",
-                    new Date());
-
-            Prescription prescription1 = new Prescription("RX001", patient1, "DR001");
-            prescription1.addMedicineItem("Paracetamol", "1 tablets", "3 times daily after meals", "5 days", "Oral");
+            // Sample Prescription 1: Common Cold Treatment
+            Prescription prescription1 = new Prescription("RX001", "P1100", "DR001");
+            prescription1.addMedicineItem("Paracetamol", "1 tablet", "3 times daily after meals", "5 days", "Oral");
             prescription1.addMedicineItem("Vitamin C", "2 tablets", "Once daily", "7 days", "Oral");
             pharmacyService.addToQueue(prescription1);
 
-            // Sample Patient 2: Jane Smith - Infection Treatment
-            Patient patient2 = new Patient("Jane Smith", "987654321098",
-                    sdf.parse("15/05/1985"), 'F',
-                    "0187654321", "jane@email.com",
-                    "456 Oak Ave, PJ", "0123344556",
-                    new Date());
-
-            Prescription prescription2 = new Prescription("RX002", patient2, "DR002");
+            // Sample Prescription 2: Infection Treatment
+            Prescription prescription2 = new Prescription("RX002", "P1101", "DR002");
             prescription2.addMedicineItem("Amoxicillin", "1 capsule", "3 times daily", "7 days", "Oral");
             prescription2.addMedicineItem("Benadryl Cough Syrup", "10ml", "2 times daily", "5 days", "Oral");
             pharmacyService.addToQueue(prescription2);
 
-            // Sample Patient 3: Bob Johnson - Stomach Issues
-            Patient patient3 = new Patient("Bob Johnson", "555123456789",
-                    sdf.parse("20/12/1975"), 'M',
-                    "0155512345", "bob@email.com",
-                    "789 Pine St, Subang", "0134455667",
-                    new Date());
-
-            Prescription prescription3 = new Prescription("RX003", patient3, "DR003");
+            // Sample Prescription 3: Stomach Issues
+            Prescription prescription3 = new Prescription("RX003", "P1102", "DR003");
             prescription3.addMedicineItem("Omeprazole", "1 capsule", "Once daily before breakfast", "14 days", "Oral");
             prescription3.addMedicineItem("ORS Sachet", "1 sachet", "After each loose stool", "As needed", "Dissolve in water");
             pharmacyService.addToQueue(prescription3);
 
-            // Sample Patient 4: Alice Wong - Skin Treatment
-            Patient patient4 = new Patient("Alice Wong", "444567890123",
-                    sdf.parse("08/03/1992"), 'F',
-                    "0144456789", "alice.wong@email.com",
-                    "321 Elm St, Shah Alam", "0145566778",
-                    new Date());
-
-            Prescription prescription4 = new Prescription("RX004", patient4, "DR004");
+            // Sample Prescription 4: Skin Treatment
+            Prescription prescription4 = new Prescription("RX004", "P1103", "DR004");
             prescription4.addMedicineItem("Hydrocortisone Cream", "Apply thin layer", "2 times daily", "10 days", "Topical");
             prescription4.addMedicineItem("Aspirin", "1 capsule", "Once daily", "7 days", "Oral");
             pharmacyService.addToQueue(prescription4);
 
-            // Sample Patient 5: David Lee - Chronic Condition
-            Patient patient5 = new Patient("David Lee", "666789012345",
-                    sdf.parse("22/11/1988"), 'M',
-                    "0166678901", "david.lee@email.com",
-                    "654 Maple Ave, Petaling Jaya", "0156677889",
-                    new Date());
-
-            Prescription prescription5 = new Prescription("RX005", patient5, "DR005");
+            // Sample Prescription 5: Chronic Condition Management
+            Prescription prescription5 = new Prescription("RX005", "P1104", "DR005");
             prescription5.addMedicineItem("Paracetamol", "2 tablets", "4 times daily as needed for pain", "10 days", "Oral");
             prescription5.addMedicineItem("Vitamin C", "2 tablets", "Twice daily", "30 days", "Oral");
             prescription5.addMedicineItem("Omeprazole", "1 capsule", "Once daily", "30 days", "Oral");
             pharmacyService.addToQueue(prescription5);
 
-            System.out.println("Added 5 sample prescriptions to queue successfully.");
+            // Sample Prescription 6: Respiratory Issues
+            Prescription prescription6 = new Prescription("RX006", "P1105", "DR001");
+            prescription6.addMedicineItem("Benadryl Cough Syrup", "5ml", "3 times daily", "7 days", "Oral");
+            prescription6.addMedicineItem("Paracetamol", "1 tablet", "As needed for fever", "5 days", "Oral");
+            pharmacyService.addToQueue(prescription6);
 
-        } catch (ParseException e) {
-            System.err.println("Error parsing date in sample prescription data: " + e.getMessage());
+            // Sample Prescription 7: Pain Management
+            Prescription prescription7 = new Prescription("RX007", "P1106", "DR002");
+            prescription7.addMedicineItem("Aspirin", "2 capsules", "Twice daily with food", "14 days", "Oral");
+            prescription7.addMedicineItem("Hydrocortisone Cream", "Apply as needed", "Up to 3 times daily", "7 days", "Topical");
+            pharmacyService.addToQueue(prescription7);
+
+            // Sample Prescription 8: Nutritional Support
+            Prescription prescription8 = new Prescription("RX008", "P1107", "DR003");
+            prescription8.addMedicineItem("Vitamin C", "1 tablet", "Twice daily", "30 days", "Oral");
+            prescription8.addMedicineItem("ORS Sachet", "1 sachet", "Once daily", "10 days", "Dissolve in water");
+            pharmacyService.addToQueue(prescription8);
+
         } catch (Exception e) {
             System.err.println("Error adding sample prescriptions: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
