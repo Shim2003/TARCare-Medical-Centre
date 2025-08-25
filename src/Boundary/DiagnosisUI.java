@@ -27,16 +27,15 @@ public class DiagnosisUI {
 
         while (true) {
             System.out.println("\n=== Diagnosis Management System ===");
-            System.out.println("1. Add New Diagnosis");
-            System.out.println("2. View Diagnosis List");
-            System.out.println("3. Update Diagnosis Details");
-            System.out.println("4. Delete Diagnosis");
-            System.out.println("5. Generate Diagnosis Reports");
-            System.out.println("6. Generate Diagnosis Statistics Report");
-            System.out.println("7. Filter Diagnosis by Severity Level");
-            System.out.println("8. Exit to Main Menu");
+            System.out.println("1. View Diagnosis List");
+            System.out.println("2. Update Diagnosis Details");
+            System.out.println("3. Delete Diagnosis");
+            System.out.println("4. Generate Diagnosis Reports");
+            System.out.println("5. Generate Diagnosis Statistics Report");
+            System.out.println("6. Filter Diagnosis by Severity Level");
+            System.out.println("7. Exit to Main Menu");
 
-            System.out.print("Enter your choice (1-8): ");
+            System.out.print("Enter your choice (1-7): ");
 
             try {
                 int choice = scanner.nextInt();
@@ -44,23 +43,21 @@ public class DiagnosisUI {
 
                 switch (choice) {
                     case 1 ->
-                        addDiagnosisTest();
-                    case 2 ->
                         viewDiagnosisDetails();
-                    case 3 ->
+                    case 2 ->
                         updateDiagnosisDetails();
-                    case 4 ->
+                    case 3 ->
                         deleteDiagnosis();
-                    case 5 -> {
+                    case 4 -> {
                         String report = displayDiagnosisList();
                         System.out.println(report);
                     }
 
-                    case 6 ->
+                    case 5 ->
                         generateDiagnosisStatisticsReport();
-                    case 7 ->
+                    case 6 ->
                         filterDiagnosisBySeverityLevel();
-                    case 8 -> {
+                    case 7 -> {
                         System.out.println("Exiting to Main Menu...");
                         return; // Exit to main menu
                     }
@@ -156,8 +153,8 @@ public class DiagnosisUI {
         System.out.println("\n=== Add New Diagnosis ===");
 
         // Dummy data for testing
-        String patientId = "P001";
-        String doctorId = "D001";
+        String patientId = "P1001";
+        String doctorId = "D1001";
 
         DynamicList<String> symptomsInput = new DynamicList<>();
         symptomsInput.add("Fever");
