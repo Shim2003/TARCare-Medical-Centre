@@ -7,7 +7,7 @@ package Control;
 import ADT.DynamicList;
 import ADT.MyList;
 import Entity.MedicalTreatment;
-import java.util.Date;;
+import java.util.Date;
 
 /**
 * 
@@ -18,6 +18,7 @@ public class MedicalTreatmentManagement {
     
     //list to store medical treatment details
     private static final MyList<MedicalTreatment> treatmentList = new DynamicList<>();
+
 
     //create a new medical treatment
     public static boolean addMedicalTreatment(MedicalTreatment treatment) {

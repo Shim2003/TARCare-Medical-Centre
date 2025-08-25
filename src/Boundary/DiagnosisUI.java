@@ -474,21 +474,43 @@ public class DiagnosisUI {
         sb.append("=================================================================\n");
         // Diagnosis Description
         sb.append("> Diagnosis Description:                                        <\n");
-        DiagnosisManagement.appendWrappedText(sb, diagnosis.getDiagnosisDescription());
+        appendWrappedText(sb, diagnosis.getDiagnosisDescription());
         sb.append("=================================================================\n");
         // Recommendations
         sb.append("> Recommendations:                                              <\n");
-        DiagnosisManagement.appendWrappedText(sb, diagnosis.getRecommendations());
+        appendWrappedText(sb, diagnosis.getRecommendations());
         sb.append("=================================================================\n");
         // Additional Notes
         sb.append("> Additional Notes:                                             <\n");
-        DiagnosisManagement.appendWrappedText(sb, diagnosis.getNotes());
+        appendWrappedText(sb, diagnosis.getNotes());
         sb.append("=================================================================\n");
         sb.append(">                        END OF REPORT                          <\n");
         sb.append("=================================================================\n");
         sb.append("\n");
 
         return sb.toString();
+    }
+
+    private static void appendWrappedText(StringBuilder sb, String text) {
+        if (text == null || text.trim().isEmpty()) {
+            sb.append(">   N/A                                                         <\n");
+            return;
+        }
+        
+        String[] words = text.split(" ");
+        StringBuilder line = new StringBuilder(">   ");
+        
+        for (String word : words) {
+            if (line.length() + word.length() + 1 > 63) {
+                sb.append(String.format("%-63s <\n", line.toString()));
+                line = new StringBuilder(">   ");
+            }
+            line.append(word).append(" ");
+        }
+        
+        if (line.length() > 4) {
+            sb.append(String.format("%-63s <\n", line.toString().trim()));
+        }
     }
 
     // Allow users to enter the severity level to filter the diagnosis list and display the diagnosis ID and its patient ID
