@@ -7,7 +7,6 @@ package DAO;
 import ADT.DynamicList;
 import ADT.MyList;
 import Control.DiagnosisManagement;
-import Control.DoctorManagement;
 import Control.LeaveManagement;
 import Control.PatientManagement;
 import Control.QueueControl;
@@ -15,18 +14,25 @@ import Control.PharmacyManagement;
 import Control.ScheduleManagement;
 import Control.AppointmentManagement;
 import Control.ConsultationManagement;
+import Control.DoctorManagement;
 import Entity.Appointment;
 import Entity.Consultation;
 import Entity.Diagnosis;
+import Entity.Doctor;
+import Entity.DoctorLeave;
 import Entity.Medicine;
 import Entity.Patient;
 import Entity.QueueEntry;
 import Entity.Prescription;
+import Entity.Schedule;
 import Entity.StockRequest;
 import Utility.UtilityClass;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
@@ -44,9 +50,9 @@ public class ClinicData {
         addSampleQueueData();
         addSampleMedicine();
         ConsultationManagement.initializeConsultationCounter();
-        LeaveManagement.addSampleLeaves();
-        ScheduleManagement.addSampleSchedules();
-        DoctorManagement.addSampleDoctor();
+        addSampleLeaves();
+        addSampleSchedules();
+        addSampleDoctor();
     }
 
     public static void addSamplePatients() {
@@ -163,7 +169,7 @@ public class ClinicData {
             samples[9].setStartTime(LocalDateTime.of(2025, 8, 24, 14, 15));
             samples[9].setEndTime(LocalDateTime.of(2025, 8, 24, 14, 55));
 
-             // Added to ConsultationManagement's completedConsultations
+            // Added to ConsultationManagement's completedConsultations
             DynamicList<Consultation> completedList = ConsultationManagement.getCompletedConsultations();
             for (Consultation c : samples) {
                 completedList.add(c);
@@ -174,31 +180,31 @@ public class ClinicData {
             System.out.println("Error adding sample consultations: " + e.getMessage());
         }
     }
-    
+
     public static void addSampleAppointments() {
         try {
             Appointment[] samples = new Appointment[10];
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
 
-            samples[0] = new Appointment("A1001", "P1001", "D001", 
+            samples[0] = new Appointment("A1001", "P1001", "D001",
                     LocalDateTime.of(2025, 8, 20, 9, 0), "General Checkup");
-            samples[1] = new Appointment("A1002", "P1002", "D002", 
+            samples[1] = new Appointment("A1002", "P1002", "D002",
                     LocalDateTime.of(2025, 8, 20, 10, 30), "Fever");
-            samples[2] = new Appointment("A1003", "P1003", "D003", 
+            samples[2] = new Appointment("A1003", "P1003", "D003",
                     LocalDateTime.of(2025, 8, 21, 11, 15), "Headache");
-            samples[3] = new Appointment("A1004", "P1004", "D004", 
+            samples[3] = new Appointment("A1004", "P1004", "D004",
                     LocalDateTime.of(2025, 8, 21, 14, 45), "Back Pain");
-            samples[4] = new Appointment("A1005", "P1005", "D005", 
+            samples[4] = new Appointment("A1005", "P1005", "D005",
                     LocalDateTime.of(2025, 8, 22, 9, 20), "Stomach Ache");
-            samples[5] = new Appointment("A1006", "P1006", "D006", 
+            samples[5] = new Appointment("A1006", "P1006", "D006",
                     LocalDateTime.of(2025, 8, 22, 10, 40), "Sore Throat");
-            samples[6] = new Appointment("A1007", "P1007", "D007", 
+            samples[6] = new Appointment("A1007", "P1007", "D007",
                     LocalDateTime.of(2025, 8, 23, 8, 50), "Allergy");
-            samples[7] = new Appointment("A1008", "P1008", "D008", 
+            samples[7] = new Appointment("A1008", "P1008", "D008",
                     LocalDateTime.of(2025, 8, 23, 10, 10), "Flu");
-            samples[8] = new Appointment("A1009", "P1009", "D009", 
+            samples[8] = new Appointment("A1009", "P1009", "D009",
                     LocalDateTime.of(2025, 8, 24, 13, 30), "Fatigue");
-            samples[9] = new Appointment("A1010", "P1010", "D010", 
+            samples[9] = new Appointment("A1010", "P1010", "D010",
                     LocalDateTime.of(2025, 8, 24, 14, 20), "Dizziness");
 
             for (Appointment a : samples) {
@@ -469,9 +475,8 @@ public class ClinicData {
         // Add to queue list
         QueueControl.getQueueList().add(queueEntry);
     }
-    
 
-        public static void addSamplePrescriptions(PharmacyManagement pharmacyService) {
+    public static void addSamplePrescriptions(PharmacyManagement pharmacyService) {
         try {
             // Sample Prescription 1: Common Cold Treatment
             Prescription prescription1 = new Prescription("RX001", "P1100", "DR001");
@@ -639,6 +644,111 @@ public class ClinicData {
             pharmacyService.getAllStockRequests().add(request10);
         } catch (Exception e) {
             System.err.println("❌ Error adding sample stock requests: " + e.getMessage());
+        }
+    }
+    
+    public static void addSampleLeaves() {
+        LeaveManagement.addLeave(new DoctorLeave(
+                "L001", // leaveID
+                "D001", // doctorID
+                LocalDate.of(2025, 8, 14), // dateFrom
+                LocalDate.of(2025, 8, 30), // dateTo (same day leave)
+                "Medical conference" // reason
+        ));
+
+        LeaveManagement.addLeave(new DoctorLeave(
+                "L002",
+                "D002",
+                LocalDate.of(2025, 8, 13), // multi-day leave
+                LocalDate.of(2025, 8, 16),
+                "Family vacation"
+        ));
+
+        LeaveManagement.addLeave(new DoctorLeave(
+                "L003",
+                "D004",
+                LocalDate.of(2025, 8, 13), // multi-day leave
+                LocalDate.of(2025, 8, 25),
+                "Family vacation"
+        ));
+
+        LeaveManagement.addLeave(new DoctorLeave(
+                "L004",
+                "D004",
+                LocalDate.of(2025, 9, 15), // multi-day leave
+                LocalDate.of(2025, 9, 25),
+                "Family vacation"
+        ));
+    }
+    
+    public static void addSampleSchedules() {
+        ScheduleManagement.addSchedule(new Schedule("S001", "D001", DayOfWeek.MONDAY,
+                LocalTime.of(9, 0), LocalTime.of(13, 0)));
+        ScheduleManagement.addSchedule(new Schedule("S002", "D002", DayOfWeek.MONDAY,
+                LocalTime.of(9, 0), LocalTime.of(13, 0)));
+        ScheduleManagement.addSchedule(new Schedule("S003", "D003", DayOfWeek.MONDAY,
+                LocalTime.of(9, 0), LocalTime.of(13, 0)));
+        ScheduleManagement.addSchedule(new Schedule("S004", "D004", DayOfWeek.MONDAY,
+                LocalTime.of(13, 0), LocalTime.of(18, 0)));
+        ScheduleManagement.addSchedule(new Schedule("S005", "D005", DayOfWeek.MONDAY,
+                LocalTime.of(13, 0), LocalTime.of(18, 0)));
+        ScheduleManagement.addSchedule(new Schedule("S006", "D001", DayOfWeek.TUESDAY,
+                LocalTime.of(9, 0), LocalTime.of(12, 0)));
+        ScheduleManagement.addSchedule(new Schedule("S007", "D003", DayOfWeek.TUESDAY,
+                LocalTime.of(9, 0), LocalTime.of(12, 0)));
+        ScheduleManagement.addSchedule(new Schedule("S008", "D005", DayOfWeek.TUESDAY,
+                LocalTime.of(9, 0), LocalTime.of(13, 0)));
+        ScheduleManagement.addSchedule(new Schedule("S009", "D004", DayOfWeek.TUESDAY,
+                LocalTime.of(13, 0), LocalTime.of(15, 0)));
+        ScheduleManagement.addSchedule(new Schedule("S010", "D005", DayOfWeek.TUESDAY,
+                LocalTime.of(15, 0), LocalTime.of(18, 0)));
+        ScheduleManagement.addSchedule(new Schedule("S011", "D005", DayOfWeek.WEDNESDAY,
+                LocalTime.of(9, 0), LocalTime.of(12, 0)));
+        ScheduleManagement.addSchedule(new Schedule("S012", "D003", DayOfWeek.WEDNESDAY,
+                LocalTime.of(9, 0), LocalTime.of(12, 0)));
+        ScheduleManagement.addSchedule(new Schedule("S013", "D001", DayOfWeek.THURSDAY,
+                LocalTime.of(9, 0), LocalTime.of(12, 0)));
+        ScheduleManagement.addSchedule(new Schedule("S014", "D001", DayOfWeek.THURSDAY,
+                LocalTime.of(13, 0), LocalTime.of(18, 0)));
+        ScheduleManagement.addSchedule(new Schedule("S020", "D002", DayOfWeek.FRIDAY,
+                LocalTime.of(9, 0), LocalTime.of(13, 30)));
+    }
+
+    public static void addSampleDoctor() {
+        
+        MyList<Doctor> doctorList = DoctorManagement.getAllDoctors();
+        
+        SimpleDateFormat sdf = new SimpleDateFormat(UtilityClass.DATE_FORMAT);
+        try {
+            Doctor d1 = new Doctor("D001", "Lee Wee Teck", sdf.parse("01/01/1990"), 'M',
+                    "0123456789", "leewt@example.com", "Bachelor of Medicine, TARUMT", UtilityClass.statusFree);
+
+            Doctor d2 = new Doctor("D002", "Lee Chong Wei", sdf.parse("02/01/1985"), 'M',
+                    "0123456780", "chongwei@example.com", "Bachelor of Surgery, UTAR", UtilityClass.statusFree);
+
+            Doctor d3 = new Doctor("D003", "Aaron Chia Teng Feng", sdf.parse("15/11/1997"), 'M',
+                    "0123666789", "aaron@example.com", "Bachelor of Medicine, TARUMT", UtilityClass.statusFree);
+
+            Doctor d4 = new Doctor("D004", "Soh Wooi Yik", sdf.parse("27/03/1998"), 'M',
+                    "0123666789", "wooiyik@example.com", "Bachelor of Medicine, SUNWAY", UtilityClass.statusConsulting);
+
+            Doctor d5 = new Doctor("D005", "Lee Zii Jia", sdf.parse("05/03/1998"), 'M',
+                    "0123666789", "lzj@example.com", "Bachelor of Medicine, University of Melaya", UtilityClass.workingStatusOff);
+
+            DoctorManagement.add(d1);
+            DoctorManagement.add(d2);
+            DoctorManagement.add(d3);
+            DoctorManagement.add(d4);
+            DoctorManagement.add(d5);
+//            System.out.println("Doctors loaded: " + doctorList.size()); // DEBUG
+
+            // 🔹 Once doctors are added, update each doctor's working status
+            for (int i = 0; i < doctorList.size(); i++) {
+                DoctorManagement.updateWorkingStatus(doctorList.get(i));
+            }
+
+        } catch (ParseException e) {
+            System.out.println("Error parsing date in sample data.");
         }
     }
 }
