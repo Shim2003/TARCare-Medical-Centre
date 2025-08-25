@@ -42,12 +42,11 @@ public class ClinicData {
         addSampleConsultations();
         addSampleAppointments();
         addSampleQueueData();
-        addSampleMedicine(); 
+        addSampleMedicine();
         ConsultationManagement.initializeConsultationCounter();
         LeaveManagement.addSampleLeaves();
         ScheduleManagement.addSampleSchedules();
         DoctorManagement.addSampleDoctor();
-
     }
 
     public static void addSamplePatients() {
