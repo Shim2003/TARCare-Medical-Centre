@@ -70,15 +70,14 @@ public class MedicalTreatmentUI {
     public static void medicalTreatmentMenu() {
         while (true) {
             System.out.println("\n=== Medical Treatment Management System ===");
-            System.out.println("1. Create New Medical Treatment");
-            System.out.println("2. View Treatment History");
-            System.out.println("3. Update Treatment History");
-            System.out.println("4. Delete Treatment History");
-            System.out.println("5. Generate Monthly Report");
-            System.out.println("6. Generate Overall Treatment History Report");
-            System.out.println("7. Exit to Main Menu");
+            System.out.println("1. View Treatment History");
+            System.out.println("2. Update Treatment History");
+            System.out.println("3. Delete Treatment History");
+            System.out.println("4. Generate Monthly Report");
+            System.out.println("5. Generate Overall Treatment History Report");
+            System.out.println("6. Exit to Main Menu");
 
-            System.out.print("Enter your choice (1-7): ");
+            System.out.print("Enter your choice (1-6): ");
 
             try {
                 int choice = scanner.nextInt();
@@ -86,18 +85,16 @@ public class MedicalTreatmentUI {
 
                 switch (choice) {
                     case 1 ->
-                        createTreatmentTest();
-                    case 2 ->
                         viewTreatmentHistoryMenu();
-                    case 3 ->
+                    case 2 ->
                         updateTreatmentStatus();
-                    case 4 ->
+                    case 3 ->
                         deleteTreatmentHistoryMenu();
-                    case 5 ->
+                    case 4 ->
                         generateMonthlyReport();
-                    case 6 -> 
+                    case 5 -> 
                         generateTreatmentReports();
-                    case 7 -> {
+                    case 6 -> {
                         System.out.println("Exiting to Main Menu...");
                         medicalTreatmentMainMenu(); // Exit to main menu
                     }
