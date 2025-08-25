@@ -4,22 +4,23 @@
  */
 package Control;
 
-import java.util.Scanner;
-import java.util.Iterator;
-import java.util.Date;
 import ADT.DynamicList;
 import ADT.MyList;
-import DAO.CurrentServingDAO;
-import Entity.QueueEntry;
-import Entity.Patient;
-import Entity.Doctor;
-import Entity.Consultation;
-import Utility.UtilityClass;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.Duration;
-import java.time.ZoneId;
+import Boundary.DiagnosisUI;
 import Boundary.MedicalTreatmentUI;
+import DAO.CurrentServingDAO;
+import Entity.Consultation;
+import Entity.Doctor;
+import Entity.Patient;
+import Entity.QueueEntry;
+import Utility.UtilityClass;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.Scanner;
 
 /**
  *
@@ -236,7 +237,8 @@ public class ConsultationManagement {
         // Print all doctors status (for debugging)
         printAllDoctorsStatus("All Doctors Status After Assignment");
         
-        MedicalTreatmentUI.medicalTreatmentMainMenu();
+        DiagnosisUI.addDiagnosis();
+        MedicalTreatmentUI.createTreatment();
     }
     
     // Calculate consultation duration
