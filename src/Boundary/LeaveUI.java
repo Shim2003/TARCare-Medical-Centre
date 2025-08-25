@@ -11,11 +11,7 @@ import Control.LeaveManagement;
 import Entity.Doctor;
 import Entity.DoctorLeave;
 import Utility.UtilityClass;
-import java.text.SimpleDateFormat;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.Date;
 import java.util.Scanner;
 import java.time.format.DateTimeParseException;
 
@@ -62,7 +58,7 @@ public class LeaveUI {
                     break;
                 case "4":
                     validOption = true;
-                    DoctorUI.AdminMode();
+                    DoctorUI.DoctorStaffMode();
                     break;
                 default:
                     System.out.println("Invalid Option!!! Pls try again");

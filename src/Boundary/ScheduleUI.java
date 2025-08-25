@@ -72,7 +72,7 @@ public class ScheduleUI {
                     break;
                 case "5":
                     validOption = true;
-                    DoctorUI.AdminMode();
+                    DoctorUI.DoctorStaffMode();
                     break;
                 default:
                     System.out.println("Invalid Option!!! Pls try again");

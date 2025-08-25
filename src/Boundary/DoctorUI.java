@@ -15,8 +15,6 @@ import Utility.UtilityClass;
 import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.YearMonth;
 import java.util.Date;
 import java.util.Scanner;
 
@@ -28,52 +26,53 @@ public class DoctorUI {
 
     private static final Scanner scanner = new Scanner(System.in);
 
-    public static void main(String[] args) {
+//    public static void main(String[] args) {
+//
+//        //call methods to add sample objects
+//        LeaveManagement.addSampleLeaves();
+//        ScheduleManagement.addSampleSchedules();
+//        DoctorManagement.addSampleDoctor();
+//        //
+//
+//       DoctorModuleMenu();
+//    }
 
-        //call methods to add sample objects
-        LeaveManagement.addSampleLeaves();
-        ScheduleManagement.addSampleSchedules();
-        DoctorManagement.addSampleDoctor();
-        //
+//    public static void DoctorModuleMenu() {
+//
+//        boolean validOption = false;
+//
+//        while (!validOption) {
+//            System.out.println("\n--- Welcome to TAR UMT Clinic Doctor Management System ---");
+//            System.out.println("Select a mode");
+//            System.out.println("1. Patients/User");
+//            System.out.println("2. Admin\n");
+//            System.out.print("Enter your choice: ");
+//
+//            String choice = scanner.nextLine();
+//
+//            switch (choice) {
+//                case "1":
+//                    validOption = true; // valid choice → stop looping
+//                    DoctorUserMode();
+//                    break;
+//                case "2":
+//                    validOption = true; // valid choice → stop looping
+//                    DoctorStaffMode();
+//                    break;
+//                default:
+//                    System.out.println("Invalid Option!!! Pls try again");
+//                    UtilityClass.pressEnterToContinue();
+//            }
+//        }
+//
+//    }
 
-       DoctorModuleMenu();
-    }
-
-    public static void DoctorModuleMenu() {
-
+    public static void DoctorStaffMode() {
         boolean validOption = false;
 
         while (!validOption) {
-            System.out.println("\n--- Welcome to TAR UMT Clinic Doctor Management System ---");
-            System.out.println("Select a mode");
-            System.out.println("1. Patients/User");
-            System.out.println("2. Admin\n");
-            System.out.print("Enter your choice: ");
-
-            String choice = scanner.nextLine();
-
-            switch (choice) {
-                case "1":
-                    validOption = true; // valid choice → stop looping
-                    UserMode();
-                    break;
-                case "2":
-                    validOption = true; // valid choice → stop looping
-                    AdminMode();
-                    break;
-                default:
-                    System.out.println("Invalid Option!!! Pls try again");
-                    UtilityClass.pressEnterToContinue();
-            }
-        }
-
-    }
-
-    public static void AdminMode() {
-        boolean validOption = false;
-
-        while (!validOption) {
-            System.out.println("\n--- Welcome Admin ---");
+            System.out.println("\n*-*-*-*-*-*-* Doctor Module *-*-*-*-*-*-*");
+            System.out.println("\t  --- Welcome Staff ---");
             System.out.println("1. Manage Doctors");
             System.out.println("2. Manage Schedules");
             System.out.println("3. Manage Leaves");
@@ -102,7 +101,7 @@ public class DoctorUI {
                     break;
                 case "5":
                     validOption = true;
-                    DoctorModuleMenu();
+                    TARCareMedicalCentre.adminMainMenu();
                     break;
                 default:
                     System.out.println("Invalid Option!!! Pls try again");
@@ -112,12 +111,13 @@ public class DoctorUI {
         }
     }
 
-    public static void UserMode() {
+    public static void DoctorUserMode() {
 
         boolean validOption = false;
 
         while (!validOption) {
-            System.out.println("\n--- Welcome ---");
+           System.out.println("\n*-*-*-*-*-*-* Doctor Module *-*-*-*-*-*-*");
+            System.out.println("\t  ------ Welcome ------");
             System.out.println("1. Show All Doctors");
             System.out.println("2. Show Current Free Doctor(s)");
             System.out.println("3. Check Day of Week");
@@ -133,35 +133,35 @@ public class DoctorUI {
                     validOption = true;
                     ShowDoctors();
                     UtilityClass.pressEnterToContinue();
-                    UserMode();
+                    DoctorUserMode();
                     break;
                 case "2":
                     validOption = true;
                     ShowDCurrentFreeDoctors();
                     UtilityClass.pressEnterToContinue();
-                    UserMode();
+                    DoctorUserMode();
                     break;
                 case "3":
                     validOption = true;
                     ShowDoctorsSchedulesByDayUI();
                     UtilityClass.pressEnterToContinue();
-                    UserMode();
+                    DoctorUserMode();
                     break;
                 case "4":
                     validOption = true;
                     DisplayAllTimetableWithLeaves();
                     UtilityClass.pressEnterToContinue();
-                    UserMode();
+                    DoctorUserMode();
                     break;
                 case "5":
                     validOption = true;
                     ScheduleUI.DisplayAllTimetable();
                     UtilityClass.pressEnterToContinue();
-                    UserMode();
+                    DoctorUserMode();
                     break;
                 case "6":
                     validOption = true;
-                    DoctorModuleMenu();
+                    TARCareMedicalCentre.patientMainMenu();
                 default:
                     System.out.println("Invalid Option!!! Pls try again");
                     UtilityClass.pressEnterToContinue();
@@ -200,6 +200,8 @@ public class DoctorUI {
                 case "3":
                     validOption = true;
                     editDoctorDetailsUI();
+                    UtilityClass.pressEnterToContinue();
+                    ManageDoctor();
                     break;
                 case "4":
                     validOption = true;
@@ -209,7 +211,7 @@ public class DoctorUI {
                     break;
                 case "5":
                     validOption = true;
-                    AdminMode();
+                    DoctorStaffMode();
                     break;
                 default:
                     System.out.println("Invalid Option!!! Pls try again");
@@ -591,8 +593,7 @@ public class DoctorUI {
 
         if (success) {
             System.out.println(" Doctor details updated successfully.");
-            UtilityClass.pressEnterToContinue();
-            AdminMode();
+           
         } else {
             System.out.println(" Failed to update doctor details.");
         }

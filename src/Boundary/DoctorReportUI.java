@@ -62,7 +62,7 @@ public class DoctorReportUI {
                     break;
                 case "4":
                     validOption = true;
-                    DoctorUI.AdminMode();
+                    DoctorUI.DoctorStaffMode();
                     break;
                 default:
                     System.out.println("Invalid Option!!! Pls try again");
