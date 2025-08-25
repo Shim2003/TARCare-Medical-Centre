@@ -46,7 +46,8 @@ public class TARCareMedicalCentre {
                     break;
                 case "3":
                     System.out.println("Exiting system. Goodbye!");
-                    return;
+                    System.exit(0);
+//                    return;
                 default:
                     System.out.println("Invalid choice. Please enter 1-3.");
             }
@@ -92,7 +93,8 @@ public class TARCareMedicalCentre {
                     MedicalTreatmentUI.medicalTreatmentMainMenu();
                     break;
                 case "8":
-                    return;
+                    mainMenu();
+//                    return;
                 default:
                     System.out.println("Invalid choice. Please enter 1-8.");
             }
@@ -130,7 +132,8 @@ public class TARCareMedicalCentre {
                     DoctorUI.DoctorUserMode();
                     break;
                 case "6":
-                    return;
+                    mainMenu();
+//                    return;
                 default:
                     System.out.println("Invalid choice. Please enter 1-6.");
             }
