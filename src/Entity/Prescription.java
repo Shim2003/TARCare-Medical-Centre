@@ -8,7 +8,7 @@ import ADT.MyList;
 
 public class Prescription {
     private String prescriptionID;
-    private String patientID;  // Changed from Patient object to String ID
+    private String patientID;
     private MyList<MedicalTreatmentItem> medicineItems;
     private String status; // PENDING, PROCESSING, COMPLETED
     private String doctorId;
@@ -22,7 +22,7 @@ public class Prescription {
     // Basic constructor - most common use case
     public Prescription(String prescriptionID, String patientID, String doctorId) {
         this.prescriptionID = prescriptionID;
-        this.patientID = patientID;  // Using patient ID instead of Patient object
+        this.patientID = patientID;
         this.doctorId = doctorId;
         this.medicineItems = new DynamicList<>();
         this.status = "PENDING";

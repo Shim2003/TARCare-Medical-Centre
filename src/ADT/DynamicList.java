@@ -1,3 +1,7 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package ADT;
 
 import java.util.Iterator;
@@ -6,7 +10,7 @@ import java.util.function.Predicate;
 
 public class DynamicList<T> implements MyList<T> {
 
-    private static final int BLOCK_SIZE = 1024; // Block size for better memory management
+    private static final int BLOCK_SIZE = 128; // Block size for better memory management
     private static final int INITIAL_BLOCKS = 4;
     
     private Object[][] blocks;
