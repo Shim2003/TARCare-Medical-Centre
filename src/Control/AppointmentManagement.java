@@ -13,6 +13,7 @@ import Entity.Doctor;
 import Control.PatientManagement;
 import Control.DoctorManagement;
 import Entity.Schedule;
+import Utility.UtilityClass;
 import java.time.DayOfWeek;
 import java.util.Scanner;
 import java.time.LocalDateTime;
@@ -525,7 +526,7 @@ public class AppointmentManagement {
         DynamicList<Appointment> sortedList = (DynamicList<Appointment>) scheduledAppointments.clone();
 
         // Call the sorting method we used earlier
-        sortedList.sortByDateTime(Appointment::getAppointmentTime);
+        UtilityClass.quickSort(sortedList, Comparator.comparing(Appointment::getAppointmentTime));
 
         LocalDateTime now = LocalDateTime.now();
 
