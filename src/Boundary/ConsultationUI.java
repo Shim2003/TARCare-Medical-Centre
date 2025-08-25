@@ -13,10 +13,10 @@ import java.util.Scanner;
 
 public class ConsultationUI {
 
-    private final ConsultationManagement consultationManagement = new ConsultationManagement();
-    private final Scanner sc = new Scanner(System.in);
+    private static final ConsultationManagement consultationManagement = new ConsultationManagement();
+    private static final Scanner sc = new Scanner(System.in);
 
-    public void run() {
+    public static void run() {
         int choice;
         do {
             System.out.println("\n======================================");
@@ -49,7 +49,7 @@ public class ConsultationUI {
     }
 
     // MAIN FUNCTIONS MENU
-    private void showMainFunctionsMenu() {
+    private static void showMainFunctionsMenu() {
         int choice;
         do {
             System.out.println("\n====== MAIN FUNCTIONS (Daily Use) ======");
@@ -99,7 +99,7 @@ public class ConsultationUI {
     }
 
     // MANAGEMENT MENU
-    private void showManagementMenu() {
+    private static void showManagementMenu() {
         int choice;
         do {
             System.out.println("\n====== MANAGEMENT (Admin/IT Use) ======");
@@ -135,7 +135,7 @@ public class ConsultationUI {
     }
 
     // ANALYTICS MENU
-    private void showAnalyticsMenu() {
+    private static void showAnalyticsMenu() {
         int choice;
         do {
             System.out.println("\n====== ANALYTICS & UTILITIES ======");

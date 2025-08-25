@@ -17,9 +17,9 @@ import java.util.Scanner;
  */
 public class AppointmentUI {
 
-    private final Scanner sc = new Scanner(System.in);
+    private static final Scanner sc = new Scanner(System.in);
 
-    public void run1() {
+    public static void run1() {
         int choice;
         do {
             System.out.println("\n======================================");
@@ -52,7 +52,7 @@ public class AppointmentUI {
     }
 
     // MAIN FUNCTIONS MENU
-    private void showMainFunctionsMenu() {
+    private static void showMainFunctionsMenu() {
         int choice;
         do {
             System.out.println("\n====== MAIN FUNCTIONS (Daily Use) ======");
@@ -90,7 +90,7 @@ public class AppointmentUI {
     }
 
     // MANAGEMENT MENU
-    private void showManagementMenu() {
+    private static void showManagementMenu() {
         int choice;
         do {
             System.out.println("\n====== MANAGEMENT (Admin/IT Use) ======");
@@ -127,7 +127,7 @@ public class AppointmentUI {
     }
 
     // ANALYTICS MENU
-    private void showAnalyticsMenu() {
+    private static void showAnalyticsMenu() {
         int choice;
         do {
             System.out.println("\n====== ANALYTICS & UTILITIES ======");
@@ -160,7 +160,6 @@ public class AppointmentUI {
     }
 
     public static void main(String[] args) {
-        // 初始化样本数据
         ClinicData.addSamplePatients();
         DoctorManagement.addSampleDoctor();
         LeaveManagement.addSampleLeaves();

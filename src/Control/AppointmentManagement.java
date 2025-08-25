@@ -26,7 +26,7 @@ import java.time.format.DateTimeFormatter;
 public class AppointmentManagement {
     private static DynamicList<Appointment> scheduledAppointments = new DynamicList<>();
     
-    // 计数器
+    // Counter
     private static int appointmentCounter = 1001; // A1001
 
     private static String generateNextAppointmentId() {
@@ -74,14 +74,14 @@ public class AppointmentManagement {
     }
 
     public static void scheduleNextAppointment(String patientId, String doctorId, String dateTimeStr, String reason) {
-        // 检查病人是否存在
+        // Check if the patient exists
         Patient patient = PatientManagement.findPatientById(patientId);
         if (patient == null) {
             System.out.println("Patient not found. Cannot schedule appointment.");
             return;
         }
 
-        // 检查医生是否存在
+        // Check if the doctor exists
         Doctor doctor = DoctorManagement.findDoctorById(doctorId);
         if (doctor == null) {
             System.out.println("Doctor not found. Cannot schedule appointment.");
@@ -92,13 +92,13 @@ public class AppointmentManagement {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
             LocalDateTime appointmentTime = LocalDateTime.parse(dateTimeStr, formatter);
 
-            // 检查预约时间必须是未来
+            // Check that appointment time is in the future
             if (appointmentTime.isBefore(LocalDateTime.now())) {
                 System.out.println("Invalid appointment time. The appointment must be in the future.");
                 return;
             }
 
-            // 检查医生在预约那天是否有排班
+            // Check if doctor is scheduled on the appointment day
             DayOfWeek dayOfWeek = appointmentTime.getDayOfWeek();
             MyList<Schedule> doctorSchedules = ScheduleManagement.findSchedulesByDoctorId(doctorId);
             boolean isAvailable = false;
@@ -120,7 +120,7 @@ public class AppointmentManagement {
                 return;
             }
             
-            // ✅ 检查是否已有冲突的预约（同一个医生在相同时间）
+            // ✅ Check for conflicting appointments (same doctor at the same time)
             for (int i = 0; i < scheduledAppointments.size(); i++) {
                 Appointment existing = scheduledAppointments.get(i);
                 if (existing.getDoctorId().equals(doctorId) &&
@@ -153,7 +153,7 @@ public class AppointmentManagement {
         }
     }
 
-    // ✅ 查看所有预约，并显示 Patient 名字和 Doctor 名字
+    // View all appointments with Patient and Doctor names
     public static void viewAppointmentsWithNames() {
         if (scheduledAppointments.isEmpty()) {
             System.out.println("No scheduled appointments.");
@@ -184,7 +184,7 @@ public class AppointmentManagement {
         System.out.println("-------------------------------------------\n");
     }
     
-    // ✅ 通用方法：根据 ID 自动查找 Appointment
+    // General method: find Appointment by ID automatically
     public static MyList<Appointment> findAppointmentsById(String id) {
         boolean isPatient = (PatientManagement.findPatientById(id) != null);
         boolean isDoctor = (DoctorManagement.findDoctorById(id) != null);
@@ -192,7 +192,7 @@ public class AppointmentManagement {
         MyList<Appointment> result = new DynamicList<>();
 
         if (!isPatient && !isDoctor) {
-            return result; // 直接返回空结果
+            return result; // Return empty result
         }
 
         for (int i = 0; i < scheduledAppointments.size(); i++) {
@@ -205,6 +205,7 @@ public class AppointmentManagement {
         return result;
     }
     
+    // Prompt user and view appointments
     public static void promptAndViewAppointments() {
         Scanner sc = new Scanner(System.in);
         System.out.print("Enter Appointment ID, Patient ID, or Doctor ID to view appointments: ");
@@ -212,7 +213,7 @@ public class AppointmentManagement {
         viewAppointmentsById(id);
     }
     
-    // ✅ 统一显示 Appointment 详情的方法
+    // Unified method to display Appointment details
     private static void displayAppointment(Appointment a) {
         Patient patient = PatientManagement.findPatientById(a.getPatientId());
         String patientName = (patient != null) ? patient.getFullName() : "Unknown Patient";
@@ -231,13 +232,13 @@ public class AppointmentManagement {
         );
     }
     
-    // ✅ 自动判断 ID 属于 Appointment / Patient / Doctor 并显示
+    // Automatically determine ID type (Appointment / Patient / Doctor) and display
     public static void viewAppointmentsById(String id) {
         // 先检查是否为 Appointment ID
         for (int i = 0; i < scheduledAppointments.size(); i++) {
             Appointment a = scheduledAppointments.get(i);
             if (a.getAppointmentId().equalsIgnoreCase(id)) {
-                // 只显示未来的预约
+                // Display only future appointments
                 if (a.getAppointmentTime().isAfter(java.time.LocalDateTime.now())) {
                     System.out.println("\n--- Appointment Detail for ID: " + id + " ---");
                     displayAppointment(a);
@@ -245,7 +246,7 @@ public class AppointmentManagement {
                 } else {
                     System.out.println("Appointment ID " + id + " has already passed.");
                 }
-                return; // 直接 return
+                return; 
             }
         }
 
@@ -285,7 +286,7 @@ public class AppointmentManagement {
     }
 
 
-    // ✅ 删除 Appointment（通过 Appointment ID）
+    // Delete Appointment by Appointment ID
     public static void deleteAppointmentById(String appointmentId) {
         if (scheduledAppointments.isEmpty()) {
             System.out.println("No appointments available to delete.");
@@ -308,7 +309,7 @@ public class AppointmentManagement {
         }
     }
 
-    // ✅ 修改 Appointment
+    // Modify Appointment
     public static void modifyAppointment(String appointmentId) {
         Appointment appointment = null;
         for (int i = 0; i < scheduledAppointments.size(); i++) {
@@ -382,8 +383,9 @@ public class AppointmentManagement {
         return scheduledAppointments;
     }
     
+    // View Consultation Report by ID
     public static void viewConsultationReportById(String id) {
-        // 先检查是否为 Appointment ID
+        // Check Appointment ID
         Appointment found = null;
         for (int i = 0; i < scheduledAppointments.size(); i++) {
             Appointment a = scheduledAppointments.get(i);
@@ -395,12 +397,12 @@ public class AppointmentManagement {
 
         if (found != null) {
             System.out.println("\n--- Consultation Report for Appointment ID: " + id + " ---\n");
-            displayAppointment1(found); // 使用报表风格
+            displayAppointment1(found);
             System.out.println("---------------------------------------\n");
             return;
         }
 
-        // 判断是否为 Patient 或 Doctor
+        // Determine whether it is a Patient or a Doctor
         boolean isPatient = (PatientManagement.findPatientById(id) != null);
         boolean isDoctor = (DoctorManagement.findDoctorById(id) != null);
 
@@ -421,7 +423,7 @@ public class AppointmentManagement {
 
         for (int i = 0; i < appointments.size(); i++) {
             Appointment a = appointments.get(i);
-            displayAppointment1(a); // 保持报表风格
+            displayAppointment1(a);
             System.out.println("---------------------------------------");
         }
     }
@@ -450,13 +452,13 @@ public class AppointmentManagement {
         System.out.print("Enter Doctor ID to check total appointments: ");
         String doctorId = sc.nextLine().trim();
 
-        // 1️⃣ 用户输入医生ID的总预约数量
+        // The total number of appointments for the user's doctor ID
         int doctorTotal = (int) scheduledAppointments
                             .filter(a -> a.getDoctorId().equals(doctorId))
                             .getStatistics(a -> 1).sum;
         System.out.println("Total appointments for Doctor " + doctorId + ": " + doctorTotal);
 
-        // 2️⃣ 预约数量最高的医生（平局显示）
+        // The doctor with the highest appointment volume
         DynamicList<String> doctorIds = new DynamicList<>();
         for (int i = 0; i < scheduledAppointments.size(); i++) {
             String dId = scheduledAppointments.get(i).getDoctorId();
@@ -481,10 +483,10 @@ public class AppointmentManagement {
         }
 
         if (topDoctors.size() == doctorIds.size()) {
-            // 全部都一样
+            // All same
             System.out.println("All doctors have the same number of appointments: " + maxAppointments);
         } else {
-            // 显示最多预约的医生
+            // Display the doctor with the most appointments
             System.out.print("Doctor(s) with most appointments: ");
             for (int i = 0; i < topDoctors.size(); i++) {
                 System.out.print(topDoctors.get(i));
@@ -494,7 +496,7 @@ public class AppointmentManagement {
         }
 
 
-        // 3️⃣ 本周内预约最多的医生
+        //  The doctor with the most appointments this week
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime startOfWeek = now.with(DayOfWeek.MONDAY).withHour(0).withMinute(0).withSecond(0).withNano(0);
         LocalDateTime endOfWeek = startOfWeek.plusDays(6).withHour(23).withMinute(59).withSecond(59);

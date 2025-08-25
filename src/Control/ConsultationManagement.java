@@ -95,12 +95,12 @@ public class ConsultationManagement {
     }
 
 
-    // 工具方法：将 Date 转为 LocalDateTime
+    // Utility method: convert Date to LocalDateTime
     private static LocalDateTime toLocalDateTime(Date date) {
         return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
     }
     
-    // 计数器
+    // Counter
     private static int consultationCounter = 1001; // C1001
     
     private static String generateNextConsultationId() {
@@ -116,13 +116,14 @@ public class ConsultationManagement {
             return;
         }
 
-        Iterator<Consultation> it = completedConsultations.iterator(); // ✅ 用 DynamicList 的迭代器
+        Iterator<Consultation> it = completedConsultations.iterator(); // Use DynamicList iterator
         while (it.hasNext()) {
             Consultation c = it.next();
             System.out.println(c);
         }
     }
     
+    // Show ongoing consultations
     public static void showOngoingConsultations() {
         System.out.println("===== Ongoing Consultations =====");
         if (ongoingConsultations.isEmpty()) {
@@ -134,7 +135,8 @@ public class ConsultationManagement {
         }
         System.out.println("=================================");
     }
-
+    
+    // Add patient to queue
     public static void addPatientToQueue(String patientId) {
         QueueEntry entry = QueueControl.addInQueue(patientId);
         if (entry != null) {
@@ -144,7 +146,7 @@ public class ConsultationManagement {
         }
     }
 
-    // 查看队列
+    // View the queue
     public static void viewQueue() {
         if (QueueControl.getQueueList().isEmpty()) {
             System.out.println("No patients in queue.");
@@ -157,6 +159,7 @@ public class ConsultationManagement {
         }
     }
 
+    // Print all doctors status
     public static void printAllDoctorsStatus(String header) {
         System.out.println("\n=== " + header + " ===");
         MyList<Doctor> allDoctors = DoctorManagement.getAllDoctors();
@@ -167,7 +170,7 @@ public class ConsultationManagement {
         System.out.println("==========================\n");
     }
     
-    // ✅ 单独的方法：获取下一个等待的病人
+    // Get next waiting patient
     public static QueueEntry getNextWaitingPatient() {
         MyList<QueueEntry> queueList = QueueControl.getQueueList();
         for (int i = 0; i < queueList.size(); i++) {
@@ -176,21 +179,21 @@ public class ConsultationManagement {
                 return qe;
             }
         }
-        return null; // 没有等待中的病人
+        return null; // No waiting patient
     }
     
-    // ✅ 获取最新的 CurrentServingDAO（即刚分配的病人和医生）
+    // Get latest CurrentServingDAO (recently assigned patient & doctor)
     public static CurrentServingDAO getLatestCurrentConsulting() {
         if (currentConsulting.isEmpty()) {
-            return null; // 没有正在咨询的
+            return null; // No ongoing consultation
         }
         return currentConsulting.get(currentConsulting.size() - 1); 
     }
 
-    // 开始下一位咨询
+    // Start next consultation
     public static void startNextConsultation() {
 
-        // ✅ 限制最大咨询数为3
+        // Limit maximum concurrent consultations to 3
         if (currentConsulting.size() >= 3) {
             System.out.println("Maximum consultations reached (3). Please wait for a consultation to finish.");
             return;
@@ -198,7 +201,7 @@ public class ConsultationManagement {
 
         printAllDoctorsStatus("All Doctors Status Before Assignment");
 
-        // 获取下一个等待的病人
+        // Get next waiting patient
         QueueEntry nextPatient = getNextWaitingPatient();
 
         if (nextPatient == null) {
@@ -206,7 +209,7 @@ public class ConsultationManagement {
             return;
         }
 
-        // ✅ 手动输入医生ID
+        // Manually input doctor ID
         Doctor assignedDoctor = null;
         while (assignedDoctor == null) {
             System.out.print("Enter Doctor ID to assign for Patient " + nextPatient.getPatientId() + ": ");
@@ -217,20 +220,20 @@ public class ConsultationManagement {
             } else if (!d.getWorkingStatus().equals(UtilityClass.statusFree)) {
                 System.out.println("Doctor is not free. Please choose another doctor.");
             } else {
-                assignedDoctor = d; // 找到空闲医生
+                assignedDoctor = d; // Found free doctor
             }
         }
 
-        assignedDoctor.setWorkingStatus(UtilityClass.statusConsulting); // 更新医生状态
+        assignedDoctor.setWorkingStatus(UtilityClass.statusConsulting); // Update doctor status
 
-        // 创建当前咨询记录
+        // Create current consultation record
         CurrentServingDAO current = new CurrentServingDAO(nextPatient.getPatientId(), assignedDoctor.getDoctorID());
-        currentConsulting.add(current); // 添加到 currentConsulting
+        currentConsulting.add(current); // Add to currentConsulting
 
-        // 更新 QueueEntry 状态
+        // Update QueueEntry status
         nextPatient.setStatus(UtilityClass.statusConsulting);
 
-        // 创建 Consultation 对象并加入 static ongoingConsultations
+        // Create Consultation object and add to ongoingConsultations
         Patient patient = PatientManagement.findPatientById(nextPatient.getPatientId());
         if (patient != null) {
             String consultationId = generateNextConsultationId();
@@ -238,10 +241,10 @@ public class ConsultationManagement {
                     consultationId,
                     patient.getPatientID(),
                     assignedDoctor.getDoctorID(),
-                    "" // symptoms 先空着，后面让医生输入
+                    "" // symptoms left empty, doctor will input
             );
 
-            // ✅ 让医生输入病人的 Symptoms
+            // Let doctor input patient symptoms
             System.out.print("Enter Symptoms for Patient " + patient.getFullName() + ": ");
             String symptoms = sc.nextLine();
             consultation.setSymptoms(symptoms);
@@ -261,13 +264,13 @@ public class ConsultationManagement {
             System.out.println("Patient data not found.");
         }
 
-        // 打印所有医生状态（调试用）
+        // Print all doctors status (for debugging)
         printAllDoctorsStatus("All Doctors Status After Assignment");
         
         MedicalTreatmentUI.medicalTreatmentMainMenu();
     }
     
-    // 计算咨询已经进行多久
+    // Calculate consultation duration
     public static String getConsultationDuration(LocalDateTime startTime) {
         if (startTime == null) {
             return "Not started";
@@ -283,7 +286,7 @@ public class ConsultationManagement {
         return String.format("%02d:%02d:%02d", hours, minutes, seconds);
     }
 
-    // --- 查看当前咨询 ---
+    // View current consulting patients
     public static void viewCurrentConsulting() {
         if (currentConsulting.size() == 0) {
             System.out.println("No patients currently consulting.");
@@ -320,9 +323,9 @@ public class ConsultationManagement {
         }
     }
 
-    // 结束咨询并保存病人信息
+    // End consultation and save patient info
     public static void endConsultation(String patientId) {
-        // 找队列中的病人
+        // Find patient in queue
         QueueEntry queueEntry = null;
         MyList<QueueEntry> queueList = QueueControl.getQueueList();
         for (int i = 0; i < queueList.size(); i++) {
@@ -341,7 +344,7 @@ public class ConsultationManagement {
         queueEntry.setStatus(UtilityClass.statusCompleted);
         System.out.println("Consultation ended for Patient ID: " + patientId);
 
-        // 从 ongoingConsultations 找对应 consultation
+        // Find corresponding consultation in ongoingConsultations
         Consultation consultation = null;
         int consultationIndex = -1;
         for (int i = 0; i < ongoingConsultations.size(); i++) {
@@ -367,11 +370,11 @@ public class ConsultationManagement {
 
             completedConsultations.add(consultation);
             if (consultationIndex != -1) {
-                ongoingConsultations.remove(consultationIndex); // ✅ 用索引移除
+                ongoingConsultations.remove(consultationIndex);  // Remove by index
             }
         }
 
-        // 保存病人信息
+        // Save patient info
         Patient patient = PatientManagement.findPatientById(patientId);
         if (patient != null) {
             completedPatients.add(patient);
@@ -380,7 +383,7 @@ public class ConsultationManagement {
             System.out.println("Warning: Patient data not found to save.");
         }
 
-        // 用 currentConsulting 管理医生状态
+        // Update doctor status in currentConsulting
         int currentIndex = -1;
         for (int i = 0; i < currentConsulting.size(); i++) {
             if (currentConsulting.get(i).getPatientId().equals(patientId)) {
@@ -396,11 +399,11 @@ public class ConsultationManagement {
                 doctor.setWorkingStatus(UtilityClass.statusFree);
                 System.out.println("Doctor " + doctor.getName() + " is now free.");
             }
-            currentConsulting.remove(currentIndex); // ✅ 用索引移除
+            currentConsulting.remove(currentIndex); // Remove by index
         }
     }
     
-    // 你可以加个方法查看所有完成咨询的病人
+    // Method to view all completed patients
     public static void viewCompletedPatients() {
         DynamicList<String> addedPatientIds = new DynamicList<>();
 
@@ -421,7 +424,7 @@ public class ConsultationManagement {
         }
     }
 
-    // 查看咨询报告：可以通过 PatientID 或 ConsultationID 查询
+    // View consultation report: can search by PatientID or ConsultationID
     public static void viewConsultationReport(String id) {
         boolean found = false;
         boolean searchByConsultationId = isConsultationId(id);
@@ -435,7 +438,7 @@ public class ConsultationManagement {
         for (int i = 0; i < completedConsultations.size(); i++) {
             Consultation c = completedConsultations.get(i);
 
-            // ✅ 支持两种匹配：PatientID 或 ConsultationID
+            // Support both match types: PatientID or ConsultationID
             if (c.getPatientId().equalsIgnoreCase(id) || c.getConsultationId().equalsIgnoreCase(id)) {
                 found = true;
                 System.out.println("Consultation #" + count++);
@@ -451,7 +454,7 @@ public class ConsultationManagement {
                 System.out.printf("%-15s: %s\n", "Symptoms", symptoms);
                 System.out.println("--------------------------------------------\n");
 
-                // ⚡ 如果输入的是 ConsultationID，只需要一条
+                // If input is ConsultationID, only need one entry
                 if (searchByConsultationId) {
                     break;
                 }
@@ -467,13 +470,13 @@ public class ConsultationManagement {
         System.out.println("============================================\n");
     }
 
-    // 辅助方法：判断是不是 ConsultationID
+    // Helper method: check if it's a ConsultationID
     private static boolean isConsultationId(String id) {
         return id != null && id.toUpperCase().startsWith("C");
     }
 
 
-    // 辅助方法：格式化持续时间
+    // Helper method: format duration
     private static String formatDuration(long totalSeconds) {
         long hours = totalSeconds / 3600;
         long minutes = (totalSeconds % 3600) / 60;
@@ -482,7 +485,7 @@ public class ConsultationManagement {
     }
 
     
-    // ✅ 删除 Consultation 记录（通过 Consultation ID）
+    // Delete Consultation record by Consultation ID
     public static void deleteConsultationById(String consultationId) {
         if (completedConsultations.isEmpty()) {
             System.out.println("No consultations available to delete.");
@@ -555,11 +558,11 @@ public class ConsultationManagement {
     }
     
     public static void exportConsultationsToArray() {
-        Object[] objArr = completedConsultations.toArray();  // 只能拿到 Object[]
+        Object[] objArr = completedConsultations.toArray();  // Can only get Object[]
         Consultation[] arr = new Consultation[objArr.length];
 
         for (int i = 0; i < objArr.length; i++) {
-            arr[i] = (Consultation) objArr[i];  // ✅ 手动转型
+            arr[i] = (Consultation) objArr[i];  // Manual casting
         }
 
         System.out.println("\n=== Exported Consultations to Array ===");
@@ -579,7 +582,7 @@ public class ConsultationManagement {
             return;
         }
 
-        // 获取统计信息：以分钟为单位
+        // Get statistics: in minutes
         DynamicList.ListStatistics<Consultation> stats = completedConsultations.getStatistics(
             c -> {
                 if (c.getStartTime() != null && c.getEndTime() != null) {
