@@ -149,20 +149,14 @@ public class PrescriptionCalculator {
 
     // check the prescription list ids, if the list is null then create id RX001 if not empty then check the last 3 digit value and increment by 1
     public static String generateNewPrescriptionId() {
-        MyList<Prescription> prescriptionList = new DynamicList<>();
-        if (prescriptionList.isEmpty()) {
+        if (PharmacyManagement.prescriptionQueue.isEmpty()) {
             return "RX001";
         } else {
-            String lastId = prescriptionList.get(prescriptionList.size() - 1).getPrescriptionID();
+            String lastId = PharmacyManagement.prescriptionQueue.get(PharmacyManagement.prescriptionQueue.size() - 1).getPrescriptionID();
             int numericPart = Integer.parseInt(lastId.substring(2));
             numericPart++;
             return String.format("RX%03d", numericPart);
         }
     }
 
-    //add prescription to the list through object
-    public static void addPrescription(Prescription prescription) {
-        MyList<Prescription> prescriptionList = new DynamicList<>();
-        prescriptionList.add(prescription);
-    }
 }

@@ -46,7 +46,8 @@ public class TARCareMedicalCentre {
                     break;
                 case "3":
                     System.out.println("Exiting system. Goodbye!");
-                    return;
+                    System.exit(0);
+//                    return;
                 default:
                     System.out.println("Invalid choice. Please enter 1-3.");
             }
@@ -63,10 +64,10 @@ public class TARCareMedicalCentre {
             System.out.println("4. Consultation Management");
             System.out.println("5. Appointment Management");
             System.out.println("6. Medical Treatment Management");
-            System.out.println("7. Prescription Management");
+            System.out.println("7. Pharmacy Management");
             System.out.println("8. Back to Role Selection");
 
-            System.out.print("Enter your choice (1-3): ");
+            System.out.print("Enter your choice (1-8): ");
             String choice = scanner.nextLine();
 
             switch (choice) {
@@ -89,10 +90,11 @@ public class TARCareMedicalCentre {
                     MedicalTreatmentUI.medicalTreatmentMainMenu();
                     break;
                 case "7":
-                    MedicalTreatmentUI.medicalTreatmentMainMenu();
+                    PharmacyUI.PharmacyMainMenu();
                     break;
                 case "8":
-                    return;
+                    mainMenu();
+//                    return;
                 default:
                     System.out.println("Invalid choice. Please enter 1-8.");
             }
@@ -110,7 +112,7 @@ public class TARCareMedicalCentre {
             System.out.println("5. Doctor(s) & Timetable info");
             System.out.println("6. Back to Role Selection");
 
-            System.out.print("Enter your choice (1-3): ");
+            System.out.print("Enter your choice (1-6): ");
             String choice = scanner.nextLine();
 
             switch (choice) {
@@ -130,7 +132,8 @@ public class TARCareMedicalCentre {
                     DoctorUI.DoctorUserMode();
                     break;
                 case "6":
-                    return;
+                    mainMenu();
+//                    return;
                 default:
                     System.out.println("Invalid choice. Please enter 1-6.");
             }

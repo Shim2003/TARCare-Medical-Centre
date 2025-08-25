@@ -42,6 +42,7 @@ public class DiagnosisManagement {
         return false;
     }
 
+    // get the diagnosis list by ID
     public static Diagnosis getDiagnosisListById(String diagnosisId) {
         return diagnosisList.findFirst(d -> d.getDiagnosisId().equals(diagnosisId));
     }
@@ -59,18 +60,13 @@ public class DiagnosisManagement {
         return diagnosisList.findFirst(d -> d.getDiagnosisId().equals(diagnosisId));
     }
 
-    //update diagnosis details
+    //update diagnosis details using ADT method
     public static boolean   updateDiagnosisDetails(String diagnosisId, Diagnosis newDiagnosis) {
-        Diagnosis existingDiagnosis = findDiagnosisById(diagnosisId);
-        if (existingDiagnosis != null) {
-            existingDiagnosis.setPatientId(newDiagnosis.getPatientId());
-            existingDiagnosis.setDoctorId(newDiagnosis.getDoctorId());
-            existingDiagnosis.setDiagnosisDate(newDiagnosis.getDiagnosisDate());
-            existingDiagnosis.setSymptoms(newDiagnosis.getSymptoms());
-            existingDiagnosis.setDiagnosisDescription(newDiagnosis.getDiagnosisDescription());
-            existingDiagnosis.setSeverityLevel(newDiagnosis.getSeverityLevel());
-            existingDiagnosis.setRecommendations(newDiagnosis.getRecommendations());
-            existingDiagnosis.setNotes(newDiagnosis.getNotes());
+        int index  = diagnosisList.findIndex(p -> p.getDiagnosisId().equals(diagnosisId));
+        if(index != -1) {
+
+            diagnosisList.replace(index, newDiagnosis);
+
             return true;
         }
         return false;
@@ -103,28 +99,7 @@ public class DiagnosisManagement {
         }
     }
 
-    public static void appendWrappedText(StringBuilder sb, String text) {
-        if (text == null || text.trim().isEmpty()) {
-            sb.append(">   N/A                                                         <\n");
-            return;
-        }
-        
-        String[] words = text.split(" ");
-        StringBuilder line = new StringBuilder(">   ");
-        
-        for (String word : words) {
-            if (line.length() + word.length() + 1 > 63) {
-                sb.append(String.format("%-63s <\n", line.toString()));
-                line = new StringBuilder(">   ");
-            }
-            line.append(word).append(" ");
-        }
-        
-        if (line.length() > 4) {
-            sb.append(String.format("%-63s <\n", line.toString().trim()));
-        }
-    }
-
+    // get the diagnosis list by year and month
     public static MyList<Diagnosis> getDiagnosesByYearAndMonth(int year, int month) {
     MyList<Diagnosis> filteredDiagnoses = new DynamicList<>();
         for (int i = 0; i < diagnosisList.size(); i++) {
@@ -141,6 +116,7 @@ public class DiagnosisManagement {
         return filteredDiagnoses;
     }
 
+    // print the diagnosis list based on the severity level
     public static MyList<Diagnosis> filterDiagnosisBySeverityLevel(String severityLevel) {
         if (severityLevel == null || severityLevel.isEmpty()) {
             System.out.println("Invalid severity level. Please try again.");
@@ -179,21 +155,5 @@ public class DiagnosisManagement {
             return diagnosisList.get(diagnosisList.size() - 1).getDiagnosisId();
         }
         return null;
-    }
-
-    // update the diagnosis list
-    public static boolean updateDiagnosisList(Diagnosis updatedDiagnosis) {
-        if (updatedDiagnosis == null || updatedDiagnosis.getDiagnosisId() == null) {
-            return false;
-        }
-
-        for (int i = 0; i < diagnosisList.size(); i++) {
-            Diagnosis existingDiagnosis = diagnosisList.get(i);
-            if (existingDiagnosis.getDiagnosisId().equals(updatedDiagnosis.getDiagnosisId())) {
-                diagnosisList.replace(i, updatedDiagnosis);
-                return true;
-            }
-        }
-        return false;
     }
 }

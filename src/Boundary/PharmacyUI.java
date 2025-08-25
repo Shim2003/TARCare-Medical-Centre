@@ -15,7 +15,6 @@ import Entity.MedicalTreatmentItem;
 import Entity.Prescription;
 import Entity.StockRequest;
 import ADT.MyList;
-import DAO.ClinicData;
 import Utility.UtilityClass;
 import java.text.SimpleDateFormat;
 
@@ -24,11 +23,7 @@ public class PharmacyUI {
     private static final Scanner sc = new Scanner(System.in);
     private static final PharmacyManagement service = new PharmacyManagement();
 
-    public static void main(String[] args) {
-        
-        ClinicData.addSampleMedicine();
-        ClinicData.addSamplePrescriptions(service);
-        ClinicData.addSampleStockRequests(service);
+    public static void PharmacyMainMenu() {
         
         int choice;
         do {
@@ -338,20 +333,41 @@ public class PharmacyUI {
 
     private static void displayLowStockAlert() {
         System.out.println("\n--- Low Stock Alert ---");
-        boolean hasLowStock = false;
-        MyList<Medicine> lowStockMedicines = new DynamicList<>();
+        boolean hasAnyAlert = false;
 
-        for (int i = 0; i < service.getAll().size(); i++) {
-            Medicine medicine = service.getAll().get(i);
-            if (medicine.getQuantity() <= UtilityClass.LOW_STOCK_THRESHOLD) { // Low stock threshold
-                lowStockMedicines.add(medicine);
-                if (!hasLowStock) {
-                    System.out.println("[WARNING] LOW STOCK MEDICINES:");
-                    printMedicineHeader();
-                    hasLowStock = true;
+        MyList<Medicine> lowStockMedicines = service.getLowStockMedicines(UtilityClass.LOW_STOCK_THRESHOLD);
+        MyList<Medicine> outOfStockMedicines = service.getOutOfStockMedicines();
+
+        if (lowStockMedicines.size() == 0) {
+            System.out.println("[OK] All medicines have sufficient stock.");
+            return;
+        }
+        
+        if (outOfStockMedicines.size() > 0) {
+            System.out.println("[CRITICAL] OUT OF STOCK MEDICINES:");
+            printMedicineHeader();
+            for (int i = 0; i < outOfStockMedicines.size(); i++) {
+                Medicine medicine = outOfStockMedicines.get(i);
+
+                String statusLabel;
+                if (service.hasPendingRequestForMedicine(medicine.getMedicineID())) {
+                    int pendingQty = service.getTotalPendingQuantityForMedicine(medicine.getMedicineID());
+                    statusLabel = "[REQUESTED: " + pendingQty + " units]";
+                } else {
+                    statusLabel = "[OUT OF STOCK]";
                 }
 
-                // Check if there's a pending request for this medicine
+                System.out.println(formatMedicineDisplay(medicine) + " " + statusLabel);
+            }
+            hasAnyAlert = true;
+        }
+
+        if (lowStockMedicines.size() > 0) {
+            System.out.println("\n[WARNING] LOW STOCK MEDICINES:");
+            printMedicineHeader();
+            for (int i = 0; i < lowStockMedicines.size(); i++) {
+                Medicine medicine = lowStockMedicines.get(i);
+
                 String statusLabel;
                 if (service.hasPendingRequestForMedicine(medicine.getMedicineID())) {
                     int pendingQty = service.getTotalPendingQuantityForMedicine(medicine.getMedicineID());
@@ -362,15 +378,16 @@ public class PharmacyUI {
 
                 System.out.println(formatMedicineDisplay(medicine) + " " + statusLabel);
             }
+            hasAnyAlert = true;
         }
 
-        if (!hasLowStock) {
-            System.out.println("[OK] All medicines have sufficient stock.");
-            return;
-        }
-
-        // Filter out medicines that already have pending requests for the selection menu
         MyList<Medicine> availableForRequest = new DynamicList<>();
+        for (int i = 0; i < outOfStockMedicines.size(); i++) {
+            Medicine med = outOfStockMedicines.get(i);
+            if (!service.hasPendingRequestForMedicine(med.getMedicineID())) {
+                availableForRequest.add(med);
+            }
+        }
         for (int i = 0; i < lowStockMedicines.size(); i++) {
             Medicine med = lowStockMedicines.get(i);
             if (!service.hasPendingRequestForMedicine(med.getMedicineID())) {
@@ -379,7 +396,7 @@ public class PharmacyUI {
         }
 
         if (availableForRequest.size() == 0) {
-            System.out.println("\n[INFO] All low stock medicines already have pending restock requests.");
+            System.out.println("\n[INFO] All low/out-of-stock medicines already have pending restock requests.");
             return;
         }
 
@@ -784,8 +801,7 @@ public class PharmacyUI {
     private static void searchByNamePattern() {
         String pattern = readLine("Enter name pattern to search: ");
         MyList<Medicine> results = service.searchMedicinesByPattern(pattern);
-        displaySearchResults("medicines matching '" + pattern + "'",
-                (DynamicList<Medicine>) results);
+        displaySearchResults("medicines matching '" + pattern + "'", (DynamicList<Medicine>) results);
     }
 
     private static void filterByPriceRange() {
@@ -793,10 +809,9 @@ public class PharmacyUI {
         double minPrice = readDouble("Enter minimum price (RM): ");
         double maxPrice = readDouble("Enter maximum price (RM): ");
 
-        DynamicList<Medicine> results = (DynamicList<Medicine>) service.getAll()
-            .filter(m -> m.getPrice() >= minPrice && m.getPrice() <= maxPrice);
-
-        displaySearchResults("medicines in price range RM" + minPrice + " - RM" + maxPrice, results);
+        MyList<Medicine> results = service.filterByPriceRange(minPrice, maxPrice);
+        displaySearchResults("medicines in price range RM" + minPrice + " - RM" + maxPrice,
+                (DynamicList<Medicine>) results);
     }
 
     private static void filterByCategory() {
@@ -817,10 +832,10 @@ public class PharmacyUI {
         }
 
         String selectedCategory = readLine("Enter category name: ");
-        DynamicList<Medicine> results = (DynamicList<Medicine>) service.getAll()
-            .filter(m -> m.getCategory().equalsIgnoreCase(selectedCategory));
+        MyList<Medicine> results = service.filterByCategory(selectedCategory);
 
-        displaySearchResults("medicines in category '" + selectedCategory + "'", results);
+        displaySearchResults("medicines in category '" + selectedCategory + "'",
+                (DynamicList<Medicine>) results);
     }
 
     private static void filterByDosageForm() {
@@ -836,10 +851,10 @@ public class PharmacyUI {
         int choice = readInt("Select dosage form (1-" + forms.length + "): ");
         if (choice >= 1 && choice <= forms.length) {
             String selectedForm = forms[choice - 1];
-            DynamicList<Medicine> results = (DynamicList<Medicine>) service.getAll()
-                .filter(m -> m.getDosageForm().equalsIgnoreCase(selectedForm));
+            MyList<Medicine> results = service.filterByDosageForm(selectedForm);
 
-            displaySearchResults("medicines in " + selectedForm + " form", results);
+            displaySearchResults("medicines in " + selectedForm + " form",
+                    (DynamicList<Medicine>) results);
         } else {
             System.out.println("Invalid choice.");
         }
@@ -863,17 +878,16 @@ public class PharmacyUI {
         }
 
         String selectedManufacturer = readLine("Enter manufacturer name: ");
-        DynamicList<Medicine> results = (DynamicList<Medicine>) service.getAll()
-            .filter(m -> m.getManufacturer().equalsIgnoreCase(selectedManufacturer));
+        MyList<Medicine> results = service.filterByManufacturer(selectedManufacturer);
 
-        displaySearchResults("medicines from '" + selectedManufacturer + "'", results);
+        displaySearchResults("medicines from '" + selectedManufacturer + "'",
+                (DynamicList<Medicine>) results);
     }
 
     private static void findNearExpiryMedicines() {
         System.out.println("\n--- Find Near Expiry Medicines ---");
         int months = readInt("Enter number of months from now: ");
 
-        // Use control layer method instead of manual filtering
         MyList<Medicine> results = service.getMedicinesNearExpiry(months);
 
         displaySearchResults("medicines expiring within " + months + " months", (DynamicList<Medicine>) results);
@@ -889,33 +903,28 @@ public class PharmacyUI {
 
         System.out.print("Minimum price (Enter for no limit): ");
         String minPriceStr = sc.nextLine().trim();
-        Double minPrice = minPriceStr.isEmpty() ? null : Double.parseDouble(minPriceStr);
+        Double minPrice = null;
+        if (!minPriceStr.isEmpty()) {
+            try {
+                minPrice = Double.parseDouble(minPriceStr);
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid minimum price format. Ignoring this criteria.");
+            }
+        }
 
         System.out.print("Maximum price (Enter for no limit): ");
         String maxPriceStr = sc.nextLine().trim();
-        Double maxPrice = maxPriceStr.isEmpty() ? null : Double.parseDouble(maxPriceStr);
+        Double maxPrice = null;
+        if (!maxPriceStr.isEmpty()) {
+            try {
+                maxPrice = Double.parseDouble(maxPriceStr);
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid maximum price format. Ignoring this criteria.");
+            }
+        }
 
-        DynamicList<Medicine> results = (DynamicList<Medicine>) service.getAll().filter(m -> {
-            boolean matches = true;
-
-            if (!namePattern.isEmpty()) {
-                matches = matches && m.getMedicineName().toLowerCase().contains(namePattern.toLowerCase());
-            }
-            if (!categoryFilter.isEmpty()) {
-                matches = matches && m.getCategory().equalsIgnoreCase(categoryFilter);
-            }
-            if (!manufacturerFilter.isEmpty()) {
-                matches = matches && m.getManufacturer().equalsIgnoreCase(manufacturerFilter);
-            }
-            if (minPrice != null) {
-                matches = matches && m.getPrice() >= minPrice;
-            }
-            if (maxPrice != null) {
-                matches = matches && m.getPrice() <= maxPrice;
-            }
-
-            return matches;
-        });
+        DynamicList<Medicine> results = (DynamicList<Medicine>) service.filterByMultipleCriteria(
+                namePattern, categoryFilter, manufacturerFilter, minPrice, maxPrice);
 
         displaySearchResults("medicines matching multiple criteria", results);
     }
@@ -967,7 +976,7 @@ public class PharmacyUI {
         var priceStats = medicines.getStatistics(m -> m.getPrice());
 
         System.out.println("=== INVENTORY OVERVIEW ===");
-        System.out.println("Total medicines: " + medicines.size());
+        System.out.println("Total medicines: " + service.getMedicineCount());
         System.out.println("Total inventory value: RM" + String.format("%.2f", service.calculateTotalInventoryValue()));
 
         System.out.println("\n=== QUANTITY STATISTICS ===");
