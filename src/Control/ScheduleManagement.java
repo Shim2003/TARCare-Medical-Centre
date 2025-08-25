@@ -22,8 +22,27 @@ public class ScheduleManagement {
 
     private static MyList<Schedule> scheduleList = new DynamicList<>();
 
+//    public static boolean addSchedule(Schedule s) {
+//        if (s != null) {
+//            scheduleList.add(s);
+//
+//            // Update doctor status right after adding schedule
+//            Doctor doctor = DoctorManagement.findDoctorById(s.getDoctorID());
+//            if (doctor != null) {
+//                DoctorManagement.updateWorkingStatus(doctor);
+//            }
+//            return true;
+//        }
+//        return false;
+//    }
+    
     public static boolean addSchedule(Schedule s) {
         if (s != null) {
+            if (hasConflict(s)) {
+                System.out.println("\nSchedule conflicts with existing one!!!");
+                return false;
+            }
+
             scheduleList.add(s);
 
             // Update doctor status right after adding schedule
@@ -34,6 +53,25 @@ public class ScheduleManagement {
             return true;
         }
         return false;
+    }
+
+
+    public static boolean hasConflict(Schedule newSchedule) {
+        for (int i = 0; i < scheduleList.size(); i++) {
+            Schedule existing = scheduleList.get(i);
+
+            // Only check schedules of the same doctor and same day
+            if (existing.getDoctorID().equals(newSchedule.getDoctorID())
+                    && existing.getDayOfWeek() == newSchedule.getDayOfWeek()) {
+
+                // Overlap check: newStart < existingEnd AND newEnd > existingStart
+                if (newSchedule.getStartTime().isBefore(existing.getEndTime())
+                        && newSchedule.getEndTime().isAfter(existing.getStartTime())) {
+                    return true; // conflict detected
+                }
+            }
+        }
+        return false; // no conflict
     }
 
     public static String generateNextScheduleId() {
@@ -177,31 +215,6 @@ public class ScheduleManagement {
         return true; // edited successfully
     }
 
-//    public static boolean clearSchedulesByDoctorId(String doctorID) {
-//        boolean removed = false;
-//
-//        // Temporary list to keep schedules that don't belong to this doctor
-//        DynamicList<Schedule> tempList = new DynamicList<>();
-//
-//        for (int i = 0; i < scheduleList.size(); i++) {
-//            Schedule s = scheduleList.get(i);
-//            if (!s.getDoctorID().equals(doctorID)) {
-//                tempList.add(s); // keep other doctors' schedules
-//            } else {
-//                removed = true; // found at least one to remove
-//            }
-//        }
-//
-//        // Clear original list
-//        scheduleList.clear();
-//
-//        // Copy back the schedules that we kept
-//        for (int i = 0; i < tempList.size(); i++) {
-//            scheduleList.add(tempList.get(i));
-//        }
-//
-//        return removed;
-//    }
     public static int countWorkingDaysInMonth(String doctorID, YearMonth month) {
         MyList<Schedule> schedules = getAllSchedules();
         LocalDate monthStart = month.atDay(1);

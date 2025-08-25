@@ -71,7 +71,7 @@ public class LeaveUI {
 
         }
     }
-    
+
     public static void displayAllLeavesUI() {
         System.out.println("\n=== All Doctor Leaves ===");
 
@@ -93,12 +93,12 @@ public class LeaveUI {
         }
     }
 
-
     public static void addLeaveUI() {
         System.out.println("\n=== Add Doctor Leave ===");
 
         // Step 1: Enter Doctor ID
         String doctorId;
+        Doctor doctor;
         while (true) {
             System.out.print("Enter Doctor ID (or 'xxx' to cancel): ");
             doctorId = scanner.nextLine().trim().toUpperCase();
@@ -108,7 +108,7 @@ public class LeaveUI {
                 return;
             }
 
-            Doctor doctor = DoctorManagement.findDoctorById(doctorId);
+            doctor = DoctorManagement.findDoctorById(doctorId);
             if (doctor == null) {
                 System.out.println("❌ Doctor not found. Try again.");
             } else {
@@ -117,55 +117,63 @@ public class LeaveUI {
             }
         }
 
-        // Step 2: Enter dateFrom
-        LocalDate dateFrom = null;
-        while (dateFrom == null) {
-            System.out.print("Enter Leave Start Date (yyyy-MM-dd): ");
-            String input = scanner.nextLine().trim();
-            try {
-                dateFrom = LocalDate.parse(input);
-            } catch (DateTimeParseException e) {
-                System.out.println("❌ Invalid date format. Please use yyyy-MM-dd.");
-            }
-        }
-
-        // Step 3: Enter dateTo
-        LocalDate dateTo = null;
-        while (dateTo == null) {
-            System.out.print("Enter Leave End Date (yyyy-MM-dd): ");
-            String input = scanner.nextLine().trim();
-            try {
-                dateTo = LocalDate.parse(input);
-                if (dateTo.isBefore(dateFrom)) {
-                    System.out.println("❌ End date cannot be before start date.");
-                    dateTo = null;
-                }
-            } catch (DateTimeParseException e) {
-                System.out.println("❌ Invalid date format. Please use yyyy-MM-dd.");
-            }
-        }
-
-        // Step 4: Enter reason
-        String reason;
         while (true) {
-            System.out.print("Enter Reason for Leave: ");
-            reason = scanner.nextLine().trim();
-            if (reason.isEmpty()) {
-                System.out.println("❌ Reason cannot be empty.");
-            } else {
-                break;
+            // Step 2: Enter dateFrom
+            LocalDate dateFrom = null;
+            while (dateFrom == null) {
+                System.out.print("Enter Leave Start Date (yyyy-MM-dd): ");
+                String input = scanner.nextLine().trim();
+                try {
+                    dateFrom = LocalDate.parse(input);
+                } catch (DateTimeParseException e) {
+                    System.out.println("❌ Invalid date format. Please use yyyy-MM-dd.");
+                }
             }
-        }
 
-        // Step 5: Generate Leave ID & create object
-        String leaveId = LeaveManagement.generateNextLeaveId();
-        DoctorLeave leave = new DoctorLeave(leaveId, doctorId, dateFrom, dateTo, reason);
+            // Step 3: Enter dateTo
+            LocalDate dateTo = null;
+            while (dateTo == null) {
+                System.out.print("Enter Leave End Date (yyyy-MM-dd): ");
+                String input = scanner.nextLine().trim();
+                try {
+                    dateTo = LocalDate.parse(input);
+                    if (dateTo.isBefore(dateFrom)) {
+                        System.out.println("❌ End date cannot be before start date.");
+                        dateTo = null;
+                    }
+                } catch (DateTimeParseException e) {
+                    System.out.println("❌ Invalid date format. Please use yyyy-MM-dd.");
+                }
+            }
 
-        // Step 6: Add to list
-        if (LeaveManagement.addLeave(leave)) {
-            System.out.println(" Leave added successfully with ID: " + leaveId);
-        } else {
-            System.out.println("❌ Failed to add leave.");
+            // Step 4: Enter reason
+            String reason;
+            while (true) {
+                System.out.print("Enter Reason for Leave: ");
+                reason = scanner.nextLine().trim();
+                if (reason.isEmpty()) {
+                    System.out.println("❌ Reason cannot be empty.");
+                } else {
+                    break;
+                }
+            }
+
+            // Step 5: Generate Leave ID & create object
+            String leaveId = LeaveManagement.generateNextLeaveId();
+            DoctorLeave leave = new DoctorLeave(leaveId, doctorId, dateFrom, dateTo, reason);
+
+            // Step 6: Check conflict & add
+            if (LeaveManagement.hasLeaveConflict(leave)) {
+                System.out.println("⚠️ Conflict detected. Please enter another date range.");
+                continue; // loop back to Step 2
+            }
+
+            if (LeaveManagement.addLeave(leave)) {
+                System.out.println(" Leave added successfully with ID: " + leaveId);
+            } else {
+                System.out.println("❌ Failed to add leave.");
+            }
+            break; // exit loop after success
         }
     }
 

@@ -97,19 +97,6 @@ public class DoctorManagement {
             System.out.println("Error parsing date in sample data.");
         }
     }
-
-    //remove
-//    public static boolean removeDoctorById(String doctorID) {
-//        for (int i = 0; i < doctorList.size(); i++) {
-//            Doctor d = doctorList.get(i);
-//            if (d.getDoctorID().equals(doctorID)) {
-//                doctorList.remove(i);
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
-    
     
     public static boolean removeDoctorById(String doctorID) {
         // First, remove doctor
@@ -228,14 +215,6 @@ public class DoctorManagement {
         }
 
         DynamicList<Doctor> freeDoctors = getFreeDoctors();
-//        // Check if every doctor has status != statusFree
-//        for (int i = 0; i < doctorList.size(); i++) {
-//            Doctor doctor = doctorList.get(i);
-//            if (doctor.getWorkingStatus().equals(UtilityClass.statusFree)) {
-//                return false; // Found at least one free doctor
-//            }
-//        }
-        // All doctors are busy
 
         return freeDoctors.isEmpty();
     }

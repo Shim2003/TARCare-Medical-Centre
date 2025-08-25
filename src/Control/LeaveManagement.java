@@ -56,12 +56,33 @@ public class LeaveManagement {
         ));
     }
 
-    // Add leaves
+    public static boolean hasLeaveConflict(DoctorLeave newLeave) {
+        for (int i = 0; i < leaveList.size(); i++) {
+            DoctorLeave existing = leaveList.get(i);
+
+            if (existing.getDoctorID().equals(newLeave.getDoctorID())) {
+                // Check overlap: (start1 <= end2) && (end1 >= start2)
+                if (!newLeave.getDateFrom().isAfter(existing.getDateTo())
+                        && !newLeave.getDateTo().isBefore(existing.getDateFrom())) {
+                    System.out.println("❌ Conflict: Doctor already has leave from "
+                            + existing.getDateFrom() + " to " + existing.getDateTo());
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     public static boolean addLeave(DoctorLeave l) {
         if (l != null) {
+            // ✅ Use helper for conflict check
+            if (hasLeaveConflict(l)) {
+                return false;
+            }
+
             leaveList.add(l);
 
-            // ✅ Update doctor's working status
+            // Update doctor's working status
             Doctor doctor = DoctorManagement.findDoctorById(l.getDoctorID());
             if (doctor != null) {
                 DoctorManagement.updateWorkingStatus(doctor);
@@ -130,26 +151,6 @@ public class LeaveManagement {
         return false;
     }
 
-//    public static boolean updateLeave(String leaveID, LocalDate newDateFrom, LocalDate newDateTo, String newReason) {
-//        for (int i = 0; i < leaveList.size(); i++) {
-//            DoctorLeave leave = leaveList.get(i);
-//            if (leave.getLeaveID().equals(leaveID)) {
-//                leave.setDateFrom(newDateFrom);
-//                leave.setDateTo(newDateTo);
-//                leave.setReason(newReason);
-//                leaveList.replace(i, leave);
-//
-//                // ✅ Update doctor's working status
-//                Doctor doctor = DoctorManagement.findDoctorById(leave.getDoctorID());
-//                if (doctor != null) {
-//                    DoctorManagement.updateWorkingStatus(doctor);
-//                }
-//
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
     public static boolean removeLeave(String leaveID) {
         for (int i = 0; i < leaveList.size(); i++) {
             DoctorLeave leave = leaveList.get(i);
@@ -273,9 +274,9 @@ public class LeaveManagement {
         }
         return leaveDays;
     }
-    
+
     //helper method
-     public static MyList<LocalDate> getLeaveDaysForDoctorInMonth(String doctorId, YearMonth month) {
+    public static MyList<LocalDate> getLeaveDaysForDoctorInMonth(String doctorId, YearMonth month) {
         MyList<DoctorLeave> allLeaves = getAllLeaves(); // however you store leaves
         MyList<LocalDate> leaveDays = new DynamicList<>();
 
@@ -291,7 +292,7 @@ public class LeaveManagement {
 
             // leave period
             LocalDate from = leave.getDateFrom();
-            LocalDate to   = leave.getDateTo();
+            LocalDate to = leave.getDateTo();
 
             // iterate all days in the leave range
             LocalDate d = from;

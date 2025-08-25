@@ -151,7 +151,6 @@ public class ScheduleUI {
     }
 
     public static void AddScheduleUI() {
-
         System.out.println("\n=== Add Schedule ===");
         String doctorIdInput = "";
         Doctor doctor = null;
@@ -176,56 +175,61 @@ public class ScheduleUI {
         // Generate Schedule ID
         String scheduleId = ScheduleManagement.generateNextScheduleId();
 
-        // Ask for Day of Week
-        DayOfWeek dayOfWeek = null;
-        while (dayOfWeek == null) {
-            System.out.print("Enter day of week (e.g., MONDAY): ");
-            String dayInput = scanner.nextLine().trim().toUpperCase();
-            try {
-                dayOfWeek = DayOfWeek.valueOf(dayInput);
-            } catch (IllegalArgumentException e) {
-                System.out.println("Invalid day! Please enter MONDAY, TUESDAY, etc.");
-            }
-        }
-
-        // Ask for Start Time
-        LocalTime startTime = null;
-        while (startTime == null) {
-            System.out.print("Enter start time (HH:mm): ");
-            String startInput = scanner.nextLine().trim();
-            try {
-                startTime = LocalTime.parse(startInput);
-            } catch (Exception e) {
-                System.out.println("Invalid time format! Please use HH:mm (e.g., 09:00).");
-            }
-        }
-
-        // Ask for End Time
-        LocalTime endTime = null;
-        while (endTime == null) {
-            System.out.print("Enter end time (HH:mm): ");
-            String endInput = scanner.nextLine().trim();
-            try {
-                endTime = LocalTime.parse(endInput);
-                if (endTime.isBefore(startTime) || endTime.equals(startTime)) {
-                    System.out.println("End time must be after start time!");
-                    endTime = null;
+        boolean scheduleAdded = false;
+        while (!scheduleAdded) {  // loop until a valid non-conflicting schedule is added
+            // Ask for Day of Week
+            DayOfWeek dayOfWeek = null;
+            while (dayOfWeek == null) {
+                System.out.print("Enter day of week (e.g., MONDAY): ");
+                String dayInput = scanner.nextLine().trim().toUpperCase();
+                try {
+                    dayOfWeek = DayOfWeek.valueOf(dayInput);
+                } catch (IllegalArgumentException e) {
+                    System.out.println("Invalid day! Please enter MONDAY, TUESDAY, etc.");
                 }
-            } catch (Exception e) {
-                System.out.println("Invalid time format! Please use HH:mm (e.g., 17:00).");
             }
-        }
 
-        // Create Schedule Object
-        Schedule schedule = new Schedule(scheduleId, doctorIdInput, dayOfWeek, startTime, endTime);
+            // Ask for Start Time
+            LocalTime startTime = null;
+            while (startTime == null) {
+                System.out.print("Enter start time (HH:mm): ");
+                String startInput = scanner.nextLine().trim();
+                try {
+                    startTime = LocalTime.parse(startInput);
+                } catch (Exception e) {
+                    System.out.println("Invalid time format! Please use HH:mm (e.g., 09:00).");
+                }
+            }
 
-        // Add Schedule
-        boolean success = ScheduleManagement.addSchedule(schedule);
+            // Ask for End Time
+            LocalTime endTime = null;
+            while (endTime == null) {
+                System.out.print("Enter end time (HH:mm): ");
+                String endInput = scanner.nextLine().trim();
+                try {
+                    endTime = LocalTime.parse(endInput);
+                    if (endTime.isBefore(startTime) || endTime.equals(startTime)) {
+                        System.out.println("End time must be after start time!");
+                        endTime = null;
+                    }
+                } catch (Exception e) {
+                    System.out.println("Invalid time format! Please use HH:mm (e.g., 17:00).");
+                }
+            }
 
-        if (success) {
-            System.out.println("Schedule added successfully: " + schedule);
-        } else {
-            System.out.println("Failed to add schedule.");
+            // Create Schedule Object
+            Schedule schedule = new Schedule(scheduleId, doctorIdInput, dayOfWeek, startTime, endTime);
+
+            // Try to add Schedule
+            boolean success = ScheduleManagement.addSchedule(schedule);
+
+            if (success) {
+                System.out.println("Schedule added successfully: ");
+                scheduleDetail(schedule.getScheduleID());
+                scheduleAdded = true; // exit the loop
+            } else {
+                System.out.println("Failed to add schedule. Please try again.\n");
+            }
         }
     }
 
@@ -302,7 +306,7 @@ public class ScheduleUI {
             return; // end after one edit
         }
     }
-    
+
     public static void removeScheduleUI() {
         System.out.println("\n=== Remove Schedule ===");
 
@@ -343,14 +347,14 @@ public class ScheduleUI {
             }
         }
     }
-    
-    public static void scheduleDetail(String scheduleID){
+
+    public static void scheduleDetail(String scheduleID) {
         Schedule schedule;
         schedule = ScheduleManagement.findScheduleByScheduleId(scheduleID);
-        
+
         Doctor doctor;
         doctor = DoctorManagement.findDoctorById(schedule.getDoctorID());
-        
+
         System.out.println("-------------------------------------------------");
         System.out.printf("""
                           | Name: %-35s  %s
@@ -361,12 +365,12 @@ public class ScheduleUI {
         System.out.printf("""
                           | Start Time : %s
                           """, schedule.getStartTime());
-         System.out.printf("""
+        System.out.printf("""
                           | End Time   : %s
                           """, schedule.getEndTime());
-       
-         System.out.println("-------------------------------------------------");
-        
+
+        System.out.println("-------------------------------------------------");
+
     }
 
 }

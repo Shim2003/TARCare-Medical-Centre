@@ -37,7 +37,6 @@ public class DoctorUI {
         //
 
        DoctorModuleMenu();
-//       testing();
     }
 
     public static void DoctorModuleMenu() {
@@ -495,7 +494,6 @@ public class DoctorUI {
     }
 
     public static void editDoctorDetailsUI() {
-        Scanner scanner = new Scanner(System.in);
 
         Doctor doctor = null;
         String doctorID;
@@ -667,63 +665,4 @@ public class DoctorUI {
         System.out.println("-------------------------------------------------");
 
     }
-
-    public static void testing() {
-        //
-        LocalDate today = LocalDate.now();
-        LocalTime currentTime = LocalTime.now();
-        DayOfWeek currentDay = today.getDayOfWeek();
-        //
-
-//        System.out.println("Doctors available on 12/08/2025:");
-//        ScheduleManagement.findAvailableDoctors(DayOfWeek.TUESDAY);
-        MyList<Schedule> schedulesList = ScheduleManagement.getAllSchedules();
-//        DynamicList<Doctor> availableDoctors = ScheduleManagement.findAvailableDoctors(DayOfWeek.TUESDAY);
-//        DynamicList<Doctor> freeDoctors = DoctorManagement.getFreeDoctors();
-//        boolean allBusy = DoctorManagement.areAllDoctorsBusy();
-        MyList<Doctor> allDoctors = DoctorManagement.getAllDoctors();
-
-        boolean check = LeaveManagement.isDoctorOnLeave("D002", LocalDate.of(2025, 8, 15));
-        System.out.println(check);
-
-        for (int i = 0; i < schedulesList.size(); i++) {
-            Schedule s = schedulesList.get(i);
-            System.out.println(s);
-        }
-//        
-//        for (int i = 0; i < availableDoctors.size(); i++) {
-//            Doctor d = availableDoctors.get(i);
-//            System.out.println(d);
-//        }
-//        for (int i = 0; i < freeDoctors.size(); i++) {
-//            Doctor d = freeDoctors.get(i);
-//            System.out.println(d);
-//        }
-//
-//        System.out.println(allBusy);
-//
-        for (int i = 0; i < allDoctors.size(); i++) {
-            Doctor d = allDoctors.get(i);
-            System.out.println(d);
-        }
-
-        DoctorManagement.removeDoctorById("D001");
-
-        System.out.println("\n");
-
-        for (int i = 0; i < allDoctors.size(); i++) {
-            Doctor d = allDoctors.get(i);
-            System.out.println(d);
-        }
-
-        for (int i = 0; i < schedulesList.size(); i++) {
-            Schedule s = schedulesList.get(i);
-            System.out.println(s);
-        }
-        System.out.println("");
-//        DisplaySummaryReport();
-
-//        System.out.println("Today: " + currentDay + " " + currentTime);
-    }
-
 }
