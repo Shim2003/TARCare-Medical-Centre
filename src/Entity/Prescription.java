@@ -7,8 +7,10 @@ import ADT.DynamicList;
 import ADT.MyList;
 
 public class Prescription {
+
+    private static int prescriptionCounter = 001;
     private String prescriptionID;
-    private String patientID;
+    private String patientID;  // Changed from Patient object to String ID
     private MyList<MedicalTreatmentItem> medicineItems;
     private String status; // PENDING, PROCESSING, COMPLETED
     private String doctorId;
@@ -21,8 +23,8 @@ public class Prescription {
     
     // Basic constructor - most common use case
     public Prescription(String prescriptionID, String patientID, String doctorId) {
-        this.prescriptionID = prescriptionID;
-        this.patientID = patientID;
+        this.prescriptionID = "RX" + prescriptionCounter++;
+        this.patientID = patientID;  // Using patient ID instead of Patient object
         this.doctorId = doctorId;
         this.medicineItems = new DynamicList<>();
         this.status = "PENDING";
@@ -31,7 +33,7 @@ public class Prescription {
     // Full constructor - allows setting medicine items and status
     public Prescription(String prescriptionID, String patientID, String doctorId, 
                        MyList<MedicalTreatmentItem> medicineItems, String status) {
-        this.prescriptionID = prescriptionID;
+        this.prescriptionID = "RX" + prescriptionCounter++;
         this.patientID = patientID;
         this.doctorId = doctorId;
         this.medicineItems = medicineItems != null ? medicineItems : new DynamicList<>();

@@ -6,7 +6,9 @@ package Boundary;
 
 import ADT.DynamicList;
 import ADT.MyList;
+import Control.DiagnosisManagement;
 import Control.MedicalTreatmentManagement;
+import Control.PrescriptionCalculator;
 import Entity.*;
 import Utility.UtilityClass;
 import java.text.SimpleDateFormat;
@@ -69,9 +71,9 @@ public class MedicalTreatmentUI {
         while (true) {
             System.out.println("\n=== Medical Treatment Management System ===");
             System.out.println("1. Create New Medical Treatment");
-            System.out.println("2. View Treatment History By Patient ID");
-            System.out.println("3. View Treatment History By Treatment ID");
-            System.out.println("4. Update Treatment History");
+            System.out.println("2. View Treatment History");
+            System.out.println("3. Update Treatment History");
+            System.out.println("4. Delete Treatment History");
             System.out.println("5. Generate Monthly Report");
             System.out.println("6. Generate Overall Treatment History Report");
             System.out.println("7. Exit to Main Menu");
@@ -86,16 +88,87 @@ public class MedicalTreatmentUI {
                     case 1 ->
                         createTreatmentTest();
                     case 2 ->
-                        viewPatientTreatmentHistoryByPatientId();
+                        viewTreatmentHistoryMenu();
                     case 3 ->
-                        viewSpecificTreatmentHistoryByTreatmentId();
-                    case 4 ->
                         updateTreatmentStatus();
+                    case 4 ->
+                        deleteTreatmentHistoryMenu();
                     case 5 ->
                         generateMonthlyReport();
                     case 6 -> 
                         generateTreatmentReports();
                     case 7 -> {
+                        System.out.println("Exiting to Main Menu...");
+                        medicalTreatmentMainMenu(); // Exit to main menu
+                    }
+                    default -> {
+                        System.out.println("Invalid Choice. Please enter again from 1 to 5.");
+                    }
+                }
+            } catch (Exception e) {
+                System.out.println("Invalid Input. Please enter a number.");
+                //clear buffer
+                scanner.nextLine();
+            }
+        }
+    }
+
+    public static void viewTreatmentHistoryMenu() {
+        while (true) {
+            System.out.println("\n=== View Medical Treatment ===");
+            System.out.println("1. View Treatment History By Patient ID");
+            System.out.println("2. View Treatment History By Treatment ID");
+            System.out.println("3. Exit to Previous Menu");
+
+            System.out.print("Enter your choice (1-3): ");
+
+            try {
+                int choice = scanner.nextInt();
+                scanner.nextLine(); //Clear buffer
+
+                switch (choice) {
+                    case 1 ->
+                        viewPatientTreatmentHistoryByPatientId();
+                    case 2 ->
+                        viewSpecificTreatmentHistoryByTreatmentId();
+                    case 3 -> {
+                        System.out.println("Exiting to Main Menu...");
+                        medicalTreatmentMainMenu(); // Exit to main menu
+                    }
+                    default -> {
+                        System.out.println("Invalid Choice. Please enter again from 1 to 5.");
+                    }
+                }
+            } catch (Exception e) {
+                System.out.println("Invalid Input. Please enter a number.");
+                //clear buffer
+                scanner.nextLine();
+            }
+        }
+    }
+
+    public static void deleteTreatmentHistoryMenu() {
+        while (true) {
+            System.out.println("\n=== Delete Medical Treatment ===");
+            System.out.println("1. Delete Treatment History By Treatment ID");
+            System.out.println("2. Delete All Treatment History By Patient ID");
+            System.out.println("3. Delete All Treatment History");
+            System.out.println("4. Exit to Previous Menu");
+
+            System.out.print("Enter your choice (1-4): ");
+
+            try {
+                int choice = scanner.nextInt();
+                scanner.nextLine(); //Clear buffer
+
+                switch (choice) {
+                    case 1 ->
+                        deleteTreatmentById();
+                    case 2 ->
+                        viewPatientTreatmentHistoryByPatientId();
+                    case 3 ->
+                        deleteAllTreatmentHistory();
+                    case 4 -> {
                         System.out.println("Exiting to Main Menu...");
                         medicalTreatmentMainMenu(); // Exit to main menu
                     }
@@ -136,13 +209,14 @@ public class MedicalTreatmentUI {
         String treatmentAdvice = "Follow the prescribed dosage and frequency. Take medicines after meals. Drink plenty of water and get adequate rest.";
 
         // Dummy consultation data
-        String consultationId = "C001";
-        String patientId = "P001";
-        String doctorId = "D001";
+        String diagnosisId = "DIAG001";
+        String consultationId = "C1001";
+        String patientId = "P1001";
+        String doctorId = "D1001";
         String notes = "Patient responded well to initial consultation. No allergic reactions reported.";
 
         // Create a new MedicalTreatment object
-        MedicalTreatment treatment = new MedicalTreatment(consultationId, patientId, doctorId,
+        MedicalTreatment treatment = new MedicalTreatment(diagnosisId, patientId, doctorId,
                 treatmentDate, treatmentDate, "Active", "Ongoing", treatmentAdvice, notes, medicineList);
 
         // Add the new MedicalTreatment object to the treatmentList
@@ -172,7 +246,19 @@ public class MedicalTreatmentUI {
 
         System.out.println("\n=== Create Medical Treatment ===");
 
-        DynamicList<MedicalTreatmentItem> medicineList = new DynamicList<>();
+        MyList<MedicalTreatmentItem> medicineList = new DynamicList<>();
+
+        //print the diagnosis id
+        String diagnosisId = DiagnosisManagement.getCurrentDiagnosisId();
+        System.out.print("Enter Diagnosis ID: " + diagnosisId + "\n");
+
+        // Get the current serving patient ID from the queue list
+        String patientId = DiagnosisManagement.getCurrentServingPatient();
+        System.out.println("Patient ID: " + patientId);
+
+        // Get the current serving doctor ID from the queue list
+        String doctorId = DiagnosisManagement.getCurrentServingDoctor();
+        System.out.println("Doctor ID: " + doctorId);
 
         int i = 1;
         // if it is medication, ask for the medicine name and for many day(s)
@@ -213,10 +299,8 @@ public class MedicalTreatmentUI {
             }
 
             //put the medicine details into the medicineList
-            MedicalTreatmentItem item = new MedicalTreatmentItem(medicineName, dosage, frequency,
-                    duration, method);
+            MedicalTreatmentItem item = new MedicalTreatmentItem(medicineName, dosage, frequency, duration, method);
             medicineList.add(item);
-
             System.out.println("Medicine added: " + medicineName);
             i++;
         }
@@ -233,25 +317,22 @@ public class MedicalTreatmentUI {
         Date treatmentDate = new Date();
 
         System.out.print("Enter Medical Treatment Advice(s): ");
-        // String treatmentAdvice = scanner.nextLine();
+        String treatmentAdvice = scanner.nextLine();
 
         System.out.print("Enter Additional Notes: ");
-        // String notes = scanner.nextLine();
+        String notes = scanner.nextLine();
 
-        // Consultation currentConsultation = Consultation.getCurrentConsultation();
-        // String consultationId = currentConsultation.getConsultationId();
-        // String patientId = currentConsultation.getPatientId();
-        // String doctorId = currentConsultation.getDoctorId();
-        // sample data for consultation and patient
-        String consultationId = "C001";
-        String patientId = "P001";
-        String doctorId = "D001";
-        String treatmentAdvice = "Follow the prescribed dosage and frequency. Drink plenty of water.";
-        String notes = "Patient responded well to initial consultation. No allergic reactions reported.";
-
+        // pass the medicineList to prescription by constructor
+        
         // Create a new MedicalTreatment object
-        MedicalTreatment treatment = new MedicalTreatment(consultationId, patientId, doctorId,
+        MedicalTreatment treatment = new MedicalTreatment(diagnosisId, patientId, doctorId,
                 treatmentDate, treatmentDate, "Active", "Ongoing", treatmentAdvice, notes, medicineList);
+
+
+        Prescription prescription = new Prescription(PrescriptionCalculator.generateNewPrescriptionId(), patientId,
+        doctorId, medicineList, "PENDING");
+
+        PrescriptionCalculator.addPrescription(prescription);
 
         // Add the new MedicalTreatment object to the treatmentList
         MedicalTreatmentManagement.addMedicalTreatment(treatment);
@@ -275,22 +356,22 @@ public class MedicalTreatmentUI {
         MyList<MedicalTreatment> treatmentHistoryList
                 = MedicalTreatmentManagement.getTreatmentHistoryByPatientIdList(patientId);
 
-        if (treatmentHistoryList.isEmpty()) {
+        if (MedicalTreatmentManagement.isTreatmentListEmpty() || treatmentHistoryList.isEmpty()) {
             System.out.println("No treatment history found for Patient ID: " + patientId);
             return;
         }
 
         System.out.println("\n" + "=".repeat(68));
         System.out.println("PATIENT TREATMENT HISTORY - PATIENT ID: " + patientId);
-        System.out.println("Total Records Found: " + treatmentHistoryList.size());
+        System.out.println("Total Records Found: " + MedicalTreatmentManagement.getTreatmentListSize());
         System.out.println("=".repeat(68));
 
         for (int i = 0; i < treatmentHistoryList.size(); i++) {
             MedicalTreatment history = treatmentHistoryList.get(i);
-            System.out.println("\nRecord " + (i + 1) + " of " + treatmentHistoryList.size() + ":");
-            System.out.println(history.toString()); // Using the enhanced toString method
+            System.out.println("\nRecord " + (i + 1) + " of " + MedicalTreatmentManagement.getTreatmentListSize() + ":");
+            treatmentHistoryDisplayForm(history.getTreatmentId());
 
-            if (i < treatmentHistoryList.size() - 1) {
+            if (i < MedicalTreatmentManagement.getTreatmentListSize() - 1) {
                 System.out.println("\n" + "+".repeat(68));
                 // UtilityClass.pressEnterToContinue();
             }
@@ -321,7 +402,7 @@ public class MedicalTreatmentUI {
         System.out.println("\n" + "=".repeat(68));
         System.out.println("TREATMENT HISTORY DETAILS");
         System.out.println("=".repeat(68));
-        System.out.println(history.toString()); // Using the enhanced toString method
+        treatmentHistoryDisplayForm(treatmentId);
     }
 
     // updateTreatmentStatus method
@@ -344,7 +425,7 @@ public class MedicalTreatmentUI {
 
         // Display current treatment details using toString
         System.out.println("\nCurrent Treatment Details:");
-        System.out.println(treatment.toString());
+        treatmentHistoryDisplayForm(treatmentId);
 
         System.out.println("\n" + "=".repeat(50));
         System.out.print("Would you like to update this treatment? (y/n): ");
@@ -452,7 +533,73 @@ public class MedicalTreatmentUI {
 
         // Display updated treatment details
         System.out.println("\nUpdated Treatment Details:");
-        System.out.println(treatment.toString());
+        treatmentHistoryDisplayForm(treatmentId);
+    }
+
+    public static void deleteTreatmentById() {
+        System.out.println("\n=== Delete Treatment By ID ===");
+        System.out.print("Enter Treatment ID to delete: ");
+        String treatmentId = scanner.nextLine().trim();
+
+        if (treatmentId.isEmpty()) {
+            System.out.println("Treatment ID cannot be empty.");
+            return;
+        }
+
+        System.out.print("Are you sure you want to delete Treatment ID " + treatmentId + "? (y/n): ");
+        String confirm = scanner.nextLine().trim().toLowerCase();
+
+        if (confirm.equals("y")) {
+            boolean deleted = MedicalTreatmentManagement.deleteTreatmentById(treatmentId);
+            if (deleted) {
+                System.out.println(">> Treatment ID " + treatmentId + " deleted successfully.");
+            } else {
+                System.out.println("No treatment found with ID: " + treatmentId);
+                System.out.println("Deletion cancelled.");
+            }
+        } else {
+            System.out.println("Deletion cancelled.");
+        }
+    }
+
+    public static void deleteAllTreatmentsByPatientId() {
+        System.out.println("\n=== Delete All Treatments By Patient ID ===");
+        System.out.print("Enter Patient ID to delete all treatments: ");
+        String patientId = scanner.nextLine().trim();
+
+        if (patientId.isEmpty()) {
+            System.out.println("Patient ID cannot be empty.");
+            return;
+        }
+
+        System.out.print("Are you sure you want to delete all treatments for Patient ID " + patientId + "? (y/n): ");
+        String confirm = scanner.nextLine().trim().toLowerCase();
+
+        if (confirm.equals("y")) {
+            boolean deletedCount = MedicalTreatmentManagement.deleteAllTreatmentsByPatientId(patientId);
+            if (deletedCount) {
+                System.out.println(">> All treatments for Patient ID " + patientId + " deleted successfully. Total deleted: " + deletedCount);
+            } else {
+                System.out.println("No treatments found for Patient ID: " + patientId);
+                System.out.println("Deletion cancelled.");
+            }
+        } else {
+            System.out.println("Deletion cancelled.");
+        }
+    }
+
+    // delete all the treatment history in once
+    public static void deleteAllTreatmentHistory() {
+        System.out.println("\n=== Delete All Treatment History ===");
+        System.out.print("Are you sure you want to delete ALL treatment history? This action cannot be undone. (y/n): ");
+        String confirm = scanner.nextLine().trim().toLowerCase();
+
+        if (confirm.equals("y")) {
+            MedicalTreatmentManagement.deleteAllTreatments();
+            System.out.println(">> All treatment history deleted successfully.");
+        } else {
+            System.out.println("Deletion cancelled.");
+        }
     }
 
     // Generate patient history report based on month
@@ -531,7 +678,7 @@ public class MedicalTreatmentUI {
         for(int i = 0;i<monthlyTreatments.size();i++) {
             MedicalTreatment treatment = monthlyTreatments.get(i);
             System.out.println("\nTreatment Record " + (i + 1) + ":");
-            System.out.println(treatment.toString());
+            treatmentHistoryDisplayForm(treatment.getTreatmentId());
         }
 
         System.out.println(">> Monthly report generated successfully for " + monthYearStr + "!");
@@ -580,7 +727,7 @@ public class MedicalTreatmentUI {
     // Retrieve treatments for the specified year and month
     MyList<MedicalTreatment> treatments = MedicalTreatmentManagement.getMonthlyTreatments(year, month);
 
-    if (treatments.isEmpty()) {
+    if (MedicalTreatmentManagement.isTreatmentListEmpty() || treatments.isEmpty()) {
         System.out.printf("No treatments found for %s %d.\n", UtilityClass.getMonthName(month), year);
         return;
     }
@@ -591,7 +738,7 @@ public class MedicalTreatmentUI {
     StringBuilder completedTreatments = new StringBuilder();
     StringBuilder cancelledTreatments = new StringBuilder();
 
-    for (int i = 0; i < treatments.size(); i++) {
+    for (int i = 0; i < MedicalTreatmentManagement.getTreatmentListSize(); i++) {
         MedicalTreatment treatment = treatments.get(i);
         String treatmentDetails = String.format(
             "Treatment ID: %s | Patient ID: %s | Doctor ID: %s | Date: %s\n",
@@ -624,7 +771,7 @@ public class MedicalTreatmentUI {
     System.out.println("\n==============================================================");
     System.out.printf("Treatment Summary Report for %s %d\n", UtilityClass.getMonthName(month), year);
     System.out.println("==============================================================");
-    System.out.printf("Total Treatments: %d\n", treatments.size());
+    System.out.printf("Total Treatments: %d\n", MedicalTreatmentManagement.getTreatmentListSize());
     System.out.printf("Active Treatments: %d\n", activeCount);
     System.out.printf("Completed Treatments: %d\n", completedCount);
     System.out.printf("Cancelled Treatments: %d\n", cancelledCount);
@@ -659,7 +806,6 @@ public class MedicalTreatmentUI {
         sb.append(">                    TREATMENT HISTORY RECORD                    <\n");
         sb.append("==================================================================\n");
         sb.append(String.format("> Treatment ID    : %-44s <\n", treatment.getTreatmentId()));
-        sb.append(String.format("> Consultation ID : %-44s <\n", treatment.getConsultationId()));
         sb.append(String.format("> Patient ID      : %-44s <\n", treatment.getPatientId()));
         sb.append(String.format("> Doctor ID       : %-44s <\n", treatment.getDoctorId()));
         sb.append("==================================================================\n");

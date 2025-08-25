@@ -172,4 +172,28 @@ public class DiagnosisManagement {
         }
         return null; 
     }
+
+    // get the current diagnosis ID from the diagnosis list
+    public static String getCurrentDiagnosisId() {
+        if (!diagnosisList.isEmpty()) {
+            return diagnosisList.get(diagnosisList.size() - 1).getDiagnosisId();
+        }
+        return null;
+    }
+
+    // update the diagnosis list
+    public static boolean updateDiagnosisList(Diagnosis updatedDiagnosis) {
+        if (updatedDiagnosis == null || updatedDiagnosis.getDiagnosisId() == null) {
+            return false;
+        }
+
+        for (int i = 0; i < diagnosisList.size(); i++) {
+            Diagnosis existingDiagnosis = diagnosisList.get(i);
+            if (existingDiagnosis.getDiagnosisId().equals(updatedDiagnosis.getDiagnosisId())) {
+                diagnosisList.replace(i, updatedDiagnosis);
+                return true;
+            }
+        }
+        return false;
+    }
 }

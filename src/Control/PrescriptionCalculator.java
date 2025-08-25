@@ -3,10 +3,14 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package Control;
-
+import ADT.DynamicList;
+import ADT.MyList;
 import Entity.MedicalTreatmentItem;
+import Entity.Prescription;
 
 public class PrescriptionCalculator {
+
+    MyList<Prescription> prescriptionList = new DynamicList<>();
     
     // Make this static for utility-like usage
     public static int calculateQuantityNeeded(MedicalTreatmentItem item) {
@@ -141,5 +145,24 @@ public class PrescriptionCalculator {
         
         // Otherwise, append the dosage form
         return item.getDosage().trim() + " " + (dosageForm != null ? dosageForm : "unit");
+    }
+
+    // check the prescription list ids, if the list is null then create id RX001 if not empty then check the last 3 digit value and increment by 1
+    public static String generateNewPrescriptionId() {
+        MyList<Prescription> prescriptionList = new DynamicList<>();
+        if (prescriptionList.isEmpty()) {
+            return "RX001";
+        } else {
+            String lastId = prescriptionList.get(prescriptionList.size() - 1).getPrescriptionID();
+            int numericPart = Integer.parseInt(lastId.substring(2));
+            numericPart++;
+            return String.format("RX%03d", numericPart);
+        }
+    }
+
+    //add prescription to the list through object
+    public static void addPrescription(Prescription prescription) {
+        MyList<Prescription> prescriptionList = new DynamicList<>();
+        prescriptionList.add(prescription);
     }
 }

@@ -11,8 +11,8 @@ public class MedicalTreatment {
     private static int treatmentIdCounter = 1001;
     SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy");
 
+    private String diagnosisId;
     private String treatmentId;
-    private String consultationId;
     private String patientId;
     private String doctorId;
     private final Date treatmentDate;
@@ -30,11 +30,10 @@ public class MedicalTreatment {
         this.medicineList = new DynamicList<>();
     }
 
-    public MedicalTreatment(String consultationId, String patientId, String doctorId, Date treatmentDate,
+    public MedicalTreatment(String diagnosisId, String patientId, String doctorId, Date treatmentDate,
     Date followUpDate, String treatmentStatus, String treatmentOutcome, String medicalTreatmentAdvise, String notes, 
     MyList<MedicalTreatmentItem> medicineList) {
         this.treatmentId = "TRMT" + treatmentIdCounter++;
-        this.consultationId = consultationId;
         this.patientId = patientId;
         this.doctorId = doctorId;
         this.treatmentDate = treatmentDate;
@@ -50,8 +49,8 @@ public class MedicalTreatment {
         return treatmentId;
     }
 
-    public String getConsultationId() {
-        return consultationId;
+    public String getDiagnosisId() {
+        return diagnosisId;
     }
 
     public String getPatientId() {
@@ -107,8 +106,8 @@ public class MedicalTreatment {
         this.treatmentId = treatmentId;
     }
 
-    public void setConsultationId(String consultationId) {
-        this.consultationId = consultationId;
+    public void setDiagnosisId(String diagnosisId) {
+        this.diagnosisId = diagnosisId;
     }
 
     public void setPatientId(String patientId) {
@@ -145,7 +144,7 @@ public class MedicalTreatment {
         sb.append(String.format(
             "%-20s %-20s %-20s %-20s %-20s %-15s %-30s\n",
             "Treatment ID: " + treatmentId,
-            "Consultation ID: " + consultationId,
+            "Diagnosis ID: " + diagnosisId,
             "Patient ID: " + patientId,
             "Doctor ID: " + doctorId,
             "Treatment Date: " + treatmentDate,
