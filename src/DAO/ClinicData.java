@@ -493,8 +493,8 @@ public class ClinicData {
             createQueueEntry(patientList.get(0), cal, 8, 30, UtilityClass.statusCompleted);
             createQueueEntry(patientList.get(1), cal, 9, 15, UtilityClass.statusCompleted);
             createQueueEntry(patientList.get(2), cal, 9, 45, UtilityClass.statusCompleted);
-            createQueueEntry(patientList.get(3), cal, 10, 20, UtilityClass.statusConsulting);
-            createQueueEntry(patientList.get(4), cal, 11, 10, UtilityClass.statusConsulting);
+            createQueueEntry(patientList.get(3), cal, 10, 20, UtilityClass.statusWaiting);
+            createQueueEntry(patientList.get(4), cal, 11, 10, UtilityClass.statusWaiting);
             createQueueEntry(patientList.get(5), cal, 11, 50, UtilityClass.statusWaiting);
 
             createQueueEntry(patientList.get(6), cal, 14, 15, UtilityClass.statusWaiting);

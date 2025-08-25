@@ -198,7 +198,7 @@ public class QueueUI {
             return;
         }
 
-        String header = "+-------------------------------------------+";
+        String header = "+-----------------------------------+";
         System.out.println(header);
         System.out.printf("| %-15s | %-15s |\n", "Patient ID", "Doctor ID");
         System.out.println(header);
