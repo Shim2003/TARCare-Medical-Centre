@@ -6,8 +6,6 @@ import DAO.AppointmentInfo;
 import Entity.Appointment;
 import Entity.Patient;
 import Utility.UtilityClass;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Calendar;
@@ -15,6 +13,8 @@ import java.util.Comparator;
 import java.util.Date;
 
 /**
+ * PatientManagement - Control layer for patient operations Contains only
+ * business logic and data operations, no display logic
  *
  * @author Lee Wei Hao
  */
@@ -24,18 +24,14 @@ public class PatientManagement {
     private static DynamicList<Patient> patientList = new DynamicList<>();
 
     public static boolean add(Patient p) {
-
         if (p != null) {
             patientList.add(p);
             return true;
         }
-
         return false;
-
     }
 
     public static boolean update(String patientId, int choice, String newValue) {
-
         int index = patientList.findIndex(p -> p.getPatientID().equals(patientId));
 
         if (index == -1) {
@@ -73,14 +69,13 @@ public class PatientManagement {
         return patientList.findFirst(p -> p.getPatientID().equalsIgnoreCase(patientId));
     }
 
-    public static void remove(char confirm, Patient p) {
-        int index = patientList.indexOf(p);  // get index of patient
+    public static boolean remove(Patient p) {
+        int index = patientList.indexOf(p);
         if (index >= 0) {
-            patientList.remove(index);  // remove by index
-            System.out.println("Patient removed successfully.");
-        } else {
-            System.out.println("Error: patient not found in list.");
+            patientList.remove(index);
+            return true;
         }
+        return false;
     }
 
     public static MyList<Patient> getPatientList() {
@@ -157,8 +152,14 @@ public class PatientManagement {
             case "name":
                 UtilityClass.quickSort(sortedList, Comparator.comparing(Patient::getFullName));
                 break;
+            case "id":
+                UtilityClass.quickSort(sortedList, Comparator.comparing(Patient::getPatientID));
+                break;
             case "age":
                 UtilityClass.quickSort(sortedList, Comparator.comparingInt(PatientManagement::calculateAge));
+                break;
+            case "age_desc":
+                UtilityClass.quickSort(sortedList, Comparator.comparingInt(PatientManagement::calculateAge).reversed());
                 break;
             case "registration":
                 UtilityClass.quickSort(sortedList, Comparator.comparing(Patient::getRegistrationDate));
@@ -204,7 +205,6 @@ public class PatientManagement {
     }
 
     public static AppointmentInfo checkPatientAppointments(String patientId) {
-
         // Get all appointment list 
         MyList<Appointment> appointmentList = AppointmentManagement.getScheduledAppointments();
 
@@ -236,9 +236,11 @@ public class PatientManagement {
 
         // Convert to AppointmentInfo if needed
         return new AppointmentInfo(nextAppointment, days, hours);
-
     }
 
+    /**
+     * Inner class for gender statistics data
+     */
     public static class GenderStatistics {
 
         public final int maleCount;
@@ -261,5 +263,4 @@ public class PatientManagement {
                     maleCount, malePercentage, femaleCount, femalePercentage, totalCount);
         }
     }
-
 }

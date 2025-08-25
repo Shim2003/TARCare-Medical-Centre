@@ -4,6 +4,9 @@ import ADT.DynamicList;
 import ADT.MyList;
 import DAO.CurrentServingDAO;
 import DAO.DailyQueueStats;
+import DAO.QueueOperationResult;
+import DAO.NextPatientResult;
+import DAO.RemovalResult;
 import Entity.Doctor;
 import Entity.Patient;
 import Entity.QueueEntry;
@@ -20,47 +23,40 @@ public class QueueControl {
     private static MyList<QueueEntry> queueList = new DynamicList<>();
     private static MyList<CurrentServingDAO> currentServingPatient = new DynamicList<>();
 
-    public static QueueEntry addInQueue(String patientId) {
-
-        if (patientId != null) {
-
-            if (!PatientManagement.isPatientExists(patientId)) {
-                System.out.println("Patient ID not found... Please register first...");
-                return null;
-            }
-
-            Patient p = PatientManagement.findPatientById(patientId);
-
-            if (p == null) {
-                System.out.println("Error: Patient could not be found.");
-                return null;
-            }
-
-            if (queueList.anyMatch(qe -> qe.getPatientId().equals(p.getPatientID())
-                    && (qe.getStatus().equals(UtilityClass.statusWaiting)
-                    || qe.getStatus().equals(UtilityClass.statusConsulting)))) {
-                System.out.println("You are already in the queue or currently consulting.");
-                return null;
-            }
-
-            QueueEntry newQueue = new QueueEntry(p.getPatientID());
-            queueList.add(newQueue);
-
-            return newQueue;
+    public static QueueOperationResult addInQueue(String patientId) {
+        if (patientId == null) {
+            return new QueueOperationResult(false, "Patient ID cannot be null");
         }
 
-        return null;
+        if (!PatientManagement.isPatientExists(patientId)) {
+            return new QueueOperationResult(false, "Patient ID not found... Please register first...");
+        }
 
+        Patient p = PatientManagement.findPatientById(patientId);
+
+        if (p == null) {
+            return new QueueOperationResult(false, "Error: Patient could not be found.");
+        }
+
+        if (queueList.anyMatch(qe -> qe.getPatientId().equals(p.getPatientID())
+                && (qe.getStatus().equals(UtilityClass.statusWaiting)
+                || qe.getStatus().equals(UtilityClass.statusConsulting)))) {
+            return new QueueOperationResult(false, "You are already in the queue or currently consulting.");
+        }
+
+        QueueEntry newQueue = new QueueEntry(p.getPatientID());
+        queueList.add(newQueue);
+
+        return new QueueOperationResult(true, "Successfully added to queue", newQueue);
     }
 
-    public static QueueEntry getNextInQueue() {
-
+    public static NextPatientResult getNextInQueue() {
         // Get all waiting patients
         MyList<QueueEntry> waitingPatients = queueList.findAll(qe
                 -> qe.getStatus().equals(Utility.UtilityClass.statusWaiting));
 
         if (waitingPatients.isEmpty()) {
-            return null;
+            return new NextPatientResult(false, "No patients waiting in queue");
         }
 
         // Find the patient with the lowest queue number (next in sequence)
@@ -75,41 +71,37 @@ public class QueueControl {
         DynamicList<Doctor> freeDoctors = DoctorManagement.getFreeDoctors();
 
         if (freeDoctors.isEmpty()) {
-            System.out.println("No free doctors available. Please wait.");
-            return null;
+            return new NextPatientResult(false, "No free doctors available. Please wait.");
+        }
+
+        if (currentServingPatient.size() >= 3) {
+            return new NextPatientResult(false, "Consultation is full. Please try again later.");
         }
 
         Doctor firstFreeDoctors = freeDoctors.getFirst();
         firstFreeDoctors.setWorkingStatus(UtilityClass.statusConsulting);
         CurrentServingDAO newConsulattion = new CurrentServingDAO(nextPatient.getPatientId(), firstFreeDoctors.getDoctorID());
-
-        if (currentServingPatient.size() >= 3) {
-            System.out.println("Consultation is full. Please try again later.");
-            return null;
-        } else {
-            currentServingPatient.add(newConsulattion);
-        }
+        currentServingPatient.add(newConsulattion);
 
         nextPatient.setStatus(Utility.UtilityClass.statusConsulting);
-        return nextPatient;
+        return new NextPatientResult(true, "Patient called for consultation", nextPatient);
     }
 
     public static MyList<CurrentServingDAO> getCurrentServingPatient() {
         return currentServingPatient;
     }
 
-    public static void updateQueueStatus(String patientId) {
+    public static boolean updateQueueStatus(String patientId) {
         if (patientId == null || patientId.trim().isEmpty()) {
-            System.out.println("Invalid patient ID.");
-            return;
+            return false;
         }
 
         QueueEntry target = queueList.findFirst(qe -> qe.getPatientId().equals(patientId));
         if (target != null) {
             target.setStatus(UtilityClass.statusCompleted);
-        } else {
-            System.out.println("Patient not found in queue.");
+            return true;
         }
+        return false;
     }
 
     public static boolean isFullConsulting() {
@@ -117,10 +109,7 @@ public class QueueControl {
                 -> qe.getStatus().equals(Utility.UtilityClass.statusConsulting));
 
         // Full
-        if (consulting.size() >= 3) {
-            return true;
-        }
-        return false;
+        return consulting.size() >= 3;
     }
 
     public static MyList<QueueEntry> getQueueList() {
@@ -133,54 +122,55 @@ public class QueueControl {
     }
 
     public static boolean markAsCompleted(String patientId) {
-
         QueueEntry target = queueList.findFirst(qe -> qe.getPatientId().equals(patientId)
                 && qe.getStatus().equals(Utility.UtilityClass.statusConsulting));
 
         if (target != null) {
             target.setStatus(Utility.UtilityClass.statusCompleted);
-            System.out.println("Patient ID : " + patientId + " marked as COMPLETED.");
             return true;
-        } else {
-            System.out.println("No consulting patient found with ID: " + patientId);
-            return false;
         }
-
+        return false;
     }
 
     public static MyList<QueueEntry> getQueueListByStatus(String status) {
         return queueList.findAll(entry -> entry.getStatus().equalsIgnoreCase(status));
     }
 
-    public static boolean removeFromQueue(String queueId) {
-
+    public static RemovalResult removeFromQueue(String queueId) {
         if (queueId == null || queueId.trim().isEmpty()) {
-            System.out.println("Invalid input. Please enter a valid Patient ID.");
-            return false;
+            return new RemovalResult(false, "Invalid input. Please enter a valid Queue ID.");
         }
 
-        int id = Integer.parseInt(queueId);
-        int index = queueList.findIndex(queue -> queue.getQueueNumber() == id);
+        try {
+            int id = Integer.parseInt(queueId);
+            int index = queueList.findIndex(queue -> queue.getQueueNumber() == id);
 
-        if (index != -1) {
-            queueList.remove(index);
-            return true;
+            if (index != -1) {
+                queueList.remove(index);
+                return new RemovalResult(true, "Queue record removed successfully", 1);
+            }
+        } catch (NumberFormatException e) {
+            return new RemovalResult(false, "Invalid Queue ID format. Please enter a valid number.");
         }
 
-        return false;
+        return new RemovalResult(false, "No queue entry found with the given Queue ID.");
     }
 
-    public static boolean removeByStatus(String selectedStatus) {
-
+    public static RemovalResult removeByStatus(String selectedStatus) {
         MyList<QueueEntry> recordsToRemove = QueueControl.getQueueListByStatus(selectedStatus);
 
         if (recordsToRemove.isEmpty()) {
-            System.out.println("No queue records found with status: " + selectedStatus);
-            return false;
+            return new RemovalResult(false, "No queue records found with status: " + selectedStatus);
         }
 
-        return queueList.removeIf(entry -> entry.getStatus().equalsIgnoreCase(selectedStatus));
-
+        int removedCount = recordsToRemove.size();
+        boolean success = queueList.removeIf(entry -> entry.getStatus().equalsIgnoreCase(selectedStatus));
+        
+        if (success) {
+            return new RemovalResult(true, "Successfully removed " + removedCount + " queue records", removedCount);
+        } else {
+            return new RemovalResult(false, "Failed to remove queue records");
+        }
     }
 
     public static void clearAllQueueRecords() {
@@ -216,5 +206,4 @@ public class QueueControl {
 
         return new DailyQueueStats(date, total, waiting, consulting, completed, completionRate);
     }
-
 }

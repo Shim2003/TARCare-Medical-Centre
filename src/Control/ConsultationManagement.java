@@ -14,18 +14,10 @@ import Entity.QueueEntry;
 import Entity.Patient;
 import Entity.Doctor;
 import Entity.Consultation;
-import Entity.Appointment;
-import Entity.Schedule;
 import Utility.UtilityClass;
-import Control.PatientManagement;
-import Control.ScheduleManagement;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.time.LocalTime;
-import java.time.LocalDate;
 import java.time.Duration;
-import java.time.DayOfWeek;
 import java.time.ZoneId;
 import Boundary.MedicalTreatmentUI;
 
@@ -134,29 +126,6 @@ public class ConsultationManagement {
             }
         }
         System.out.println("=================================");
-    }
-    
-    // Add patient to queue
-    public static void addPatientToQueue(String patientId) {
-        QueueEntry entry = QueueControl.addInQueue(patientId);
-        if (entry != null) {
-            System.out.println("Patient added to consultation queue: " + patientId);
-        } else {
-            System.out.println("Failed to add patient to queue.");
-        }
-    }
-
-    // View the queue
-    public static void viewQueue() {
-        if (QueueControl.getQueueList().isEmpty()) {
-            System.out.println("No patients in queue.");
-        } else {
-            System.out.println("\n--- Current Queue ---");
-            for (int i = 0; i < QueueControl.getQueueList().size(); i++) {
-                QueueEntry qe = QueueControl.getQueueList().get(i);
-                System.out.println((i + 1) + ". " + qe.getPatientId() + " - " + qe.getStatus());
-            }
-        }
     }
 
     // Print all doctors status

@@ -7,6 +7,9 @@ package Boundary;
 import ADT.MyList;
 import Control.PatientManagement;
 import Control.QueueControl;
+import DAO.QueueOperationResult;
+import DAO.NextPatientResult;
+import DAO.RemovalResult;
 import Entity.Patient;
 import Entity.QueueEntry;
 import Utility.UtilityClass;
@@ -55,7 +58,7 @@ public class QueueUI {
                 case "6":
                     return;
                 default:
-                    System.out.println("Invalid choice. Please enter 1-4.");
+                    System.out.println("Invalid choice. Please enter 1-6.");
             }
         }
     }
@@ -98,9 +101,10 @@ public class QueueUI {
             return;
         }
 
-        QueueEntry newQueue = QueueControl.addInQueue(patientId);
+        QueueOperationResult result = QueueControl.addInQueue(patientId);
 
-        if (newQueue != null) {
+        if (result.isSuccess()) {
+            QueueEntry newQueue = result.getQueueEntry();
             // Get patient name for display
             Patient patient = PatientManagement.findPatientById(patientId);
             String patientName = (patient != null) ? patient.getFullName() : "Unknown Patient";
@@ -117,14 +121,7 @@ public class QueueUI {
 
         } else {
             System.out.println("\nFailed to join queue.");
-
-            // Brief error info
-            Patient patient = PatientManagement.findPatientById(patientId);
-            if (patient == null) {
-                System.out.println("Reason: Patient ID not found. Please register first.");
-            } else {
-                System.out.println("Reason: Already in queue or system error.");
-            }
+            System.out.println("Reason: " + result.getMessage());
         }
 
         UtilityClass.pressEnterToContinue();
@@ -165,9 +162,10 @@ public class QueueUI {
         System.out.println("+--------------------------------------+");
 
         // Get and serve next patient
-        QueueEntry nextPatient = Control.QueueControl.getNextInQueue();
+        NextPatientResult result = Control.QueueControl.getNextInQueue();
 
-        if (nextPatient != null) {
+        if (result.isSuccess()) {
+            QueueEntry nextPatient = result.getNextPatient();
             System.out.println("\n+--------------------------------------+");
             System.out.println("|            NOW SERVING               |");
             System.out.println("+--------------------------------------+");
@@ -176,7 +174,7 @@ public class QueueUI {
             System.out.println("| Patient called for consultation      |");
             System.out.println("+--------------------------------------+");
         } else {
-            System.out.println("\nERROR: Unable to retrieve next patient");
+            System.out.println("\nERROR: " + result.getMessage());
         }
 
         System.out.println("\n========================================");
@@ -208,7 +206,6 @@ public class QueueUI {
     }
 
     public static void displayQueueByStatus() {
-
         System.out.println("\n\n=== Display Queue By Status ===");
         System.out.println("Select Status : ");
         System.out.println("1. " + Utility.UtilityClass.statusWaiting);
@@ -241,30 +238,29 @@ public class QueueUI {
             System.out.println("No queue entries found with status: " + selectedStatus);
         } else {
             System.out.println("\nQueue Entries with status: " + selectedStatus);
+            System.out.println("Total entries: " + filteredList.size());
+            System.out.println("-".repeat(50));
             for (int i = 0; i < filteredList.size(); i++) {
-                System.out.println(filteredList.get(i).toString());
+                System.out.printf("%2d. %s%n", (i + 1), filteredList.get(i).toString());
             }
         }
 
         UtilityClass.pressEnterToContinue();
-
     }
 
     public static void cancelQueue() {
-
         System.out.print("Enter your Queue ID to cancel your queue entry: ");
         String queueId = scanner.nextLine();
 
-        boolean removed = Control.QueueControl.removeFromQueue(queueId);
+        RemovalResult result = Control.QueueControl.removeFromQueue(queueId);
 
-        if (removed) {
+        if (result.isSuccess()) {
             System.out.println("Your queue entry has been successfully cancelled.");
         } else {
-            System.out.println("No queue entry found with the given Identity Number.");
+            System.out.println("Cancellation Failed: " + result.getMessage());
         }
 
         UtilityClass.pressEnterToContinue();
-
     }
 
     public static void removeQueueRecord() {
@@ -309,17 +305,15 @@ public class QueueUI {
     }
 
     private static void removeSpecificQueueRecord() {
-
         System.out.print("Enter Queue ID: ");
         String queueId = scanner.nextLine();
 
-        boolean success = QueueControl.removeFromQueue(queueId);
+        RemovalResult result = QueueControl.removeFromQueue(queueId);
 
-        if (success) {
-            System.out.println("Remove Success.");
+        if (result.isSuccess()) {
+            System.out.println("Remove Success: " + result.getMessage());
         } else {
-            System.out.println("Removal cancelled. Please check on the Patient Id");
-            return;
+            System.out.println("Removal Failed: " + result.getMessage());
         }
 
         UtilityClass.pressEnterToContinue();
@@ -348,17 +342,19 @@ public class QueueUI {
                 break;
             default:
                 System.out.println("Invalid choice. Operation cancelled.");
+                UtilityClass.pressEnterToContinue();
                 return;
         }
 
-        if (QueueControl.removeByStatus(selectedStatus)) {
-            System.out.println("Successfully Removed.");
+        RemovalResult result = QueueControl.removeByStatus(selectedStatus);
+        
+        if (result.isSuccess()) {
+            System.out.println("Successfully Removed: " + result.getMessage());
         } else {
-            System.out.println("No queue entry found with the given Identity Number.");
+            System.out.println("Removal Failed: " + result.getMessage());
         }
 
         UtilityClass.pressEnterToContinue();
-
     }
 
     private static void removeAllQueueRecords() {
@@ -366,6 +362,7 @@ public class QueueUI {
 
         if (allRecords.isEmpty()) {
             System.out.println("No queue records to remove.");
+            UtilityClass.pressEnterToContinue();
             return;
         }
 
@@ -373,7 +370,14 @@ public class QueueUI {
         System.out.println("Total queue records: " + allRecords.size());
         System.out.print("Are you sure you want to remove ALL queue records? This action cannot be undone. (Y/N): ");
 
-        char confirm = scanner.nextLine().toUpperCase().charAt(0);
+        String input = scanner.nextLine().trim();
+        if (input.isEmpty()) {
+            System.out.println("No input provided. Removal cancelled.");
+            UtilityClass.pressEnterToContinue();
+            return;
+        }
+
+        char confirm = input.toUpperCase().charAt(0);
 
         if (confirm == 'Y') {
             System.out.print("Please type 'CONFIRM' to proceed with removing all records: ");
@@ -391,7 +395,6 @@ public class QueueUI {
         }
 
         UtilityClass.pressEnterToContinue();
-
     }
 
     public static void generateQueueReports() {
@@ -545,4 +548,24 @@ public class QueueUI {
         System.out.printf("] %d (%.1f%%)\n", count, percentage);
     }
 
+    // Additional helper methods for queue status management
+    public static void markPatientAsCompleted(String patientId) {
+        boolean success = QueueControl.markAsCompleted(patientId);
+        
+        if (success) {
+            System.out.println("Patient ID : " + patientId + " marked as COMPLETED.");
+        } else {
+            System.out.println("No consulting patient found with ID: " + patientId);
+        }
+    }
+
+    public static void updateQueueStatus(String patientId) {
+        boolean success = QueueControl.updateQueueStatus(patientId);
+        
+        if (success) {
+            System.out.println("Queue status updated successfully for patient: " + patientId);
+        } else {
+            System.out.println("Invalid patient ID or patient not found in queue.");
+        }
+    }
 }

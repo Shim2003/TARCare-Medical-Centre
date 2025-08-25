@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package Boundary;
 
 import ADT.DynamicList;
@@ -14,7 +10,9 @@ import java.util.Date;
 import java.util.Scanner;
 
 /**
- *
+ * PatientUI - Boundary layer for patient user interface
+ * Contains all display logic and user interactions
+ * 
  * @author Lee Wei Hao
  */
 public class PatientUI {
@@ -32,7 +30,7 @@ public class PatientUI {
             System.out.println("5. Generate Patient Report");
             System.out.println("6. Back to Admin Main Menu");
 
-            System.out.print("Enter your choice (1-7): ");
+            System.out.print("Enter your choice (1-6): ");
             String choice = scanner.nextLine();
 
             switch (choice) {
@@ -54,7 +52,7 @@ public class PatientUI {
                 case "6":
                     return;
                 default:
-                    System.out.println("Invalid choice. Please enter 1-7.");
+                    System.out.println("Invalid choice. Please enter 1-6.");
             }
         }
     }
@@ -89,7 +87,6 @@ public class PatientUI {
     }
 
     public static void addPatient() {
-
         System.out.println("\n\n\n== Register as new Patient ==");
 
         System.out.print("Enter Full Name: ");
@@ -134,7 +131,6 @@ public class PatientUI {
         }
 
         UtilityClass.pressEnterToContinue();
-
     }
 
     public static void updatePatient() {
@@ -202,7 +198,6 @@ public class PatientUI {
     }
 
     public static void displayPatientInfo() {
-
         System.out.print("Enter the Patient Id to display info: ");
         String patientId = scanner.nextLine();
 
@@ -215,7 +210,7 @@ public class PatientUI {
 
         System.out.println("\n\n");
 
-        appointmentStatus(patient.getPatientID());
+        displayAppointmentStatus(patient.getPatientID());
         System.out.println("--- Patient Details ---");
         System.out.println("Full Name: " + patient.getFullName());
         System.out.println("Identity Number: " + patient.getIdentityNumber());
@@ -228,7 +223,6 @@ public class PatientUI {
         System.out.println("Registration Date: " + UtilityClass.formatDate(patient.getRegistrationDate()));
 
         UtilityClass.pressEnterToContinue();
-
     }
 
     public static void removePatient() {
@@ -273,7 +267,7 @@ public class PatientUI {
         char confirm = scanner.nextLine().toUpperCase().charAt(0);
 
         if (confirm == 'Y') {
-            PatientManagement.clearAll(); // You must implement this method in PatientManagement
+            PatientManagement.clearAll();
             System.out.println("All patients have been removed.");
         } else {
             System.out.println("Removal of all patients cancelled.");
@@ -283,19 +277,31 @@ public class PatientUI {
     }
 
     public static void removeSpecificPatient() {
-        System.out.print("Enter the Identity Number of the patient to remove: ");
+        System.out.print("Enter the Patient ID of the patient to remove: ");
         String patientId = scanner.nextLine();
 
         Patient patient = PatientManagement.findPatientById(patientId);
         if (patient == null) {
             System.out.println("Patient not found.");
+            UtilityClass.pressEnterToContinue();
             return;
         }
 
+        System.out.println("\n--- Patient to be removed ---");
+        System.out.println("Patient ID: " + patient.getPatientID());
+        System.out.println("Full Name: " + patient.getFullName());
+        System.out.println("Identity Number: " + patient.getIdentityNumber());
+
         System.out.print("Are you sure you want to remove this patient? (Y/N): ");
         char confirm = scanner.nextLine().toUpperCase().charAt(0);
+        
         if (confirm == 'Y') {
-            PatientManagement.remove(confirm, patient);
+            boolean removed = PatientManagement.remove(patient);
+            if (removed) {
+                System.out.println("Patient removed successfully.");
+            } else {
+                System.out.println("Failed to remove patient.");
+            }
         } else {
             System.out.println("Removal cancelled.");
         }
@@ -329,7 +335,7 @@ public class PatientUI {
                 case "4":
                     return;
                 default:
-                    System.out.println("Invalid choice. Please enter 1-3.");
+                    System.out.println("Invalid choice. Please enter 1-4.");
             }
         }
     }
@@ -347,8 +353,6 @@ public class PatientUI {
             return;
         }
 
-        MyList<Patient> malePatients = PatientManagement.getMalePatients();
-        MyList<Patient> femalePatients = PatientManagement.getFemalePatients();
         PatientManagement.GenderStatistics genderStats = PatientManagement.getGenderStatistics();
 
         // Display the report
@@ -562,12 +566,11 @@ public class PatientUI {
             System.out.println("=".repeat(60));
             System.out.println("No patients registered yet. Cannot generate report.");
             System.out.println("=".repeat(60));
-            System.out.println("\nPress Enter to continue...");
-            scanner.nextLine();
+            UtilityClass.pressEnterToContinue();
             return;
         }
 
-        // Get age statistics using the new statistical function
+        // Get age statistics using the statistical function
         DynamicList.ListStatistics<Patient> ageStats = PatientManagement.getAgeStatistics();
 
         System.out.println("\n" + "=".repeat(70));
@@ -615,11 +618,14 @@ public class PatientUI {
         }
 
         System.out.println("=".repeat(70));
-        System.out.println("\nPress Enter to continue...");
-        scanner.nextLine();
+        UtilityClass.pressEnterToContinue();
     }
 
-    public static void appointmentStatus(String patientId) {
+    /**
+     * Display appointment status for a patient
+     * @param patientId The patient ID to check appointments for
+     */
+    public static void displayAppointmentStatus(String patientId) {
         AppointmentInfo nextAppointmentInfo = PatientManagement.checkPatientAppointments(patientId);
 
         if (nextAppointmentInfo != null) {
@@ -647,5 +653,4 @@ public class PatientUI {
             System.out.println(border);
         }
     }
-
 }

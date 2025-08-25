@@ -53,13 +53,11 @@ public class ConsultationUI {
         int choice;
         do {
             System.out.println("\n====== MAIN FUNCTIONS (Daily Use) ======");
-            System.out.println(" 1. Add Patient to Queue");
-            System.out.println(" 2. View Queue");
-            System.out.println(" 3. Start Next Consultation");
-            System.out.println(" 4. View Current Consulting Patients");
-            System.out.println(" 5. End Consultation");
-            System.out.println(" 6. View Patients Who Finished Consultation");
-            System.out.println(" 7. View Consultation Report");
+            System.out.println(" 1. Start Next Consultation");
+            System.out.println(" 2. View Current Consulting Patients");
+            System.out.println(" 3. End Consultation");
+            System.out.println(" 4. View Patients Who Finished Consultation");
+            System.out.println(" 5. View Consultation Report");
             System.out.println(" 0. Back");
             System.out.println("======================================");
             System.out.print("Enter your choice: ");
@@ -73,21 +71,15 @@ public class ConsultationUI {
             sc.nextLine();
 
             switch (choice) {
-                case 1 -> {
-                    System.out.print("Enter Patient ID: ");
-                    String patientId = sc.nextLine();
-                    consultationManagement.addPatientToQueue(patientId);
-                }
-                case 2 -> consultationManagement.viewQueue();
-                case 3 -> consultationManagement.startNextConsultation();
-                case 4 -> consultationManagement.viewCurrentConsulting();
-                case 5 -> {
+                case 1 -> consultationManagement.startNextConsultation();
+                case 2 -> consultationManagement.viewCurrentConsulting();
+                case 3 -> {
                     System.out.print("Enter Patient ID to end consultation: ");
                     String id = sc.nextLine();
                     consultationManagement.endConsultation(id);
                 }
-                case 6 -> consultationManagement.viewCompletedPatients();
-                case 7 -> {
+                case 4 -> consultationManagement.viewCompletedPatients();
+                case 5 -> {
                     System.out.print("Enter Patient ID or Consultation ID to view report: ");
                     String id = sc.nextLine();
                     consultationManagement.viewConsultationReport(id);
