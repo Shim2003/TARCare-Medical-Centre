@@ -83,8 +83,10 @@ public class TARCareMedicalCentre {
                     break;
                 case "5":
                     MedicalTreatmentUI.medicalTreatmentMainMenu();
+                    break;
                 case "6":
                     MedicalTreatmentUI.medicalTreatmentMainMenu();
+                    break;
                 case "7":
                     return;
                 default:
