@@ -868,7 +868,6 @@ public class PharmacyUI {
         System.out.println("\n--- Find Near Expiry Medicines ---");
         int months = readInt("Enter number of months from now: ");
 
-        // Use control layer method instead of manual filtering
         MyList<Medicine> results = service.getMedicinesNearExpiry(months);
 
         displaySearchResults("medicines expiring within " + months + " months", (DynamicList<Medicine>) results);
@@ -884,33 +883,28 @@ public class PharmacyUI {
 
         System.out.print("Minimum price (Enter for no limit): ");
         String minPriceStr = sc.nextLine().trim();
-        Double minPrice = minPriceStr.isEmpty() ? null : Double.parseDouble(minPriceStr);
+        Double minPrice = null;
+        if (!minPriceStr.isEmpty()) {
+            try {
+                minPrice = Double.parseDouble(minPriceStr);
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid minimum price format. Ignoring this criteria.");
+            }
+        }
 
         System.out.print("Maximum price (Enter for no limit): ");
         String maxPriceStr = sc.nextLine().trim();
-        Double maxPrice = maxPriceStr.isEmpty() ? null : Double.parseDouble(maxPriceStr);
+        Double maxPrice = null;
+        if (!maxPriceStr.isEmpty()) {
+            try {
+                maxPrice = Double.parseDouble(maxPriceStr);
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid maximum price format. Ignoring this criteria.");
+            }
+        }
 
-        DynamicList<Medicine> results = (DynamicList<Medicine>) service.getAll().filter(m -> {
-            boolean matches = true;
-
-            if (!namePattern.isEmpty()) {
-                matches = matches && m.getMedicineName().toLowerCase().contains(namePattern.toLowerCase());
-            }
-            if (!categoryFilter.isEmpty()) {
-                matches = matches && m.getCategory().equalsIgnoreCase(categoryFilter);
-            }
-            if (!manufacturerFilter.isEmpty()) {
-                matches = matches && m.getManufacturer().equalsIgnoreCase(manufacturerFilter);
-            }
-            if (minPrice != null) {
-                matches = matches && m.getPrice() >= minPrice;
-            }
-            if (maxPrice != null) {
-                matches = matches && m.getPrice() <= maxPrice;
-            }
-
-            return matches;
-        });
+        DynamicList<Medicine> results = (DynamicList<Medicine>) service.filterByMultipleCriteria(
+                namePattern, categoryFilter, manufacturerFilter, minPrice, maxPrice);
 
         displaySearchResults("medicines matching multiple criteria", results);
     }

@@ -159,55 +159,6 @@ public class PharmacyManagement {
         return totalCost;
     }
     
-    // Medicine inventory statistics
-    public void printMedicineUsageStats() {
-        if (medicines.isEmpty()) {
-            System.out.println("No medicines in inventory.");
-            return;
-        }
-        
-        // Cast to DynamicList to access getStatistics method
-        DynamicList<Medicine> medicineList = (DynamicList<Medicine>) medicines;
-        var stats = medicineList.getStatistics(Medicine::getQuantity);
-        
-        System.out.println("=== Medicine Inventory Statistics ===");
-        System.out.println("Total medicines: " + stats.count);
-        System.out.printf("Average quantity: %.2f%n", stats.average);
-        System.out.println("Minimum stock: " + (int)stats.min);
-        System.out.println("Maximum stock: " + (int)stats.max);
-        System.out.printf("Standard deviation: %.2f%n", stats.standardDeviation);
-        System.out.printf("Total inventory value: $%.2f%n", calculateTotalInventoryValue());
-        System.out.println("==========================================");
-    }
-    
-    // Sort medicines by name
-    public void sortMedicinesByName() {
-        DynamicList<Medicine> medicineList = (DynamicList<Medicine>) medicines;
-        UtilityClass.quickSort(medicineList, Comparator.comparing(Medicine::getMedicineName));
-        System.out.println("Medicines sorted by name.");
-    }
-    
-    // Sort medicines by quantity (useful for stock management)
-    public void sortMedicinesByQuantity() {
-        DynamicList<Medicine> medicineList = (DynamicList<Medicine>) medicines;
-        UtilityClass.quickSort(medicineList, Comparator.comparing(Medicine::getQuantity));
-        System.out.println("Medicines sorted by quantity (ascending).");
-    }
-    
-    // Sort medicines by price
-    public void sortMedicinesByPrice() {
-        DynamicList<Medicine> medicineList = (DynamicList<Medicine>) medicines;
-        UtilityClass.quickSort(medicineList, Comparator.comparing(Medicine::getPrice));
-        System.out.println("Medicines sorted by price (ascending).");
-    }
-    
-    // Sort medicines by dosage form
-    public void sortMedicinesByDosageForm() {
-        DynamicList<Medicine> medicineList = (DynamicList<Medicine>) medicines;
-        UtilityClass.quickSort(medicineList, Comparator.comparing(Medicine::getDosageForm));
-        System.out.println("Medicines sorted by dosage form.");
-    }
-    
     // Find medicines with low stock
     public MyList<Medicine> getLowStockMedicines(int threshold) {
         return medicines.findAll(m -> m.getQuantity() <= threshold);
@@ -234,59 +185,9 @@ public class PharmacyManagement {
         return total;
     }
     
-    // Print low stock alert
-    public void printLowStockAlert(int threshold) {
-        MyList<Medicine> lowStock = getLowStockMedicines(threshold);
-        if (lowStock.isEmpty()) {
-            System.out.println("All medicines are well-stocked!");
-        } else {
-            System.out.println("⚠️  === LOW STOCK ALERT ===");
-            System.out.println("Medicines with stock <= " + threshold + ":");
-            for (int i = 0; i < lowStock.size(); i++) {
-                Medicine med = lowStock.get(i);
-                System.out.printf("- %s (ID: %s): %d %s remaining%n", 
-                    med.getMedicineName(), med.getMedicineID(), 
-                    med.getQuantity(), med.getDosageForm());
-            }
-            System.out.println("==========================");
-        }
-    }
-    
     // Get medicines that are out of stock
     public MyList<Medicine> getOutOfStockMedicines() {
         return medicines.findAll(m -> m.getQuantity() == 0);
-    }
-    
-    // Print detailed inventory report
-    public void printDetailedInventoryReport() {
-        if (medicines.isEmpty()) {
-            System.out.println("No medicines in inventory.");
-            return;
-        }
-        
-        System.out.println("=== DETAILED INVENTORY REPORT ===");
-        System.out.printf("%-15s %-25s %-10s %-20s %-10s %-15s%n", 
-                         "ID", "Name", "Quantity", "Dosage", "Price", "Total Value");
-        System.out.println("-".repeat(95));
-        
-        double grandTotal = 0.0;
-        for (int i = 0; i < medicines.size(); i++) {
-            Medicine med = medicines.get(i);
-            double totalValue = med.getPrice() * med.getQuantity();
-            grandTotal += totalValue;
-            
-            System.out.printf("%-15s %-25s %-10d %-20s $%-9.2f $%-14.2f%n",
-                             med.getMedicineID(),
-                             med.getMedicineName(),
-                             med.getQuantity(),
-                             med.getCompleteDosage(),
-                             med.getPrice(),
-                             totalValue);
-        }
-        
-        System.out.println("-".repeat(95));
-        System.out.printf("Total Inventory Value: $%.2f%n", grandTotal);
-        System.out.println("=================================");
     }
     
     public String createStockRequest(String medicineID, int requestedQuantity) {
@@ -453,42 +354,6 @@ public class PharmacyManagement {
         return removedCount;
     }
     
-    public void printExpiryAlert(int daysAhead) {
-        MyList<Medicine> expired = getExpiredMedicines();
-        MyList<Medicine> nearExpiry = getMedicinesNearExpiry(daysAhead);
-        
-        if (!expired.isEmpty()) {
-            System.out.println("=== EXPIRED MEDICINES ===");
-            for (int i = 0; i < expired.size(); i++) {
-                Medicine med = expired.get(i);
-                System.out.printf("- %s (ID: %s): Expired on %s%n", 
-                    med.getMedicineName(), 
-                    med.getMedicineID(),
-                    sdf.format(med.getExpiryDate()));
-            }
-            System.out.println("============================");
-        }
-        
-        if (!nearExpiry.isEmpty()) {
-            System.out.println("=== MEDICINES EXPIRING WITHIN " + daysAhead + " DAYS ===");
-            for (int i = 0; i < nearExpiry.size(); i++) {
-                Medicine med = nearExpiry.get(i);
-                long daysUntilExpiry = (med.getExpiryDate().getTime() - System.currentTimeMillis()) 
-                                     / (24 * 60 * 60 * 1000);
-                System.out.printf("- %s (ID: %s): Expires in %d days (%s)%n", 
-                    med.getMedicineName(), 
-                    med.getMedicineID(),
-                    daysUntilExpiry,
-                    sdf.format(med.getExpiryDate()));
-            }
-            System.out.println("================================================");
-        }
-        
-        if (expired.isEmpty() && nearExpiry.isEmpty()) {
-            System.out.println("No expired or near-expiry medicines found!");
-        }
-    }
-    
     public double calculatePrescriptionCostForUI(Prescription prescription) {
         return calculatePrescriptionCost(prescription);
     }
@@ -507,25 +372,38 @@ public class PharmacyManagement {
             m.getPrice() >= minPrice && m.getPrice() <= maxPrice);
     }
 
-    public MyList<Medicine> filterByMultipleCriteria(String namePattern, 
-        String category, String manufacturer, Double minPrice, Double maxPrice) {
+    public MyList<Medicine> filterByMultipleCriteria(String namePattern,
+            String category, String manufacturer, Double minPrice, Double maxPrice) {
         return medicines.filter(m -> {
             boolean matches = true;
-            if (!namePattern.isEmpty()) {
+
+            // Check name pattern (case-insensitive)
+            if (namePattern != null && !namePattern.trim().isEmpty()) {
                 matches = matches && m.getMedicineName().toLowerCase()
-                    .contains(namePattern.toLowerCase());
+                        .contains(namePattern.toLowerCase().trim());
             }
-            if (!category.isEmpty()) {
-                matches = matches && m.getCategory().equalsIgnoreCase(category);
+
+            // Check category (case-insensitive)
+            if (category != null && !category.trim().isEmpty()) {
+                matches = matches && m.getCategory().equalsIgnoreCase(category.trim());
             }
-            // ... rest of criteria logic
+
+            // Check manufacturer (case-insensitive)
+            if (manufacturer != null && !manufacturer.trim().isEmpty()) {
+                matches = matches && m.getManufacturer().equalsIgnoreCase(manufacturer.trim());
+            }
+
+            // Check minimum price
+            if (minPrice != null) {
+                matches = matches && m.getPrice() >= minPrice;
+            }
+
+            // Check maximum price
+            if (maxPrice != null) {
+                matches = matches && m.getPrice() <= maxPrice;
+            }
+
             return matches;
         });
-    }
-
-    public MyList<Medicine> getAvailableMedicinesForRequest() {
-        MyList<Medicine> lowStock = getLowStockMedicines();
-        return lowStock.filter(med -> 
-            !hasPendingRequestForMedicine(med.getMedicineID()));
     }
 }
