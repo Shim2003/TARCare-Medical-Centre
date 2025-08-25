@@ -51,8 +51,8 @@ public class MedicalTreatmentUI {
                     case 2 ->
                         medicalTreatmentMenu();
                     case 3 -> {
-                        System.out.println("Exiting to Main Menu...");
-                        return; // Exit to main menu
+                        System.out.println("Exiting...");
+                        TARCareMedicalCentre.adminMainMenu();
                     }
                     default -> {
                         System.out.println("Invalid Choice. Please enter again from 1 to 5.");

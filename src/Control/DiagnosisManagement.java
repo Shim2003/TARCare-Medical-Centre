@@ -59,18 +59,13 @@ public class DiagnosisManagement {
         return diagnosisList.findFirst(d -> d.getDiagnosisId().equals(diagnosisId));
     }
 
-    //update diagnosis details
+    //update diagnosis details using ADT method
     public static boolean   updateDiagnosisDetails(String diagnosisId, Diagnosis newDiagnosis) {
-        Diagnosis existingDiagnosis = findDiagnosisById(diagnosisId);
-        if (existingDiagnosis != null) {
-            existingDiagnosis.setPatientId(newDiagnosis.getPatientId());
-            existingDiagnosis.setDoctorId(newDiagnosis.getDoctorId());
-            existingDiagnosis.setDiagnosisDate(newDiagnosis.getDiagnosisDate());
-            existingDiagnosis.setSymptoms(newDiagnosis.getSymptoms());
-            existingDiagnosis.setDiagnosisDescription(newDiagnosis.getDiagnosisDescription());
-            existingDiagnosis.setSeverityLevel(newDiagnosis.getSeverityLevel());
-            existingDiagnosis.setRecommendations(newDiagnosis.getRecommendations());
-            existingDiagnosis.setNotes(newDiagnosis.getNotes());
+        int index  = diagnosisList.findIndex(p -> p.getDiagnosisId().equals(diagnosisId));
+        if(index != -1) {
+
+            diagnosisList.replace(index, newDiagnosis);
+
             return true;
         }
         return false;
