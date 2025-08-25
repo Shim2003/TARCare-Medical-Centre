@@ -64,7 +64,7 @@ public class TARCareMedicalCentre {
             System.out.println("4. Consultation Management");
             System.out.println("5. Appointment Management");
             System.out.println("6. Medical Treatment Management");
-            System.out.println("7. Prescription Management");
+            System.out.println("7. Pharmacy Management");
             System.out.println("8. Back to Role Selection");
 
             System.out.print("Enter your choice (1-8): ");
