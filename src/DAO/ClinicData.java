@@ -6,21 +6,24 @@ package DAO;
 
 import ADT.DynamicList;
 import ADT.MyList;
+import Control.AppointmentManagement;
 import Control.DiagnosisManagement;
 import Control.DoctorManagement;
 import Control.LeaveManagement;
+import Control.MedicalTreatmentManagement;
 import Control.PatientManagement;
-import Control.QueueControl;
 import Control.PharmacyManagement;
+import Control.QueueControl;
 import Control.ScheduleManagement;
-import Control.AppointmentManagement;
 import Entity.Appointment;
 import Entity.Consultation;
 import Entity.Diagnosis;
+import Entity.MedicalTreatment;
+import Entity.MedicalTreatmentItem;
 import Entity.Medicine;
 import Entity.Patient;
-import Entity.QueueEntry;
 import Entity.Prescription;
+import Entity.QueueEntry;
 import Entity.StockRequest;
 import Utility.UtilityClass;
 import java.text.ParseException;
@@ -42,6 +45,8 @@ public class ClinicData {
         addSampleAppointments();
         addSampleQueueData();
         addSampleMedicine(); 
+        addSampleDiagnosis();
+        addSampleMedicalTreatment();
         LeaveManagement.addSampleLeaves();
         ScheduleManagement.addSampleSchedules();
         DoctorManagement.addSampleDoctor();
@@ -215,45 +220,65 @@ public class ClinicData {
 
             // Adding 10 sample diagnoses
             Diagnosis d1 = new Diagnosis("P001", "D001", new Date(),
-                    getSymptoms("D001"), "Common Cold", "Low",
+                    getSymptoms("DIAG1001"), "Common Cold", "Low",
                     "Drink warm fluids and rest for 3 days.",
                     "Patient reported mild cough and nasal congestion.");
             Diagnosis d2 = new Diagnosis("P002", "D002", new Date(),
-                    getSymptoms("D002"), "Influenza", "Medium",
+                    getSymptoms("DIAG1002"), "Influenza", "Medium",
                     "Take prescribed antiviral medication and monitor temperature.",
                     "High fever and body aches reported.");
             Diagnosis d3 = new Diagnosis("P003", "D003", new Date(),
-                    getSymptoms("D003"), "Migraine", "High",
+                    getSymptoms("DIAG1003"), "Migraine", "High",
                     "Avoid bright lights and take prescribed painkillers.",
                     "Severe headache localized to the right side.");
             Diagnosis d4 = new Diagnosis("P004", "D004", new Date(),
-                    getSymptoms("D004"), "Muscle Strain", "Medium",
+                    getSymptoms("DIAG1004"), "Muscle Strain", "Medium",
                     "Apply ice packs and attend physical therapy sessions.",
                     "Patient experienced muscle pain after heavy lifting.");
             Diagnosis d5 = new Diagnosis("P005", "D005", new Date(),
-                    getSymptoms("D005"), "Gastritis", "Medium",
+                    getSymptoms("DIAG1005"), "Gastritis", "Medium",
                     "Avoid spicy foods and eat smaller, frequent meals.",
                     "Patient reported stomach pain after meals.");
             Diagnosis d6 = new Diagnosis("P006", "D006", new Date(),
-                    getSymptoms("D006"), "Pharyngitis", "Low",
+                    getSymptoms("DIAG1006"), "Pharyngitis", "Low",
                     "Complete the full course of antibiotics.",
                     "Sore throat and difficulty swallowing.");
             Diagnosis d7 = new Diagnosis("P007", "D007", new Date(),
-                    getSymptoms("D007"), "Allergic Rhinitis", "Low",
+                    getSymptoms("DIAG1007"), "Allergic Rhinitis", "Low",
                     "Take antihistamines and avoid allergens.",
                     "Patient reported sneezing and itchy eyes.");
             Diagnosis d8 = new Diagnosis("P008", "D008", new Date(),
-                    getSymptoms("D008"), "Seasonal Flu", "Medium",
+                    getSymptoms("DIAG1008"), "Seasonal Flu", "Medium",
                     "Stay hydrated and rest for 5 days.",
                     "Fever and fatigue reported during flu season.");
             Diagnosis d9 = new Diagnosis("P009", "D009", new Date(),
-                    getSymptoms("D009"), "Chronic Fatigue", "High",
+                    getSymptoms("DIAG1009"), "Chronic Fatigue", "High",
                     "Adopt a regular sleep schedule and reduce stress.",
                     "Patient reported persistent fatigue for over a month.");
             Diagnosis d10 = new Diagnosis("P010", "D010", new Date(),
-                    getSymptoms("D010"), "Vertigo", "Critical",
+                    getSymptoms("DIAG1010"), "Vertigo", "Critical",
                     "Attend vestibular therapy sessions.",
                     "Patient reported dizziness and balance issues.");
+            Diagnosis d11 = new Diagnosis("P011", "D011", new Date(),
+                    getSymptoms("DIAG1011"), "Anemia", "Medium",
+                    "Increase iron intake and take prescribed supplements.",
+                    "Patient reported fatigue and weakness.");
+            Diagnosis d12 = new Diagnosis("P012", "D012", new Date(),
+                    getSymptoms("DIAG1012"), "Urinary Tract Infection", "Low",
+                    "Complete the full course of antibiotics.",
+                    "Patient reported frequent urination and burning sensation.");
+            Diagnosis d13 = new Diagnosis("P013", "D013", new Date(),
+                    getSymptoms("DIAG1013"), "Diabetes", "High",
+                    "Monitor blood sugar levels and take prescribed medication.",
+                    "Patient reported increased thirst and frequent urination.");
+            Diagnosis d14 = new Diagnosis("P014", "D014", new Date(),
+                    getSymptoms("DIAG1014"), "Depression", "Critical",
+                    "Attend therapy sessions and take prescribed medication.",
+                    "Patient reported persistent sadness and lack of interest.");
+            Diagnosis d15 = new Diagnosis("P015", "D015", new Date(),
+                    getSymptoms("DIAG1015"), "Asthma", "High",
+                    "Use inhalers as prescribed and avoid allergens.",
+                    "Patient reported shortness of breath and wheezing.");
 
             // Adding the diagnoses to the diagnosis list
             diagnosisList.add(d1);
@@ -266,6 +291,11 @@ public class ClinicData {
             diagnosisList.add(d8);
             diagnosisList.add(d9);
             diagnosisList.add(d10);
+            diagnosisList.add(d11);
+            diagnosisList.add(d12);
+            diagnosisList.add(d13);
+            diagnosisList.add(d14);
+            diagnosisList.add(d15);
 
             System.out.println("Added 10 sample diagnoses with auto-generated IDs.");
 
@@ -278,51 +308,181 @@ public class ClinicData {
         MyList<String> symptoms = new DynamicList<>();
 
         switch (diagnosisId) {
-            case "D001":
+            case "DIAG1001":
                 symptoms.add("Cough");
                 symptoms.add("Nasal congestion");
                 symptoms.add("Mild fever");
-            case "D002":
+            case "DIAG1002":
                 symptoms.add("High fever");
                 symptoms.add("Body aches");
                 symptoms.add("Fatigue");
-            case "D003":
+            case "DIAG1003":
                 symptoms.add("Severe headache");
                 symptoms.add("Sensitivity to light");
                 symptoms.add("Nausea");
-            case "D004":
+            case "DIAG1004":
                 symptoms.add("Muscle pain");
                 symptoms.add("Stiffness");
                 symptoms.add("Weakness");
-            case "D005":
+            case "DIAG1005":
                 symptoms.add("Stomach pain");
                 symptoms.add("Nausea");
                 symptoms.add("Bloating");
                 break;
-            case "D006":
+            case "DIAG1006":
                 symptoms.add("Sore throat");
                 symptoms.add("Difficulty swallowing");
                 symptoms.add("Swollen lymph nodes");
-            case "D007":
+            case "DIAG1007":
                 symptoms.add("Sneezing");
                 symptoms.add("Itchy eyes");
                 symptoms.add("Runny nose");
-            case "D008":
+            case "DIAG1008":
                 symptoms.add("Fever");
                 symptoms.add("Chills");
                 symptoms.add("Fatigue");
-            case "D009":
+            case "DIAG1009":
                 symptoms.add("Persistent fatigue");
                 symptoms.add("Muscle aches");
                 symptoms.add("Memory issues");
-            case "D010":
+            case "DIAG1010":
                 symptoms.add("Dizziness");
                 symptoms.add("Balance issues");
                 symptoms.add("Nausea");
+            case "DIAG1011":
+                symptoms.add("Fatigue");
+                symptoms.add("Weakness");
+                symptoms.add("Pale skin");
+            case "DIAG1012":
+                symptoms.add("Frequent urination");
+                symptoms.add("Burning sensation");
+                symptoms.add("Urgency to urinate");
+            case "DIAG1013":
+                symptoms.add("Increased thirst");
+                symptoms.add("Weight loss");
+                symptoms.add("Fatigue");
+            case "DIAG1014":
+                symptoms.add("Persistent sadness");
+                symptoms.add("Lack of interest");
+                symptoms.add("Difficulty concentrating");
+            case "DIAG1015":
+                symptoms.add("Shortness of breath");
+                symptoms.add("Wheezing");
+                symptoms.add("Chest tightness");
             default:
                 return new DynamicList<>();
         }
         return symptoms;
+    }
+
+    public static void addSampleMedicalTreatment() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+        try {
+        MyList<MedicalTreatment> treatmentList = MedicalTreatmentManagement.getMedicalTreatmentList();
+
+        // Example medicines
+        MyList<MedicalTreatmentItem> meds1 = new DynamicList<>();
+        meds1.add(new MedicalTreatmentItem("Paracetamol", "500mg", "Twice daily", "5 days", "Oral"));
+        meds1.add(new MedicalTreatmentItem("Antihistamine", "10mg", "Once daily", "3 days", "Oral"));
+
+        MyList<MedicalTreatmentItem> meds2 = new DynamicList<>();
+        meds2.add(new MedicalTreatmentItem("Oseltamivir", "75mg", "Twice daily", "5 days", "Oral"));
+
+        MyList<MedicalTreatmentItem> meds3 = new DynamicList<>();
+        meds3.add(new MedicalTreatmentItem("Sumatriptan", "50mg", "As needed", "7 days", "Oral"));
+
+        MyList<MedicalTreatmentItem> meds4 = new DynamicList<>();
+        meds4.add(new MedicalTreatmentItem("Ibuprofen", "400mg", "Thrice daily", "7 days", "Oral"));
+
+        MyList<MedicalTreatmentItem> meds5 = new DynamicList<>();
+        meds5.add(new MedicalTreatmentItem("Omeprazole", "20mg", "Once daily", "14 days", "Oral"));
+
+        // Sample treatments
+        MedicalTreatment t1 = new MedicalTreatment("DIAG001", "P1001", "D001",
+                new Date(), null, "Active", "Ongoing",
+                "Rest and hydration advised", "Patient stable", meds1);
+
+        MedicalTreatment t2 = new MedicalTreatment("DIAG002", "P1002", "D002",
+                new Date(), null, "Active", "Ongoing",
+                "Antiviral medication prescribed", "Monitor temperature", meds2);
+
+        MedicalTreatment t3 = new MedicalTreatment("DIAG003", "P1003", "D003",
+                new Date(), null, "Completed", "Successful",
+                "Avoid triggers like bright light", "Headache improving", meds3);
+
+        MedicalTreatment t4 = new MedicalTreatment("DIAG004", "P1004", "D004",
+                new Date(), null, "Active", "Needs Follow-up",
+                "Physical therapy scheduled", "Muscle pain reduced slightly", meds4);
+
+        MedicalTreatment t5 = new MedicalTreatment("DIAG005", "P1005", "D005",
+                new Date(), null, "Completed", "Successful",
+                "Diet modifications suggested", "Patient responding well", meds5);
+
+        MedicalTreatment t6 = new MedicalTreatment("DIAG006", "P1006", "D006",
+                new Date(), null, "Active", "Ongoing",
+                "Antibiotics prescribed", "Throat pain persists", new DynamicList<>());
+
+        MedicalTreatment t7 = new MedicalTreatment("DIAG007", "P1007", "D007",
+                new Date(), null, "Completed", "Successful",
+                "Advised to avoid allergens", "No sneezing reported", new DynamicList<>());
+
+        MedicalTreatment t8 = new MedicalTreatment("DIAG008", "P1008", "D008",
+                new Date(), null, "Active", "Ongoing",
+                "Rest and fluids advised", "Fever persists", new DynamicList<>());
+
+        MedicalTreatment t9 = new MedicalTreatment("DIAG009", "P1009", "D009",
+                new Date(), null, "Active", "Needs Follow-up",
+                "Stress management counseling", "Fatigue continues", new DynamicList<>());
+
+        MedicalTreatment t10 = new MedicalTreatment("DIAG010", "P1010", "D010",
+                new Date(), null, "Active", "Ongoing",
+                "Vestibular therapy planned", "Patient still dizzy", new DynamicList<>());
+            
+        Date treatmentDate = sdf.parse("2023/04/01");
+        Date followUpDate = sdf.parse("2023/04/15");
+
+        MedicalTreatment t11 = new MedicalTreatment("DIAG011", "P1011", "D011",
+                treatmentDate, followUpDate, "Completed", "Partially",
+                "Patient advised to avoid caffeine", "Patient still experiencing symptoms", new DynamicList<>());
+
+        MedicalTreatment t12 = new MedicalTreatment("DIAG012", "P1012", "D012",
+                treatmentDate, followUpDate, "Completed", "Successful",
+                "Patient advised to avoid spicy foods", "Patient no longer experiencing symptoms", new DynamicList<>());
+
+        MedicalTreatment t13 = new MedicalTreatment("DIAG013", "P1013", "D013",
+                treatmentDate, followUpDate, "Completed", "Unsuccessful",
+                "Patient advised to avoid alcohol", "Patient still experiencing symptoms", new DynamicList<>());
+
+        MedicalTreatment t14 = new MedicalTreatment("DIAG014", "P1014", "D014",
+                treatmentDate, followUpDate, "Completed", "Successful",
+                "Patient advised to avoid dairy products", "Patient no longer experiencing symptoms", new DynamicList<>());
+
+        MedicalTreatment t15 = new MedicalTreatment("DIAG015", "P1015", "D015",
+                treatmentDate, followUpDate, "Completed", "Unsuccessful",
+                "Patient advised to avoid gluten", "Patient still experiencing symptoms", new DynamicList<>());
+
+        // add them into treatmentList
+        treatmentList.add(t1);
+        treatmentList.add(t2);
+        treatmentList.add(t3);
+        treatmentList.add(t4);
+        treatmentList.add(t5);
+        treatmentList.add(t6);
+        treatmentList.add(t7);
+        treatmentList.add(t8);
+        treatmentList.add(t9);
+        treatmentList.add(t10);
+        treatmentList.add(t11);
+        treatmentList.add(t12);
+        treatmentList.add(t13);
+        treatmentList.add(t14);
+        treatmentList.add(t15);
+
+        System.out.println("Added sample medical treatments for first 15 diagnoses.");
+    } catch (Exception e) {
+        System.out.println("Error adding sample treatments: " + e.getMessage());
+    }
     }
 
     public static void addSampleQueueData() {
