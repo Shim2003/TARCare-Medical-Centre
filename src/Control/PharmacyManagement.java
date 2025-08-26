@@ -351,4 +351,21 @@ public class PharmacyManagement {
         }
     }
 
+    public MyList<Medicine> createInventorySnapshot() { return medicines.clone(); }
+    
+    public double calculateSnapshotTotalValue(MyList<Medicine> snapshot) {
+        double totalValue = 0;
+        for (int i = 0; i < snapshot.size(); i++) {
+            Medicine med = snapshot.get(i);
+            totalValue += med.getPrice() * med.getQuantity();
+        }
+        return totalValue;
+    }
+
+    public double calculateSnapshotAverageStock(MyList<Medicine> snapshot) {
+        if (snapshot.isEmpty()) return 0;
+
+        var stats = medicines.getStatistics(Medicine::getQuantity);
+        return stats.average;
+    }
 }
