@@ -23,19 +23,23 @@ public class ScheduleManagement {
     private static MyList<Schedule> scheduleList = new DynamicList<>();
 
     public static boolean addSchedule(Schedule s) {
-        if (s == null) {
-            return false;
-        }
+        if (s != null) {
+            if (hasConflict(s)) {
+                return false; // no message here
+            }
 
-        // no conflict check here anymore
-        scheduleList.add(s);
+            scheduleList.add(s);
 
-        Doctor doctor = DoctorManagement.findDoctorById(s.getDoctorID());
-        if (doctor != null) {
-            DoctorManagement.updateWorkingStatus(doctor);
+            // Update doctor status right after adding schedule
+            Doctor doctor = DoctorManagement.findDoctorById(s.getDoctorID());
+            if (doctor != null) {
+                DoctorManagement.updateWorkingStatus(doctor);
+            }
+            return true;
         }
-        return true;
+        return false;
     }
+
 
     public static boolean hasConflict(Schedule newSchedule) {
         for (int i = 0; i < scheduleList.size(); i++) {
