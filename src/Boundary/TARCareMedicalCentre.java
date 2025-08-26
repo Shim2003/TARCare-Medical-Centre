@@ -99,7 +99,7 @@ public class TARCareMedicalCentre {
                     System.out.println("Invalid choice. Please enter 1-8.");
             }
         }
-    }
+    }//sh
 
     public static void patientMainMenu() {
         while (true) {

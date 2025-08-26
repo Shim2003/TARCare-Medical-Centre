@@ -68,29 +68,22 @@ public class QueueControl {
             }
         }
 
-        DynamicList<Doctor> freeDoctors = DoctorManagement.getFreeDoctors();
-
-        if (freeDoctors.isEmpty()) {
-            return new NextPatientResult(false, "No free doctors available. Please wait.");
-        }
-
         if (currentServingPatient.size() >= 3) {
             return new NextPatientResult(false, "Consultation is full. Please try again later.");
         }
 
-        Doctor firstFreeDoctors = freeDoctors.getFirst();
-        firstFreeDoctors.setWorkingStatus(UtilityClass.statusConsulting);
-        nextPatient.setStatus(Utility.UtilityClass.statusConsulting);
-        CurrentServingDAO newConsulattion = new CurrentServingDAO(nextPatient.getPatientId(), firstFreeDoctors.getDoctorID());
-        currentServingPatient.add(newConsulattion);
-
+        nextPatient.setStatus(Utility.UtilityClass.statusReadyToConsult);
         return new NextPatientResult(true, "Patient called for consultation", nextPatient);
     }
 
     public static MyList<CurrentServingDAO> getCurrentServingPatient() {
         return currentServingPatient;
     }
-
+    
+    public static MyList<QueueEntry> getReadyToConsultPatient(){
+        return queueList.findAll(ql -> ql.getStatus().equals(Utility.UtilityClass.statusReadyToConsult));
+    }
+    
     public static boolean updateQueueStatus(String patientId) {
         if (patientId == null || patientId.trim().isEmpty()) {
             return false;
@@ -200,6 +193,31 @@ public class QueueControl {
         double completionRate = total > 0 ? (double) completed / total * 100 : 0;
 
         return new DailyQueueStats(date, total, waiting, consulting, completed, completionRate);
+    }
+
+    public static boolean removeFromCurrentServing(String patientId) {
+        if (patientId == null || patientId.trim().isEmpty()) {
+            return false;
+        }
+
+        // Find index of the patient in the serving list
+        int index = currentServingPatient.findIndex(cs -> cs.getPatientId().equals(patientId));
+
+        if (index != -1) {
+            currentServingPatient.remove(index);
+
+            // Also update the doctor's status back to "Free"
+            Doctor doctor = DoctorManagement.findDoctorById(
+                    currentServingPatient.get(index).getDoctorId()
+            );
+            if (doctor != null) {
+                doctor.setWorkingStatus(UtilityClass.statusFree);
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
 }
