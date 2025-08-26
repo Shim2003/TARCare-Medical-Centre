@@ -6,7 +6,6 @@ package DAO;
 
 import ADT.DynamicList;
 import ADT.MyList;
-import Boundary.PharmacyUI;
 import Control.AppointmentManagement;
 import Control.ConsultationManagement;
 import Control.DiagnosisManagement;
@@ -59,6 +58,8 @@ public class ClinicData {
         addSampleDoctor();
         addSamplePrescriptions();
         addSampleStockRequests();
+        addSampleDiagnosis();
+        addSampleMedicalTreatment();
     }
 
     public static void addSamplePatients() {
@@ -376,7 +377,7 @@ public class ClinicData {
     }
 
     public static void addSampleMedicalTreatment() {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyy");
 
         try {
         MyList<MedicalTreatment> treatmentList = MedicalTreatmentManagement.getMedicalTreatmentList();
@@ -399,67 +400,67 @@ public class ClinicData {
         meds5.add(new MedicalTreatmentItem("Omeprazole", "20mg", "Once daily", "14 days", "Oral"));
 
         // Sample treatments
-        MedicalTreatment t1 = new MedicalTreatment("DIAG001", "P1001", "D001",
-                new Date(), null, "Active", "Ongoing",
+        MedicalTreatment t1 = new MedicalTreatment("TRMT1001", "P1001", "D001",
+                new Date(), null, "Active", "Failed",
                 "Rest and hydration advised", "Patient stable", meds1);
 
-        MedicalTreatment t2 = new MedicalTreatment("DIAG002", "P1002", "D002",
-                new Date(), null, "Active", "Ongoing",
+        MedicalTreatment t2 = new MedicalTreatment("TRMT1002", "P1002", "D002",
+                new Date(), null, "Active", "Failed",
                 "Antiviral medication prescribed", "Monitor temperature", meds2);
 
-        MedicalTreatment t3 = new MedicalTreatment("DIAG003", "P1003", "D003",
-                new Date(), null, "Completed", "Successful",
+        MedicalTreatment t3 = new MedicalTreatment("TRMT1003", "P1003", "D003",
+                new Date(), null, "Completed", "Follow up",
                 "Avoid triggers like bright light", "Headache improving", meds3);
 
-        MedicalTreatment t4 = new MedicalTreatment("DIAG004", "P1004", "D004",
-                new Date(), null, "Active", "Needs Follow-up",
+        MedicalTreatment t4 = new MedicalTreatment("TRMT1004", "P1004", "D004",
+                new Date(), null, "Active", "Follow up",
                 "Physical therapy scheduled", "Muscle pain reduced slightly", meds4);
 
-        MedicalTreatment t5 = new MedicalTreatment("DIAG005", "P1005", "D005",
+        MedicalTreatment t5 = new MedicalTreatment("TRMT1005", "P1005", "D005",
                 new Date(), null, "Completed", "Successful",
                 "Diet modifications suggested", "Patient responding well", meds5);
 
-        MedicalTreatment t6 = new MedicalTreatment("DIAG006", "P1006", "D006",
+        MedicalTreatment t6 = new MedicalTreatment("TRMT1006", "P1006", "D006",
                 new Date(), null, "Active", "Ongoing",
                 "Antibiotics prescribed", "Throat pain persists", new DynamicList<>());
 
-        MedicalTreatment t7 = new MedicalTreatment("DIAG007", "P1007", "D007",
+        MedicalTreatment t7 = new MedicalTreatment("TRMT1007", "P1007", "D007",
                 new Date(), null, "Completed", "Successful",
                 "Advised to avoid allergens", "No sneezing reported", new DynamicList<>());
 
-        MedicalTreatment t8 = new MedicalTreatment("DIAG008", "P1008", "D008",
+        MedicalTreatment t8 = new MedicalTreatment("TRMT1008", "P1008", "D008",
                 new Date(), null, "Active", "Ongoing",
                 "Rest and fluids advised", "Fever persists", new DynamicList<>());
 
-        MedicalTreatment t9 = new MedicalTreatment("DIAG009", "P1009", "D009",
-                new Date(), null, "Active", "Needs Follow-up",
+        MedicalTreatment t9 = new MedicalTreatment("TRMT1009", "P1009", "D009",
+                new Date(), null, "Active", "Follow up",
                 "Stress management counseling", "Fatigue continues", new DynamicList<>());
 
-        MedicalTreatment t10 = new MedicalTreatment("DIAG010", "P1010", "D010",
+        MedicalTreatment t10 = new MedicalTreatment("TRMT1010", "P1010", "D010",
                 new Date(), null, "Active", "Ongoing",
                 "Vestibular therapy planned", "Patient still dizzy", new DynamicList<>());
             
-        Date treatmentDate = sdf.parse("2023/04/01");
-        Date followUpDate = sdf.parse("2023/04/15");
+        Date treatmentDate = sdf.parse("04/01/2023");
+        Date followUpDate = sdf.parse("04/12/2024");
 
-        MedicalTreatment t11 = new MedicalTreatment("DIAG011", "P1011", "D011",
-                treatmentDate, followUpDate, "Completed", "Partially",
+        MedicalTreatment t11 = new MedicalTreatment("TRMT1011", "P1011", "D011",
+                treatmentDate, followUpDate, "Completed", "Failed",
                 "Patient advised to avoid caffeine", "Patient still experiencing symptoms", new DynamicList<>());
 
-        MedicalTreatment t12 = new MedicalTreatment("DIAG012", "P1012", "D012",
+        MedicalTreatment t12 = new MedicalTreatment("TRMT1012", "P1012", "D012",
                 treatmentDate, followUpDate, "Completed", "Successful",
                 "Patient advised to avoid spicy foods", "Patient no longer experiencing symptoms", new DynamicList<>());
 
-        MedicalTreatment t13 = new MedicalTreatment("DIAG013", "P1013", "D013",
-                treatmentDate, followUpDate, "Completed", "Unsuccessful",
+        MedicalTreatment t13 = new MedicalTreatment("TRMT1013", "P1013", "D013",
+                treatmentDate, followUpDate, "Completed", "Successful",
                 "Patient advised to avoid alcohol", "Patient still experiencing symptoms", new DynamicList<>());
 
-        MedicalTreatment t14 = new MedicalTreatment("DIAG014", "P1014", "D014",
-                treatmentDate, followUpDate, "Completed", "Successful",
+        MedicalTreatment t14 = new MedicalTreatment("TRMT1014", "P1014", "D014",
+                treatmentDate, followUpDate, "Completed", "Follow up",
                 "Patient advised to avoid dairy products", "Patient no longer experiencing symptoms", new DynamicList<>());
 
-        MedicalTreatment t15 = new MedicalTreatment("DIAG015", "P1015", "D015",
-                treatmentDate, followUpDate, "Completed", "Unsuccessful",
+        MedicalTreatment t15 = new MedicalTreatment("TRMT1015", "P1015", "D015",
+                treatmentDate, followUpDate, "Completed", "Successful",
                 "Patient advised to avoid gluten", "Patient still experiencing symptoms", new DynamicList<>());
 
         // add them into treatmentList
@@ -480,9 +481,9 @@ public class ClinicData {
         treatmentList.add(t15);
 
         System.out.println("Added sample medical treatments for first 15 diagnoses.");
-    } catch (Exception e) {
-        System.out.println("Error adding sample treatments: " + e.getMessage());
-    }
+        } catch (Exception e) {
+                System.out.println("Error adding sample treatments: " + e.getMessage());
+        }
     }
 
     public static void addSampleQueueData() {
