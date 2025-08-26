@@ -341,10 +341,10 @@ public class PharmacyManagement {
     }
     
     public static String generateNewPrescriptionId() {
-        if (PharmacyManagement.prescriptionQueue.isEmpty()) {
+        if (prescriptionQueue.isEmpty()) {
             return "RX001";
         } else {
-            String lastId = PharmacyManagement.prescriptionQueue.get(PharmacyManagement.prescriptionQueue.size() - 1).getPrescriptionID();
+            String lastId = prescriptionQueue.get(prescriptionQueue.size() - 1).getPrescriptionID();
             int numericPart = Integer.parseInt(lastId.substring(2));
             numericPart++;
             return String.format("RX%03d", numericPart);
