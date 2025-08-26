@@ -326,18 +326,15 @@ public class PharmacyManagement {
             results = searchMedicinesByPattern(namePattern);
         }
         if (category != null && !category.trim().isEmpty()) {
-            results = ((DynamicList<Medicine>) results)
-                    .filter(m -> m.getCategory().equalsIgnoreCase(category.trim()));
+            results = filterByCategory(category);
         }
         if (manufacturer != null && !manufacturer.trim().isEmpty()) {
-            results = ((DynamicList<Medicine>) results)
-                    .filter(m -> m.getManufacturer().equalsIgnoreCase(manufacturer.trim()));
+            results = filterByManufacturer(manufacturer);
         }
         if (minPrice != null || maxPrice != null) {
             double min = (minPrice == null) ? Double.MIN_VALUE : minPrice;
             double max = (maxPrice == null) ? Double.MAX_VALUE : maxPrice;
-            results = ((DynamicList<Medicine>) results)
-                    .filter(m -> m.getPrice() >= min && m.getPrice() <= max);
+            results = filterByPriceRange(min, max);
         }
 
         return results;
