@@ -30,12 +30,11 @@ public class DiagnosisUI {
             System.out.println("1. View Diagnosis List");
             System.out.println("2. Update Diagnosis Details");
             System.out.println("3. Delete Diagnosis");
-            System.out.println("4. Generate Diagnosis Reports");
-            System.out.println("5. Generate Diagnosis Statistics Report");
-            System.out.println("6. Filter Diagnosis by Severity Level");
-            System.out.println("7. Exit to Main Menu");
+            System.out.println("4. Generate Diagnosis Record");
+            System.out.println("5. Severity Level And Symptoms Check");
+            System.out.println("6. Exit to Main Menu");
 
-            System.out.print("Enter your choice (1-7): ");
+            System.out.print("Enter your choice (1-6): ");
 
             try {
                 int choice = scanner.nextInt();
@@ -52,12 +51,9 @@ public class DiagnosisUI {
                         String report = displayDiagnosisList();
                         System.out.println(report);
                     }
-
                     case 5 ->
-                        generateDiagnosisStatisticsReport();
-                    case 6 ->
-                        filterDiagnosisBySeverityLevel();
-                    case 7 -> {
+                        severityAndSymptomCheck();
+                    case 6 -> {
                         System.out.println("Exiting to Main Menu...");
                         return; // Exit to main menu
                     }
@@ -116,13 +112,13 @@ public class DiagnosisUI {
             String severityLevel;
             switch (severity) {
                 case "1" ->
-                    severityLevel = "Low!";
+                    severityLevel = "Low";
                 case "2" ->
-                    severityLevel = "Medium!!";
+                    severityLevel = "Medium";
                 case "3" ->
-                    severityLevel = "High!!";
+                    severityLevel = "High";
                 case "4" ->
-                    severityLevel = "Critical!!!";
+                    severityLevel = "Critical";
                 default -> {
                     System.out.println("Invalid Input. Please select again.");
                     return;
@@ -351,83 +347,6 @@ public class DiagnosisUI {
         }
     }
 
-    // Generate diagnosis statistics report
-    public static void generateDiagnosisStatisticsReport() {
-        System.out.println("\n=== Diagnosis Statistics Report ===");
-
-        // Prompt user to enter the year
-        System.out.print("Enter the year (e.g., 2025): ");
-        String yearInput = scanner.nextLine().trim();
-
-        int year;
-        try {
-            year = Integer.parseInt(yearInput);
-            if (year < 2020 || year > Year.now().getValue()) {
-                System.out.println("Please enter a valid year between 2020 and the current year.");
-                return;
-            }
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid input. Please enter a valid year.");
-            return;
-        }
-
-        // Prompt user to enter the month
-        System.out.print("Enter the month (01-12): ");
-        String monthInput = scanner.nextLine().trim();
-
-        if (monthInput.length() == 1) {
-            monthInput = "0" + monthInput; // Ensure the month is in two-digit format
-        }
-
-        int month;
-        try {
-            month = Integer.parseInt(monthInput);
-            if (month < 1 || month > 12) {
-                System.out.println("Invalid input. Please enter a month between 01 and 12.");
-                return;
-            }
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid input. Please enter a valid month.");
-            return;
-        }
-
-        // Filter diagnoses by year and month
-        MyList<Diagnosis> filteredDiagnoses = DiagnosisManagement.getDiagnosesByYearAndMonth(year, month);
-
-        if (filteredDiagnoses.isEmpty()) {
-            System.out.printf("No diagnoses found for %s %d.\n", new SimpleDateFormat("MMMM").format(new Date(year - 1900, month - 1, 1)), year);
-            return;
-        }
-
-        // Initialize counters for severity levels
-        int lowCount = 0, mediumCount = 0, highCount = 0, criticalCount = 0;
-
-        for (int i = 0; i < filteredDiagnoses.size(); i++) {
-            Diagnosis diagnosis = filteredDiagnoses.get(i);
-            switch (diagnosis.getSeverityLevel().toUpperCase()) {
-                case "LOW" ->
-                    lowCount++;
-                case "MEDIUM" ->
-                    mediumCount++;
-                case "HIGH" ->
-                    highCount++;
-                case "CRITICAL" ->
-                    criticalCount++;
-            }
-        }
-
-        // Display the statistics
-        System.out.println("\n==============================================================");
-        System.out.printf("Diagnosis Statistics Report for %s %d\n", new SimpleDateFormat("MMMM").format(new Date(year - 1900, month - 1, 1)), year);
-        System.out.println("==============================================================");
-        System.out.printf("Total Diagnoses: %d\n", filteredDiagnoses.size());
-        System.out.printf("Low Severity: %d\n", lowCount);
-        System.out.printf("Medium Severity: %d\n", mediumCount);
-        System.out.printf("High Severity: %d\n", highCount);
-        System.out.printf("Critical Severity: %d\n", criticalCount);
-        System.out.println("==============================================================");
-    }
-
     public static String displayDiagnosisList() {
         StringBuilder sb = new StringBuilder();
 
@@ -514,33 +433,117 @@ public class DiagnosisUI {
     }
 
     // Allow users to enter the severity level to filter the diagnosis list and display the diagnosis ID and its patient ID
-    public static void filterDiagnosisBySeverityLevel() {
+    public static void severityAndSymptomCheck() {
         System.out.println("\n\n=== Filter Diagnosis by Severity Level ===");
-        int year = 0;
+        int year;
         int month = 0;
-        MyList<Diagnosis> filteredList = EnterYearAndMonth(year, month);
+        // Prompt user to enter the year
+        System.out.print("Enter the year (e.g., 2025): ");
+        String yearInput = scanner.nextLine().trim();
+
+        try {
+            year = Integer.parseInt(yearInput);
+            if (year < 2020 || year > Year.now().getValue()) {
+                System.out.println("Please enter a valid year between 2020 and the current year.");
+                return;
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input. Please enter a valid year.");
+            return;
+        }
+
+        //display all the diagnosis based on severity level and its count
+        MyList<Diagnosis> filteredList = DiagnosisManagement.getDiagnosesByYear(year);
 
         if (filteredList.isEmpty()) {
             System.out.println("No diagnoses found for the specified year and month.");
             return;
         }
 
-        System.out.print("Enter the severity level to filter the diagnosis list: ");
-        String severityLevel = scanner.nextLine().trim();
+        // Counters
+        int lowCount = 0;
+        int mediumCount = 0;
+        int highCount = 0;
+        int criticalCount = 0;
 
-        MyList<Diagnosis> filteredDiagnosisList = DiagnosisManagement.filterDiagnosisBySeverityLevel(severityLevel);
+        // Collect all symptoms in a DynamicList
+        DynamicList<String> allSymptoms = new DynamicList<>();
 
-        if(filteredDiagnosisList.isEmpty()) {
-            System.out.println("No diagnoses available to filter.");
-        } else {
-            System.out.println("Filtered Diagnosis List by Severity Level (" + severityLevel + "):");
-            System.out.println("--------------------------------------------------");
-            for (int i = 0; i < filteredDiagnosisList.size(); i++) {
-                Diagnosis diagnosis = filteredDiagnosisList.get(i);
-                System.out.printf("[" + (i + 1) + "]" + "Diagnosis ID: %s, Patient ID: %s\n", diagnosis.getDiagnosisId(), diagnosis.getPatientId());
-                
+        // Loop through filtered list and count by severity
+        for (int i = 0; i < filteredList.size(); i++) {
+            Diagnosis diagnosis = filteredList.get(i);
+            String severity = diagnosis.getSeverityLevel();
+
+            if (severity.equalsIgnoreCase("low")) {
+                lowCount++;
+            } else if (severity.equalsIgnoreCase("medium")) {
+                mediumCount++;
+            } else if (severity.equalsIgnoreCase("high")) {
+                highCount++;
+            } else if (severity.equalsIgnoreCase("critical")) {
+                criticalCount++;
             }
-            System.out.println("--------------------------------------------------");
+
+            //add all symptoms to the list
+            MyList<String> symptoms = diagnosis.getSymptoms();
+            for (int j = 0; j < symptoms.size(); j++) {
+                allSymptoms.add(symptoms.get(j));
+            }
+        }
+
+        // Display the result
+        System.out.println("\nDiagnoses by Severity Level (" + year + "):");
+        System.out.println("===========================================");
+        System.out.println("Severity Level | Count");
+        System.out.println("===========================================");
+        System.out.printf("Low           | %d\n", lowCount);
+        System.out.printf("Medium        | %d\n", mediumCount);
+        System.out.printf("High          | %d\n", highCount);
+        System.out.printf("Critical      | %d\n\n", criticalCount);
+
+        // Calculate top 3 symptoms
+        DynamicList<String> topSymptoms = new DynamicList<>();
+        int[] symptomCounts = new int[allSymptoms.size()];
+
+        for (int i = 0; i < allSymptoms.size(); i++) {
+            String symptom = allSymptoms.get(i);
+            boolean found = false;
+            for (int j = 0; j < topSymptoms.size(); j++) {
+                if (topSymptoms.get(j).equalsIgnoreCase(symptom)) {
+                    symptomCounts[j]++;
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                topSymptoms.add(symptom);
+                symptomCounts[topSymptoms.size() - 1] = 1;
+            }
+        }
+
+        // Sort topSymptoms by count (simple bubble sort)
+        for (int i = 0; i < topSymptoms.size() - 1; i++) {
+            for (int j = i + 1; j < topSymptoms.size(); j++) {
+                if (symptomCounts[j] > symptomCounts[i]) {
+                    // Swap counts
+                    int tempCount = symptomCounts[i];
+                    symptomCounts[i] = symptomCounts[j];
+                    symptomCounts[j] = tempCount;
+
+                    // Swap symptoms
+                    String tempSymptom = topSymptoms.get(i);
+                    topSymptoms.replace(i, topSymptoms.get(j));
+                    topSymptoms.replace(j, tempSymptom);
+                }
+            }
+        }
+
+        // Display top 3 symptoms
+        System.out.println("Top 3 Symptoms:");
+        System.out.println("===========================================");
+        int topN = Math.min(3, topSymptoms.size());
+        for (int i = 0; i < topN; i++) {
+            System.out.printf("%d. %s - %d occurrences\n", i + 1, topSymptoms.get(i), symptomCounts[i]);
         }
     }
 
