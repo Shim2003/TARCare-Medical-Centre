@@ -30,8 +30,8 @@ public class LeaveManagement {
                 // Check overlap: (start1 <= end2) && (end1 >= start2)
                 if (!newLeave.getDateFrom().isAfter(existing.getDateTo())
                         && !newLeave.getDateTo().isBefore(existing.getDateFrom())) {
-                    System.out.println("❌ Conflict: Doctor already has leave from "
-                            + existing.getDateFrom() + " to " + existing.getDateTo());
+//                    System.out.println("❌ Conflict: Doctor already has leave from "
+//                            + existing.getDateFrom() + " to " + existing.getDateTo());
                     return true;
                 }
             }
