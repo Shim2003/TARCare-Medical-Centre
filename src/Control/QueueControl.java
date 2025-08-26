@@ -59,6 +59,10 @@ public class QueueControl {
             return new NextPatientResult(false, "No patients waiting in queue");
         }
 
+        if ((getQueueListByStatus(Utility.UtilityClass.statusReadyToConsult).size() + currentServingPatient.size()) >= 3){
+            return new NextPatientResult(false, "Full Consulting");
+        }
+        
         // Find the patient with the lowest queue number (next in sequence)
         QueueEntry nextPatient = waitingPatients.getFirst();
         for (int i = 1; i < waitingPatients.size(); i++) {
@@ -78,10 +82,6 @@ public class QueueControl {
 
     public static MyList<CurrentServingDAO> getCurrentServingPatient() {
         return currentServingPatient;
-    }
-    
-    public static MyList<QueueEntry> getReadyToConsultPatient(){
-        return queueList.findAll(ql -> ql.getStatus().equals(Utility.UtilityClass.statusReadyToConsult));
     }
     
     public static boolean updateQueueStatus(String patientId) {

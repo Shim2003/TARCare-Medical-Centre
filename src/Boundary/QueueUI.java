@@ -185,7 +185,7 @@ public class QueueUI {
     public static void displayCurrentQueue() {
         System.out.println("--- Current Patients Being Served ---");
 
-        MyList<QueueEntry> servingList = QueueControl.getReadyToConsultPatient();
+        MyList<QueueEntry> servingList = QueueControl.getQueueListByStatus(Utility.UtilityClass.statusReadyToConsult);
 
         if (servingList.isEmpty()) {
             String msg = "No patients are currently being served.";
@@ -200,12 +200,13 @@ public class QueueUI {
 
         String header = "+-----------------------------------+";
         System.out.println(header);
-        System.out.printf("| %-15s |\n", "Queue ID");
+        System.out.printf("| %-15s | %-15s |\n", "Queue ID", "Patient Name");
         System.out.println(header);
-
+        
         for (int i = 0; i < servingList.size(); i++) {
             QueueEntry cs = servingList.get(i);
-            System.out.printf("| %-15s |\n", cs.getQueueNumber());
+            String patientName = PatientManagement.getPatientNameById(cs.getPatientId());
+            System.out.printf("| %-15s | %-15s |\n", cs.getQueueNumber(), patientName);
         }
         System.out.println(header);
     }
