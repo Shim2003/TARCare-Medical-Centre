@@ -72,10 +72,6 @@ public class QueueControl {
             }
         }
 
-        if (currentServingPatient.size() >= 3) {
-            return new NextPatientResult(false, "Consultation is full. Please try again later.");
-        }
-
         nextPatient.setStatus(Utility.UtilityClass.statusReadyToConsult);
         return new NextPatientResult(true, "Patient called for consultation", nextPatient);
     }

@@ -7,7 +7,6 @@ package Boundary;
 import ADT.MyList;
 import Control.PatientManagement;
 import Control.QueueControl;
-import DAO.CurrentServingDAO;
 import DAO.QueueOperationResult;
 import DAO.NextPatientResult;
 import DAO.RemovalResult;
@@ -133,8 +132,7 @@ public class QueueUI {
         System.out.println("         SERVE NEXT PATIENT");
         System.out.println("========================================");
 
-        // Check if doctor is available
-        if (Control.QueueControl.isFullConsulting()) {
+        if ((QueueControl.getQueueListByStatus(Utility.UtilityClass.statusReadyToConsult).size() + QueueControl.getCurrentServingPatient().size()) >= 3) {
             System.out.println("STATUS: Doctor is currently busy with other patients");
             System.out.println("        Please wait and try again later");
             UtilityClass.pressEnterToContinue();
@@ -183,7 +181,7 @@ public class QueueUI {
     }
 
     public static void displayCurrentQueue() {
-        System.out.println("--- Current Patients Being Served ---");
+        System.out.println("---      Current Queue Served      ---");
 
         MyList<QueueEntry> servingList = QueueControl.getQueueListByStatus(Utility.UtilityClass.statusReadyToConsult);
 
