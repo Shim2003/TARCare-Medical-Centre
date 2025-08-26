@@ -99,56 +99,6 @@ public class DoctorManagement {
         return false;
     }
 
-    //replace
-    public static boolean replaceDoctor(
-            String doctorID,
-            String name,
-            Date dateOfBirth,
-            char gender,
-            String contactNumber,
-            String email,
-            String qualification,
-            String workingStatus) {
-
-        int doctorIndex = -1;
-        Doctor oldDoctor = null;
-
-        // Find the doctor index
-        for (int i = 0; i < doctorList.size(); i++) {
-            if (doctorList.get(i).getDoctorID().equals(doctorID)) {
-                doctorIndex = i;
-                oldDoctor = doctorList.get(i);
-                break;
-            }
-        }
-
-        if (doctorIndex == -1) {
-            return false; // doctor not found
-        }
-
-        // Create a new Doctor object with updated details
-        Doctor updatedDoctor = new Doctor(
-                doctorID,
-                name,
-                dateOfBirth,
-                gender,
-                contactNumber,
-                email,
-                qualification,
-                workingStatus
-        );
-
-        // Replace the old doctor with the new one
-        doctorList.replace(doctorIndex, updatedDoctor);
-
-        // Update working status for all doctors
-        for (int i = 0; i < doctorList.size(); i++) {
-            updateWorkingStatus(doctorList.get(i));
-        }
-
-        return true;
-    }
-
     //find doctor
     public static Doctor findDoctorById(String doctorID) {
         return doctorList.findFirst(d -> d.getDoctorID().equals(doctorID));
