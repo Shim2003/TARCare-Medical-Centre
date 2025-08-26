@@ -21,26 +21,21 @@ import java.time.temporal.TemporalAdjusters;
 public class ScheduleManagement {
 
     private static MyList<Schedule> scheduleList = new DynamicList<>();
-    
+
     public static boolean addSchedule(Schedule s) {
-        if (s != null) {
-            if (hasConflict(s)) {
-                System.out.println("\nSchedule conflicts with existing one!!!");
-                return false;
-            }
-
-            scheduleList.add(s);
-
-            // Update doctor status right after adding schedule
-            Doctor doctor = DoctorManagement.findDoctorById(s.getDoctorID());
-            if (doctor != null) {
-                DoctorManagement.updateWorkingStatus(doctor);
-            }
-            return true;
+        if (s == null) {
+            return false;
         }
-        return false;
-    }
 
+        // no conflict check here anymore
+        scheduleList.add(s);
+
+        Doctor doctor = DoctorManagement.findDoctorById(s.getDoctorID());
+        if (doctor != null) {
+            DoctorManagement.updateWorkingStatus(doctor);
+        }
+        return true;
+    }
 
     public static boolean hasConflict(Schedule newSchedule) {
         for (int i = 0; i < scheduleList.size(); i++) {
@@ -235,40 +230,6 @@ public class ScheduleManagement {
         }
 
         return uniqueDates.size();
-    }
-
-// Sample schedules
-    public static void addSampleSchedules() {
-        addSchedule(new Schedule("S001", "D001", DayOfWeek.MONDAY,
-                LocalTime.of(9, 0), LocalTime.of(13, 0)));
-        addSchedule(new Schedule("S002", "D002", DayOfWeek.MONDAY,
-                LocalTime.of(9, 0), LocalTime.of(13, 0)));
-        addSchedule(new Schedule("S003", "D003", DayOfWeek.MONDAY,
-                LocalTime.of(9, 0), LocalTime.of(13, 0)));
-        addSchedule(new Schedule("S004", "D004", DayOfWeek.MONDAY,
-                LocalTime.of(13, 0), LocalTime.of(18, 0)));
-        addSchedule(new Schedule("S005", "D005", DayOfWeek.MONDAY,
-                LocalTime.of(13, 0), LocalTime.of(18, 0)));
-        addSchedule(new Schedule("S006", "D001", DayOfWeek.TUESDAY,
-                LocalTime.of(9, 0), LocalTime.of(12, 0)));
-        addSchedule(new Schedule("S007", "D003", DayOfWeek.TUESDAY,
-                LocalTime.of(9, 0), LocalTime.of(12, 0)));
-        addSchedule(new Schedule("S008", "D005", DayOfWeek.TUESDAY,
-                LocalTime.of(9, 0), LocalTime.of(13, 0)));
-        addSchedule(new Schedule("S009", "D004", DayOfWeek.TUESDAY,
-                LocalTime.of(13, 0), LocalTime.of(15, 0)));
-        addSchedule(new Schedule("S010", "D005", DayOfWeek.TUESDAY,
-                LocalTime.of(15, 0), LocalTime.of(18, 0)));
-        addSchedule(new Schedule("S011", "D005", DayOfWeek.WEDNESDAY,
-                LocalTime.of(9, 0), LocalTime.of(12, 0)));
-        addSchedule(new Schedule("S012", "D003", DayOfWeek.WEDNESDAY,
-                LocalTime.of(9, 0), LocalTime.of(12, 0)));
-        addSchedule(new Schedule("S013", "D001", DayOfWeek.THURSDAY,
-                LocalTime.of(9, 0), LocalTime.of(12, 0)));
-        addSchedule(new Schedule("S014", "D001", DayOfWeek.THURSDAY,
-                LocalTime.of(13, 0), LocalTime.of(18, 0)));
-        addSchedule(new Schedule("S020", "D002", DayOfWeek.FRIDAY,
-                LocalTime.of(9, 0), LocalTime.of(13, 30)));
     }
 
 }

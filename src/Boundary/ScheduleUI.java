@@ -151,85 +151,91 @@ public class ScheduleUI {
     }
 
     public static void AddScheduleUI() {
-        System.out.println("\n=== Add Schedule ===");
-        String doctorIdInput = "";
-        Doctor doctor = null;
+        System.out.println("\n=== Add Doctor Schedule ===");
 
+        // Step 1: Enter Doctor ID
+        String doctorId;
+        Doctor doctor;
         while (true) {
-            System.out.print("Enter Doctor ID to add schedule for (or 'xxx' to cancel): ");
-            doctorIdInput = scanner.nextLine().trim().toUpperCase();
+            System.out.print("Enter Doctor ID (or 'xxx' to cancel): ");
+            doctorId = scanner.nextLine().trim().toUpperCase();
 
-            if (doctorIdInput.equalsIgnoreCase("XXX")) {
-                System.out.println("Cancelled adding schedule.");
-                return; // exit the whole AddScheduleUI
+            if (doctorId.equalsIgnoreCase("xxx")) {
+                System.out.println("❌ Cancelled adding schedule.");
+                return;
             }
 
-            doctor = DoctorManagement.findDoctorById(doctorIdInput);
-            if (doctor != null) {
-                break; // doctor found, exit the loop
+            doctor = DoctorManagement.findDoctorById(doctorId);
+            if (doctor == null) {
+                System.out.println("❌ Doctor not found. Try again.");
             } else {
-                System.out.println("Doctor not found! Please try again or enter 'xxx' to cancel.");
+                System.out.println("✅ Doctor found: Dr. " + doctor.getName());
+                break;
             }
         }
 
-        // Generate Schedule ID
+        // Step 2: Generate Schedule ID
         String scheduleId = ScheduleManagement.generateNextScheduleId();
 
-        boolean scheduleAdded = false;
-        while (!scheduleAdded) {  // loop until a valid non-conflicting schedule is added
-            // Ask for Day of Week
+        while (true) {
+            // Step 3: Enter Day of Week
             DayOfWeek dayOfWeek = null;
             while (dayOfWeek == null) {
-                System.out.print("Enter day of week (e.g., MONDAY): ");
-                String dayInput = scanner.nextLine().trim().toUpperCase();
+                System.out.print("Enter Day of Week (e.g., MONDAY): ");
+                String input = scanner.nextLine().trim().toUpperCase();
                 try {
-                    dayOfWeek = DayOfWeek.valueOf(dayInput);
+                    dayOfWeek = DayOfWeek.valueOf(input);
                 } catch (IllegalArgumentException e) {
-                    System.out.println("Invalid day! Please enter MONDAY, TUESDAY, etc.");
+                    System.out.println("❌ Invalid day! Please use MONDAY, TUESDAY, etc.");
                 }
             }
 
-            // Ask for Start Time
+            // Step 4: Enter Start Time
             LocalTime startTime = null;
             while (startTime == null) {
-                System.out.print("Enter start time (HH:mm): ");
-                String startInput = scanner.nextLine().trim();
+                System.out.print("Enter Start Time (HH:mm): ");
+                String input = scanner.nextLine().trim();
                 try {
-                    startTime = LocalTime.parse(startInput);
+                    startTime = LocalTime.parse(input);
                 } catch (Exception e) {
-                    System.out.println("Invalid time format! Please use HH:mm (e.g., 09:00).");
+                    System.out.println("❌ Invalid time format. Please use HH:mm.");
                 }
             }
 
-            // Ask for End Time
+            // Step 5: Enter End Time
             LocalTime endTime = null;
             while (endTime == null) {
-                System.out.print("Enter end time (HH:mm): ");
-                String endInput = scanner.nextLine().trim();
+                System.out.print("Enter End Time (HH:mm): ");
+                String input = scanner.nextLine().trim();
                 try {
-                    endTime = LocalTime.parse(endInput);
-                    if (endTime.isBefore(startTime) || endTime.equals(startTime)) {
-                        System.out.println("End time must be after start time!");
+                    endTime = LocalTime.parse(input);
+                    if (!endTime.isAfter(startTime)) {
+                        System.out.println("❌ End time must be after start time!");
                         endTime = null;
                     }
                 } catch (Exception e) {
-                    System.out.println("Invalid time format! Please use HH:mm (e.g., 17:00).");
+                    System.out.println("❌ Invalid time format. Please use HH:mm.");
                 }
             }
 
-            // Create Schedule Object
-            Schedule schedule = new Schedule(scheduleId, doctorIdInput, dayOfWeek, startTime, endTime);
+            // Step 6: Create Schedule
+            Schedule schedule = new Schedule(scheduleId, doctorId, dayOfWeek, startTime, endTime);
 
-            // Try to add Schedule
-            boolean success = ScheduleManagement.addSchedule(schedule);
-
-            if (success) {
-                System.out.println("Schedule added successfully: ");
-                scheduleDetail(schedule.getScheduleID());
-                scheduleAdded = true; // exit the loop
-            } else {
-                System.out.println("Failed to add schedule. Please try again.\n");
+            // Step 7: Conflict Check
+            if (ScheduleManagement.hasConflict(schedule)) {
+                System.out.println("⚠️ Conflict detected! Doctor already has a schedule during this time.");
+                System.out.println("👉 Please enter a different day/time.\n");
+                continue; // loop back to Step 3
             }
+
+            // Step 8: Try Adding
+            if (ScheduleManagement.addSchedule(schedule)) {
+                System.out.println(" Schedule added successfully with ID: " + scheduleId);
+                scheduleDetail(schedule.getScheduleID()); // show details
+            } else {
+                System.out.println("❌ Failed to add schedule. Conflict with existing schedule");
+            }
+            break; // exit loop after success
         }
     }
 
