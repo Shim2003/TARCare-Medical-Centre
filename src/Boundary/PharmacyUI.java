@@ -75,7 +75,7 @@ public class PharmacyUI {
                 case 2 -> updateMedicine();
                 case 3 -> deleteMedicine();
                 case 4 -> displayMedicines();
-                case 0 -> System.out.println("Returning to main menu...");
+                case 0 -> System.out.println("Returning to Pharmacy MainMenu...");
                 default -> System.out.println("Invalid choice.");
             }
         } while (choice != 0);
@@ -98,7 +98,7 @@ public class PharmacyUI {
                 case 2 -> viewPendingStockRequests();
                 case 3 -> viewStockRequestHistory();
                 case 4 -> processStockRequest();
-                case 0 -> System.out.println("Returning to main menu...");
+                case 0 -> System.out.println("Returning to Pharmacy MainMenu...");
                 default -> System.out.println("Invalid choice.");
             }
         } while (choice != 0);
@@ -792,7 +792,7 @@ public class PharmacyUI {
                 case 5 -> filterByManufacturer();
                 case 6 -> findNearExpiryMedicines();
                 case 7 -> multipleCriteriaSearch();
-                case 0 -> System.out.println("Returning to main menu...");
+                case 0 -> System.out.println("Returning to Pharmacy MainMenu...");
                 default -> System.out.println("Invalid choice.");
             }
         } while (choice != 0);
@@ -957,48 +957,65 @@ public class PharmacyUI {
             switch (choice) {
                 case 1 -> displayInventoryStatistics();
                 case 2 -> displayInventorySummary();
-                case 0 -> System.out.println("Returning to main menu...");
+                case 0 -> System.out.println("Returning to Pharmacy MainMenu...");
                 default -> System.out.println("Invalid choice.");
             }
         } while (choice != 0);
     }
 
     private static void displayInventoryStatistics() {
-        System.out.println("\n--- Inventory Statistics ---");
+        System.out.println("\n" + "=".repeat(60));
+        System.out.println("                    INVENTORY STATISTICS");
+        System.out.println("=".repeat(60));
+
         DynamicList<Medicine> medicines = (DynamicList<Medicine>) service.getAll();
 
         if (medicines.isEmpty()) {
-            System.out.println("No medicines in inventory.");
+            System.out.println("│ No medicines in inventory.                           │");
+            System.out.println("=".repeat(60));
             return;
         }
 
         var quantityStats = medicines.getStatistics(Medicine::getQuantity);
         var priceStats = medicines.getStatistics(m -> m.getPrice());
 
-        System.out.println("=== INVENTORY OVERVIEW ===");
-        System.out.println("Total medicines: " + service.getMedicineCount());
-        System.out.println("Total inventory value: RM" + String.format("%.2f", service.calculateTotalInventoryValue()));
+        // Combined Statistics Table
+        System.out.println("+" + "-".repeat(58) + "+");
+        System.out.println("|                    INVENTORY OVERVIEW                    |");
+        System.out.println("+" + "-".repeat(58) + "+");
+        System.out.printf("| Total medicines: %-39d |%n", service.getMedicineCount());
+        System.out.printf("| Total inventory value: RM %-30.2f |%n", service.calculateTotalInventoryValue());
+        System.out.println("+" + "-".repeat(58) + "+");
+        System.out.println("|                  QUANTITY STATISTICS                     |");
+        System.out.println("+" + "-".repeat(58) + "+");
+        System.out.printf("| Average quantity(units): %-30.2f  |%n", quantityStats.average);
+        System.out.printf("| Minimum stock(units): %-33d  |%n", (int) quantityStats.min);
+        System.out.printf("| Maximum stock(units): %-33d  |%n", (int) quantityStats.max);
+        System.out.printf("| Standard deviation: %-36.2f |%n", quantityStats.standardDeviation);
+        System.out.println("+" + "-".repeat(58) + "+");
+        System.out.println("|                   PRICE STATISTICS                       |");
+        System.out.println("+" + "-".repeat(58) + "+");
+        System.out.printf("| Average price: RM %-38.2f |%n", priceStats.average);
+        System.out.printf("| Lowest price: RM %-39.2f |%n", priceStats.min);
+        System.out.printf("| Highest price: RM %-38.2f |%n", priceStats.max);
+        System.out.printf("| Price standard deviation: RM %-27.2f |%n", priceStats.standardDeviation);
+        System.out.println("+" + "-".repeat(58) + "+");
 
-        System.out.println("\n=== QUANTITY STATISTICS ===");
-        System.out.printf("Average quantity: %.2f units%n", quantityStats.average);
-        System.out.println("Minimum stock: " + (int)quantityStats.min + " units");
-        System.out.println("Maximum stock: " + (int)quantityStats.max + " units");
-        System.out.printf("Standard deviation: %.2f%n", quantityStats.standardDeviation);
-
-        System.out.println("\n=== PRICE STATISTICS ===");
-        System.out.printf("Average price: RM%.2f%n", priceStats.average);
-        System.out.printf("Lowest price: RM%.2f%n", priceStats.min);
-        System.out.printf("Highest price: RM%.2f%n", priceStats.max);
-        System.out.printf("Price standard deviation: RM%.2f%n", priceStats.standardDeviation);
+        System.out.println("=".repeat(60));
     }
 
     private static void displayInventorySummary() {
         SimpleDateFormat sdf = new SimpleDateFormat(UtilityClass.DATE_FORMAT);
-        System.out.println("\n--- Inventory Summary ---");
+
+        System.out.println("\n" + "=".repeat(70));
+        System.out.println("                        INVENTORY SUMMARY");
+        System.out.println("=".repeat(70));
+
         DynamicList<Medicine> medicines = (DynamicList<Medicine>) service.getAll();
 
         if (medicines.isEmpty()) {
-            System.out.println("No medicines in inventory.");
+            System.out.println("| No medicines in inventory.                                 |");
+            System.out.println("=".repeat(70));
             return;
         }
 
@@ -1013,39 +1030,69 @@ public class PharmacyUI {
         MyList<Medicine> expired = service.getExpiredMedicines();
         MyList<Medicine> nearExpiry = service.getMedicinesNearExpiry(180); // 6 months = ~180 days
 
-        System.out.println("\nLOWEST STOCK:");
+        // Combined Summary Table
+        System.out.println("+" + "-".repeat(68) + "+");
+        System.out.println("|                         LOWEST STOCK                               |");
+        System.out.println("+" + "-".repeat(68) + "+");
         for (int i = 0; i < Math.min(3, byQuantity.size()); i++) {
             Medicine med = byQuantity.get(i);
-            System.out.println("  " + med.getMedicineName() + ": " + med.getQuantity() + " " + med.getDosageForm());
+            String line = String.format("| %d. %-35s: %3d %-22s |",
+                    (i + 1),
+                    med.getMedicineName(),
+                    med.getQuantity(),
+                    med.getDosageForm());
+            System.out.println(line);
         }
-
-        System.out.println("\nHIGHEST VALUE MEDICINES:");
+        System.out.println("+" + "-".repeat(68) + "+");
+        System.out.println("|                   HIGHEST VALUE MEDICINES                          |");
+        System.out.println("+" + "-".repeat(68) + "+");
         for (int i = 0; i < Math.min(3, byPrice.size()); i++) {
             Medicine med = byPrice.get(i);
-            System.out.println("  " + med.getMedicineName() + ": RM" + String.format("%.2f", med.getPrice()));
+            String line = String.format("| %d. %-35s: RM %23.2f |",
+                    (i + 1),
+                    med.getMedicineName(),
+                    med.getPrice());
+            System.out.println(line);
         }
-
-        System.out.println("\nNEAR EXPIRY (within 6 months): " + nearExpiry.size() + " medicines");
+        System.out.println("+" + "-".repeat(68) + "+");
+        System.out.printf("|        NEAR EXPIRY (within 6 months): %2d medicines                 |%n", nearExpiry.size());
+        System.out.println("+" + "-".repeat(68) + "+");
         if (nearExpiry.size() > 0) {
             for (int i = 0; i < Math.min(3, nearExpiry.size()); i++) {
                 Medicine med = nearExpiry.get(i);
-                System.out.println("  " + med.getMedicineName() + " - expires " + sdf.format(med.getExpiryDate()));
+                String line = String.format("| %d. %-34s - expires %18s |",
+                        (i + 1),
+                        med.getMedicineName(),
+                        sdf.format(med.getExpiryDate()));
+                System.out.println(line);
             }
             if (nearExpiry.size() > 3) {
-                System.out.println("  ... and " + (nearExpiry.size() - 3) + " more");
+                System.out.printf("|     ... and %2d more medicines                              |%n", (nearExpiry.size() - 3));
             }
+        } else {
+            System.out.println("|                    No medicines near expiry                 |");
         }
-
-        System.out.println("\nEXPIRED MEDICINES: " + expired.size() + " medicines");
+        System.out.println("+" + "-".repeat(68) + "+");
+        System.out.printf("|             EXPIRED MEDICINES: %2d medicines                        |%n", expired.size());
+        System.out.println("+" + "-".repeat(68) + "+");
         if (expired.size() > 0) {
             for (int i = 0; i < Math.min(3, expired.size()); i++) {
                 Medicine med = expired.get(i);
-                System.out.println("  " + med.getMedicineName() + " - expired " + sdf.format(med.getExpiryDate()));
+                String line = String.format("| %d. %-34s - expired %18s |",
+                        (i + 1),
+                        med.getMedicineName(),
+                        sdf.format(med.getExpiryDate()));
+                System.out.println(line);
             }
             if (expired.size() > 3) {
-                System.out.println("  ... and " + (expired.size() - 3) + " more");
+                System.out.printf("|     ... and %2d more medicines                              |%n", (expired.size() - 3));
             }
+        } else {
+            System.out.println("|                     No expired medicines                           |");
         }
+        System.out.println("+" + "-".repeat(68) + "+");
+
+        System.out.println("=".repeat(70));
     }
     
     private static void bulkOperationsMenu() {
@@ -1061,7 +1108,7 @@ public class PharmacyUI {
             switch (choice) {
                 case 1 -> cloneInventorySnapshot();
                 case 2 -> removeExpiredMedicines();
-                case 0 -> System.out.println("Returning to main menu...");
+                case 0 -> System.out.println("Returning to Pharmacy MainMenu...");
                 default -> System.out.println("Invalid choice.");
             }
         } while (choice != 0);
