@@ -14,7 +14,7 @@ import Utility.UtilityClass;
 import java.util.Date;
 /**
  * 
- * @author jecsh
+ * @author Shim
  */
 public class PharmacyManagement {
     private static MyList<Medicine> medicines = new DynamicList<>();
@@ -100,7 +100,7 @@ public class PharmacyManagement {
         for (int i = 0; i < prescription.getMedicineItems().size(); i++) {
             MedicalTreatmentItem item = prescription.getMedicineItems().get(i);
             Medicine medicine = findByName(item.getMedicineName());
-            int quantityNeeded = PrescriptionCalculator.calculateQuantityNeeded(item);
+            int quantityNeeded = UtilityClass.calculateQuantityNeeded(item);
             
             if (medicine == null || medicine.getQuantity() < quantityNeeded) {
                 return false; // Cannot process due to insufficient stock
@@ -111,7 +111,7 @@ public class PharmacyManagement {
         for (int i = 0; i < prescription.getMedicineItems().size(); i++) {
             MedicalTreatmentItem item = prescription.getMedicineItems().get(i);
             Medicine medicine = findByName(item.getMedicineName());
-            int quantityNeeded = PrescriptionCalculator.calculateQuantityNeeded(item); // FIX: Use static call
+            int quantityNeeded = UtilityClass.calculateQuantityNeeded(item); // FIX: Use static call
             
             // Update stock using calculated quantity
             int newQuantity = medicine.getQuantity() - quantityNeeded;
@@ -133,7 +133,7 @@ public class PharmacyManagement {
             Medicine medicine = findByName(item.getMedicineName());
             
             if (medicine != null) {
-                int quantityNeeded = PrescriptionCalculator.calculateQuantityNeeded(item); // FIX: Use static call
+                int quantityNeeded = UtilityClass.calculateQuantityNeeded(item); // FIX: Use static call
                 totalCost += medicine.getPrice() * quantityNeeded;
             }
         }
@@ -341,6 +341,17 @@ public class PharmacyManagement {
         }
 
         return results;
+    }
+    
+    public static String generateNewPrescriptionId() {
+        if (PharmacyManagement.prescriptionQueue.isEmpty()) {
+            return "RX001";
+        } else {
+            String lastId = PharmacyManagement.prescriptionQueue.get(PharmacyManagement.prescriptionQueue.size() - 1).getPrescriptionID();
+            int numericPart = Integer.parseInt(lastId.substring(2));
+            numericPart++;
+            return String.format("RX%03d", numericPart);
+        }
     }
 
 }

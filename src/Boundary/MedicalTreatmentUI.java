@@ -9,7 +9,6 @@ import ADT.MyList;
 import Control.DiagnosisManagement;
 import Control.MedicalTreatmentManagement;
 import Control.PharmacyManagement;
-import Control.PrescriptionCalculator;
 import Entity.*;
 import Utility.UtilityClass;
 import java.text.SimpleDateFormat;
@@ -326,7 +325,7 @@ public class MedicalTreatmentUI {
                 treatmentDate, treatmentDate, "Active", "Ongoing", treatmentAdvice, notes, medicineList);
 
 
-        Prescription prescription = new Prescription(PrescriptionCalculator.generateNewPrescriptionId(), patientId,
+        Prescription prescription = new Prescription(PharmacyManagement.generateNewPrescriptionId(), patientId,
         doctorId, medicineList, "PENDING");
 
         PharmacyManagement.addToQueue(prescription);
