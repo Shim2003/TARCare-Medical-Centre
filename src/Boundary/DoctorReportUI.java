@@ -13,8 +13,6 @@ import Entity.Doctor;
 import Entity.DoctorLeave;
 import Entity.Schedule;
 import Utility.UtilityClass;
-import java.time.DayOfWeek;
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.Scanner;
@@ -181,10 +179,10 @@ public class DoctorReportUI {
     }
 
     public static void displayTopHardworkingDoctors(YearMonth month) {
-        MyList<DoctorWorkSummary> summaries = calculateDoctorWorkingHours(month);
+        MyList<DoctorManagement.DoctorWorkSummary> summaries = DoctorManagement.calculateDoctorWorkingHours(month);
 
         // Sort by total working hours (descending)
-        UtilityClass.quickSort(summaries, (a, b) -> Integer.compare(b.totalHours, a.totalHours));
+        UtilityClass.quickSort(summaries, (a, b) -> Integer.compare(b.getTotalHours(), a.getTotalHours()));
 
         // Print report
         System.out.println("\n========== Top Hardworking Doctors ==========");
@@ -192,95 +190,11 @@ public class DoctorReportUI {
         System.out.printf("%-10s %-20s %-15s\n", "DoctorID", "Name", "TotalHours");
 
         for (int i = 0; i < summaries.size(); i++) {
-            DoctorWorkSummary s = summaries.get(i);
-            System.out.printf("%-10s %-20s %-15d\n", s.id, s.name, s.totalHours);
+            DoctorManagement.DoctorWorkSummary s = summaries.get(i);
+            System.out.printf("%-10s %-20s %-15d\n", s.getId(), s.getName(), s.getTotalHours());
         }
 
         System.out.println("=============================================");
     }
-
-    //help to generate most hardworking doctor report
-    // ================= Helper ==================
-    public static MyList<DoctorWorkSummary> calculateDoctorWorkingHours(YearMonth month) {
-        MyList<Doctor> doctors = DoctorManagement.getAllDoctors();
-        MyList<DoctorWorkSummary> summaries = new DynamicList<>();
-
-        // get all schedules for all doctors once
-        MyList<Schedule> allSchedules = ScheduleManagement.getAllSchedules();
-
-        int year = month.getYear();
-        int daysInMonth = month.lengthOfMonth();
-
-        for (int i = 0; i < doctors.size(); i++) {
-            Doctor doc = doctors.get(i);
-            String docId = doc.getDoctorID();
-
-            // collect schedules for this doctor
-            MyList<Schedule> doctorSchedules = new DynamicList<>();
-            for (int j = 0; j < allSchedules.size(); j++) {
-                Schedule sch = allSchedules.get(j);
-                if (sch.getDoctorID().equals(docId)) {
-                    doctorSchedules.add(sch);
-                }
-            }
-
-            // collect leave days for this doctor
-            MyList<LocalDate> leaveDays = LeaveManagement.getLeaveDaysForDoctorInMonth(docId, month);
-
-            int totalMinutes = 0;
-
-            // loop all days of the month
-            for (int day = 1; day <= daysInMonth; day++) {
-                LocalDate current = LocalDate.of(year, month.getMonthValue(), day);
-
-                // skip if on leave
-                boolean isLeave = false;
-                for (int k = 0; k < leaveDays.size(); k++) {
-                    if (leaveDays.get(k).equals(current)) {
-                        isLeave = true;
-                        break;
-                    }
-                }
-                if (isLeave) {
-                    continue;
-                }
-
-                // match schedule for this day-of-week
-                DayOfWeek dow = current.getDayOfWeek();
-                for (int k = 0; k < doctorSchedules.size(); k++) {
-                    Schedule sch = doctorSchedules.get(k);
-                    if (sch.getDayOfWeek().equals(dow)) {
-                        // add working time
-                        int minutes = (int) Duration.between(sch.getStartTime(), sch.getEndTime()).toMinutes();
-                        totalMinutes += minutes;
-                    }
-                }
-            }
-
-            int totalHours = totalMinutes / 60;
-
-            summaries.add(new DoctorWorkSummary(
-                    docId,
-                    doc.getName(),
-                    totalHours
-            ));
-        }
-
-        return summaries;
-    }
-
-// ================= Data Holder ==================
-    public static class DoctorWorkSummary {
-
-        String id, name;
-        int totalHours;
-
-        public DoctorWorkSummary(String id, String name, int totalHours) {
-            this.id = id;
-            this.name = name;
-            this.totalHours = totalHours;
-        }
-    }
-//help to generate most hardworking doctor report
 
 }

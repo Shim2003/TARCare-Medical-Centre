@@ -22,40 +22,6 @@ public class LeaveManagement {
 
     private static MyList<DoctorLeave> leaveList = new DynamicList<>();
 
-    public static void addSampleLeaves() {
-        addLeave(new DoctorLeave(
-                "L001", // leaveID
-                "D001", // doctorID
-                LocalDate.of(2025, 8, 14), // dateFrom
-                LocalDate.of(2025, 8, 30), // dateTo (same day leave)
-                "Medical conference" // reason
-        ));
-
-        addLeave(new DoctorLeave(
-                "L002",
-                "D002",
-                LocalDate.of(2025, 8, 13), // multi-day leave
-                LocalDate.of(2025, 8, 16),
-                "Family vacation"
-        ));
-
-        addLeave(new DoctorLeave(
-                "L003",
-                "D004",
-                LocalDate.of(2025, 8, 13), // multi-day leave
-                LocalDate.of(2025, 8, 25),
-                "Family vacation"
-        ));
-
-        addLeave(new DoctorLeave(
-                "L004",
-                "D004",
-                LocalDate.of(2025, 9, 15), // multi-day leave
-                LocalDate.of(2025, 9, 25),
-                "Family vacation"
-        ));
-    }
-
     public static boolean hasLeaveConflict(DoctorLeave newLeave) {
         for (int i = 0; i < leaveList.size(); i++) {
             DoctorLeave existing = leaveList.get(i);

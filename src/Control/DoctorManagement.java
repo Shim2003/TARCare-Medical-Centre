@@ -9,11 +9,11 @@ import ADT.MyList;
 import Entity.Doctor;
 import Entity.Schedule;
 import Utility.UtilityClass;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.YearMonth;
 import java.util.Date;
 
 /**
@@ -60,42 +60,6 @@ public class DoctorManagement {
 
         int nextId = maxId + 1;
         return String.format("D%03d", nextId); // e.g. D004
-    }
-
-
-    public static void addSampleDoctor() {
-        SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
-        try {
-            Doctor d1 = new Doctor("D001", "Lee Wee Teck", sdf.parse("01/01/1990"), 'M',
-                    "0123456789", "leewt@example.com", "Bachelor of Medicine, TARUMT", UtilityClass.statusFree);
-
-            Doctor d2 = new Doctor("D002", "Lee Chong Wei", sdf.parse("02/01/1985"), 'M',
-                    "0123456780", "chongwei@example.com", "Bachelor of Surgery, UTAR", UtilityClass.statusFree);
-
-            Doctor d3 = new Doctor("D003", "Aaron Chia Teng Feng", sdf.parse("15/11/1997"), 'M',
-                    "0123666789", "aaron@example.com", "Bachelor of Medicine, TARUMT", UtilityClass.statusFree);
-
-            Doctor d4 = new Doctor("D004", "Soh Wooi Yik", sdf.parse("27/03/1998"), 'M',
-                    "0123666789", "wooiyik@example.com", "Bachelor of Medicine, SUNWAY", UtilityClass.statusConsulting);
-
-            Doctor d5 = new Doctor("D005", "Lee Zii Jia", sdf.parse("05/03/1998"), 'M',
-                    "0123666789", "lzj@example.com", "Bachelor of Medicine, University of Melaya", UtilityClass.workingStatusOff);
-
-            add(d1);
-            add(d2);
-            add(d3);
-            add(d4);
-            add(d5);
-//            System.out.println("Doctors loaded: " + doctorList.size()); // DEBUG
-
-            // 🔹 Once doctors are added, update each doctor's working status
-            for (int i = 0; i < doctorList.size(); i++) {
-                updateWorkingStatus(doctorList.get(i));
-            }
-
-        } catch (ParseException e) {
-            System.out.println("Error parsing date in sample data.");
-        }
     }
     
     public static boolean removeDoctorById(String doctorID) {
@@ -251,5 +215,101 @@ public class DoctorManagement {
             doctor.setWorkingStatus(UtilityClass.workingStatusOff);
         }
     }
+    
+     //help to generate most hardworking doctor report
+    // ================= Helper ==================
+    public static MyList<DoctorWorkSummary> calculateDoctorWorkingHours(YearMonth month) {
+        MyList<Doctor> doctors = DoctorManagement.getAllDoctors();
+        MyList<DoctorWorkSummary> summaries = new DynamicList<>();
+
+        // get all schedules for all doctors once
+        MyList<Schedule> allSchedules = ScheduleManagement.getAllSchedules();
+
+        int year = month.getYear();
+        int daysInMonth = month.lengthOfMonth();
+
+        for (int i = 0; i < doctors.size(); i++) {
+            Doctor doc = doctors.get(i);
+            String docId = doc.getDoctorID();
+
+            // collect schedules for this doctor
+            MyList<Schedule> doctorSchedules = new DynamicList<>();
+            for (int j = 0; j < allSchedules.size(); j++) {
+                Schedule sch = allSchedules.get(j);
+                if (sch.getDoctorID().equals(docId)) {
+                    doctorSchedules.add(sch);
+                }
+            }
+
+            // collect leave days for this doctor
+            MyList<LocalDate> leaveDays = LeaveManagement.getLeaveDaysForDoctorInMonth(docId, month);
+
+            int totalMinutes = 0;
+
+            // loop all days of the month
+            for (int day = 1; day <= daysInMonth; day++) {
+                LocalDate current = LocalDate.of(year, month.getMonthValue(), day);
+
+                // skip if on leave
+                boolean isLeave = false;
+                for (int k = 0; k < leaveDays.size(); k++) {
+                    if (leaveDays.get(k).equals(current)) {
+                        isLeave = true;
+                        break;
+                    }
+                }
+                if (isLeave) {
+                    continue;
+                }
+
+                // match schedule for this day-of-week
+                DayOfWeek dow = current.getDayOfWeek();
+                for (int k = 0; k < doctorSchedules.size(); k++) {
+                    Schedule sch = doctorSchedules.get(k);
+                    if (sch.getDayOfWeek().equals(dow)) {
+                        // add working time
+                        int minutes = (int) Duration.between(sch.getStartTime(), sch.getEndTime()).toMinutes();
+                        totalMinutes += minutes;
+                    }
+                }
+            }
+
+            int totalHours = totalMinutes / 60;
+
+            summaries.add(new DoctorWorkSummary(
+                    docId,
+                    doc.getName(),
+                    totalHours
+            ));
+        }
+
+        return summaries;
+    }
+
+// ================= Data Holder ==================
+    public static class DoctorWorkSummary {
+    private String id, name;
+    private int totalHours;
+
+    public DoctorWorkSummary(String id, String name, int totalHours) {
+        this.id = id;
+        this.name = name;
+        this.totalHours = totalHours;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getTotalHours() {
+        return totalHours;
+    }
+}
+
+//help to generate most hardworking doctor report
 
 }
