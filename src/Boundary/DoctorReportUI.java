@@ -144,11 +144,11 @@ public class DoctorReportUI {
         // print report
         System.out.printf("\n %02d/%4d\n", month, year );
         System.out.println("=============== Top Doctors by Leave Taken ===============");
-        System.out.printf("%-10s %-20s %-12s %-12s\n", "DoctorID", "Name", "LeaveDays", "LeaveRecords");
+        System.out.printf("%-8s %-28s %-12s %-12s\n", "DoctorID", "Name", "LeaveDays", "LeaveRecords");
 
         for (int i = 0; i < summaries.size(); i++) {
             LeaveSummary s = summaries.get(i);
-            System.out.printf("%-10s %-20s %-12d %-12d\n", s.id, "Dr " + s.name, s.leaveDays, s.leaveCount);
+            System.out.printf("%-8s %-28s %-12d %-12d\n", s.id, "Dr " + s.name, s.leaveDays, s.leaveCount);
         }
 
         System.out.println("==========================================================");
