@@ -169,7 +169,7 @@ public class ScheduleUI {
             if (doctor == null) {
                 System.out.println("❌ Doctor not found. Try again.");
             } else {
-                System.out.println("✅ Doctor found: Dr. " + doctor.getName());
+                System.out.println(" Doctor found: Dr. " + doctor.getName());
                 break;
             }
         }
@@ -224,7 +224,7 @@ public class ScheduleUI {
             // Step 7: Conflict Check
             if (ScheduleManagement.hasConflict(schedule)) {
                 System.out.println("⚠️ Conflict detected! Doctor already has a schedule during this time.");
-                System.out.println("👉 Please enter a different day/time.\n");
+                System.out.println(" Please enter a different day/time.\n");
                 continue; // loop back to Step 3
             }
 

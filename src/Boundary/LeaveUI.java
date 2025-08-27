@@ -210,7 +210,7 @@ public class LeaveUI {
                 }
             } else {
                 // We have at least one leave for this doctor -> proceed
-                System.out.println("✅ Doctor found: " + doctor.getName());
+                System.out.println(" Doctor found: " + doctor.getName());
                 break;
             }
         }

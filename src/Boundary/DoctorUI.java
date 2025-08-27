@@ -26,47 +26,6 @@ public class DoctorUI {
 
     private static final Scanner scanner = new Scanner(System.in);
 
-//    public static void main(String[] args) {
-//
-//        //call methods to add sample objects
-//        LeaveManagement.addSampleLeaves();
-//        ScheduleManagement.addSampleSchedules();
-//        DoctorManagement.addSampleDoctor();
-//        //
-//
-//       DoctorModuleMenu();
-//    }
-
-//    public static void DoctorModuleMenu() {
-//
-//        boolean validOption = false;
-//
-//        while (!validOption) {
-//            System.out.println("\n--- Welcome to TAR UMT Clinic Doctor Management System ---");
-//            System.out.println("Select a mode");
-//            System.out.println("1. Patients/User");
-//            System.out.println("2. Admin\n");
-//            System.out.print("Enter your choice: ");
-//
-//            String choice = scanner.nextLine();
-//
-//            switch (choice) {
-//                case "1":
-//                    validOption = true; // valid choice → stop looping
-//                    DoctorUserMode();
-//                    break;
-//                case "2":
-//                    validOption = true; // valid choice → stop looping
-//                    DoctorStaffMode();
-//                    break;
-//                default:
-//                    System.out.println("Invalid Option!!! Pls try again");
-//                    UtilityClass.pressEnterToContinue();
-//            }
-//        }
-//
-//    }
-
     public static void DoctorStaffMode() {
         boolean validOption = false;
 
