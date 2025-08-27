@@ -137,7 +137,7 @@ public class DoctorUI {
                     break;
                 case "2":
                     validOption = true;
-                    ShowDCurrentFreeDoctors();
+                    ShowCurrentFreeDoctors();
                     UtilityClass.pressEnterToContinue();
                     DoctorUserMode();
                     break;
@@ -263,7 +263,7 @@ public class DoctorUI {
 
     }
     
-    public static void ShowDCurrentFreeDoctors() {
+    public static void ShowCurrentFreeDoctors() {
 
         MyList<Doctor> doctorList = DoctorManagement.getFreeDoctors();
         System.out.println("\n------------------------------------------------ AVAILABLE NOW ------------------------------------------------");
