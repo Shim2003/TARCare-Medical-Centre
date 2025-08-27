@@ -264,10 +264,19 @@ public class PharmacyManagement {
         return medicines.findAll(medicine -> isMedicineExpired(medicine));
     }
 
-    public MyList<Medicine> getMedicinesNearExpiry(int days) {
-        Date futureDate = UtilityClass.addDaysToDate(new Date(), days);
-        return medicines.filter(m -> m.getExpiryDate().before(futureDate) && 
-                                m.getExpiryDate().after(new Date()));
+    public MyList<Medicine> getMedicinesNearExpiry(int months) {
+        Date currentDate = new Date();
+        Date futureDate = UtilityClass.addMonthsToDate(currentDate, months);
+
+        return medicines.filter(m -> {
+            if (m.getExpiryDate() == null) {
+                return false;
+            }
+
+            // Medicine expires after now AND before/on the future date
+            return m.getExpiryDate().after(currentDate)
+                    && m.getExpiryDate().before(futureDate);
+        });
     }
     
     public int removeExpiredMedicines() {
@@ -320,21 +329,33 @@ public class PharmacyManagement {
             Double minPrice,
             Double maxPrice) {
 
+        // Start with all medicines and apply filters cumulatively
         MyList<Medicine> results = medicines;
 
+        // Apply name pattern filter
         if (namePattern != null && !namePattern.trim().isEmpty()) {
-            results = searchMedicinesByPattern(namePattern);
+            results = results.filter(m
+                    -> m.getMedicineName().toLowerCase().contains(namePattern.toLowerCase()));
         }
+
+        // Apply category filter
         if (category != null && !category.trim().isEmpty()) {
-            results = filterByCategory(category);
+            results = results.filter(m
+                    -> m.getCategory().equalsIgnoreCase(category));
         }
+
+        // Apply manufacturer filter
         if (manufacturer != null && !manufacturer.trim().isEmpty()) {
-            results = filterByManufacturer(manufacturer);
+            results = results.filter(m
+                    -> m.getManufacturer().equalsIgnoreCase(manufacturer));
         }
+
+        // Apply price range filter
         if (minPrice != null || maxPrice != null) {
             double min = (minPrice == null) ? Double.MIN_VALUE : minPrice;
             double max = (maxPrice == null) ? Double.MAX_VALUE : maxPrice;
-            results = filterByPriceRange(min, max);
+            results = results.filter(m
+                    -> m.getPrice() >= min && m.getPrice() <= max);
         }
 
         return results;

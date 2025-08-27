@@ -281,8 +281,6 @@ public class ClinicData {
             diagnosisList.add(d9);
             diagnosisList.add(d10);
 
-            System.out.println("Added 10 sample diagnoses with auto-generated IDs.");
-
         } catch (Exception e) {
             System.out.println("Error adding sample diagnoses: " + e.getMessage());
         }
@@ -478,7 +476,6 @@ public class ClinicData {
         treatmentList.add(t14);
         treatmentList.add(t15);
 
-        System.out.println("Added sample medical treatments for first 15 diagnoses.");
         } catch (Exception e) {
                 System.out.println("Error adding sample treatments: " + e.getMessage());
         }
