@@ -142,7 +142,8 @@ public class DoctorReportUI {
         UtilityClass.quickSort(summaries, (a, b) -> Integer.compare(b.leaveDays, a.leaveDays));
 
         // print report
-        System.out.println("\n=============== Top Doctors by Leave Taken ===============");
+        System.out.printf("\n %2s/%4s", month, year );
+        System.out.println("=============== Top Doctors by Leave Taken ===============");
         System.out.printf("%-10s %-20s %-12s %-12s\n", "DoctorID", "Name", "LeaveDays", "LeaveRecords");
 
         for (int i = 0; i < summaries.size(); i++) {
