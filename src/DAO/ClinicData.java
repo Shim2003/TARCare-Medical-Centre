@@ -182,7 +182,6 @@ public class ClinicData {
                 completedList.add(c);
             }
 
-            System.out.println("Added 10 sample consultations with LocalDateTime.");
         } catch (Exception e) {
             System.out.println("Error adding sample consultations: " + e.getMessage());
         }
@@ -218,7 +217,6 @@ public class ClinicData {
                 AppointmentManagement.addScheduledAppointment(a);
             }
 
-            System.out.println("Added 10 sample appointments with LocalDateTime.");
         } catch (Exception e) {
             System.out.println("Error adding sample appointments: " + e.getMessage());
         }
