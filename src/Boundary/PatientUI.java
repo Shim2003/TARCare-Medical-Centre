@@ -20,15 +20,15 @@ public class PatientUI {
     private static final Scanner scanner = new Scanner(System.in);
     private static ConsultationUI con = new ConsultationUI();
 
-    public static void adminUserMenu() {
+    public static void staffUserMenu() {
         while (true) {
-            System.out.println("\n--- Admin Patient Management Menu ---");
+            System.out.println("\n--- Staff Patient Management Menu ---");
             System.out.println("1. Register New Patient");
             System.out.println("2. Update Patient Profile");
             System.out.println("3. Search Patient by Patient ID");
             System.out.println("4. Remove Patient");
             System.out.println("5. Generate Patient Report");
-            System.out.println("6. Back to Admin Main Menu");
+            System.out.println("6. Back to Sdmin Main Menu");
 
             System.out.print("Enter your choice (1-6): ");
             String choice = scanner.nextLine();
@@ -404,6 +404,10 @@ public class PatientUI {
 
         // Ask user for sorting preference
         String sortBy = getSortingPreference();
+        if (sortBy == null){
+            return;
+        }
+        
         MyList<Patient> sortedPatientList = PatientManagement.getPatientsSortedBy(sortBy);
 
         int patientsPerPage = 10;
@@ -477,7 +481,7 @@ public class PatientUI {
     private static String getSortingPreference() {
         int choice = -1;
 
-        while (choice < 1 || choice > 6) {
+        while (choice < 1 || choice > 7) {
             System.out.println("\n--- Choose Sorting Option ---");
             System.out.println("1. Sort by Name (A-Z)");
             System.out.println("2. Sort by Patient ID");
@@ -485,14 +489,15 @@ public class PatientUI {
             System.out.println("4. Sort by Age (Oldest first)");
             System.out.println("5. Sort by Registration Date (Newest first)");
             System.out.println("6. Sort by Registration Date (Oldest first)");
+            System.out.println("7. Back");
 
-            System.out.print("Enter your choice (1-6): ");
+            System.out.print("Enter your choice (1-7): ");
 
             try {
                 choice = Integer.parseInt(scanner.nextLine());
 
-                if (choice < 1 || choice > 6) {
-                    System.out.println("Invalid choice. Please enter a number between 1 and 6.");
+                if (choice < 1 || choice > 7) {
+                    System.out.println("Invalid choice. Please enter a number between 1 and 7.");
                 }
 
             } catch (NumberFormatException e) {
@@ -513,6 +518,8 @@ public class PatientUI {
                 return "registration_desc";
             case 6:
                 return "registration";
+            case 7:
+                return null;
             default:
                 return "name";
         }

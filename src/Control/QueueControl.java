@@ -29,7 +29,7 @@ public class QueueControl {
         }
 
         if (!PatientManagement.isPatientExists(patientId)) {
-            return new QueueOperationResult(false, "Patient ID not found... Please register first...");
+            return new QueueOperationResult(false, "Patient ID not found... \nPlease register first...");
         }
 
         Patient p = PatientManagement.findPatientById(patientId);
@@ -59,10 +59,10 @@ public class QueueControl {
             return new NextPatientResult(false, "No patients waiting in queue");
         }
 
-        if ((getQueueListByStatus(Utility.UtilityClass.statusReadyToConsult).size() + currentServingPatient.size()) >= 3){
+        if ((getQueueListByStatus(Utility.UtilityClass.statusReadyToConsult).size() + currentServingPatient.size()) >= 3) {
             return new NextPatientResult(false, "Full Consulting");
         }
-        
+
         // Find the patient with the lowest queue number (next in sequence)
         QueueEntry nextPatient = waitingPatients.getFirst();
         for (int i = 1; i < waitingPatients.size(); i++) {
@@ -79,7 +79,7 @@ public class QueueControl {
     public static MyList<CurrentServingDAO> getCurrentServingPatient() {
         return currentServingPatient;
     }
-    
+
     public static boolean updateQueueStatus(String patientId) {
         if (patientId == null || patientId.trim().isEmpty()) {
             return false;
@@ -120,7 +120,27 @@ public class QueueControl {
         return queueList.findAll(entry -> entry.getStatus().equalsIgnoreCase(status));
     }
 
-    public static RemovalResult removeFromQueue(String queueId) {
+    public static RemovalResult removeFromQueue(String patientId) {
+        if (patientId == null || patientId.trim().isEmpty()) {
+            return new RemovalResult(false, "Invalid input. Please enter a valid Patient ID.");
+        }
+
+        int index = queueList.findIndex(queue -> queue.getPatientId().equals(patientId));
+
+        try {
+
+            if (index != -1) {
+                queueList.remove(index);
+                return new RemovalResult(true, "Queue record removed successfully", 1);
+            }
+        } catch (NumberFormatException e) {
+            return new RemovalResult(false, "Invalid Queue ID format. Please enter a valid number.");
+        }
+
+        return new RemovalResult(false, "No queue entry found with the given Queue ID.");
+    }
+
+    public static RemovalResult removeQueueById(String queueId) {
         if (queueId == null || queueId.trim().isEmpty()) {
             return new RemovalResult(false, "Invalid input. Please enter a valid Queue ID.");
         }

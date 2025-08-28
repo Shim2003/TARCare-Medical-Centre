@@ -4,7 +4,7 @@
  */
 package Boundary;
 
-import static Boundary.PatientUI.adminUserMenu;
+import static Boundary.PatientUI.staffUserMenu;
 import static Boundary.PatientUI.patientUserMenu;
 import DAO.ClinicData;
 import java.util.Scanner;
@@ -39,7 +39,7 @@ public class TARCareMedicalCentre {
 
             switch (choice) {
                 case "1":
-                    adminMainMenu();
+                    staffMainMenu();
                     break;
                 case "2":
                     patientMainMenu();
@@ -54,9 +54,9 @@ public class TARCareMedicalCentre {
         }
     }
 
-    public static void adminMainMenu() {
+    public static void staffMainMenu() {
         while (true) {
-            System.out.println("\n--- Admin Main Menu ---");
+            System.out.println("\n--- Staff Main Menu ---");
             QueueUI.displayCurrentQueue();
             System.out.println("1. Patient Management");
             System.out.println("2. Doctor Management");
@@ -72,13 +72,13 @@ public class TARCareMedicalCentre {
 
             switch (choice) {
                 case "1":
-                    adminUserMenu();
+                    staffUserMenu();
                     break;
                 case "2":
                     DoctorUI.DoctorStaffMode();
                     break;
                 case "3":
-                    QueueUI.adminQueueMenu();
+                    QueueUI.staffQueueMenu();
                     break;
                 case "4":
                     ConsultationUI.run();

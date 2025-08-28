@@ -25,16 +25,16 @@ public class QueueUI {
 
     private static final Scanner scanner = new Scanner(System.in);
 
-    public static void adminQueueMenu() {
+    public static void staffQueueMenu() {
         while (true) {
-            System.out.println("\n--- Admin Queue Management Menu ---");
+            System.out.println("\n--- Staff Queue Management Menu ---");
             QueueUI.displayCurrentQueue();
             System.out.println("1. Queue for Consultation");
             System.out.println("2. Get Next Queue Patient");
             System.out.println("3. Display Queue By Status");
             System.out.println("4. Remove Queue Records");
             System.out.println("5. Generate Queue Reports");
-            System.out.println("6. Back to Admin Main Menu");
+            System.out.println("6. Back to Staff Main Menu");
 
             System.out.print("Enter your choice (1-6): ");
             String choice = scanner.nextLine();
@@ -253,10 +253,10 @@ public class QueueUI {
     }
 
     public static void cancelQueue() {
-        System.out.print("Enter your Queue ID to cancel your queue entry: ");
-        String queueId = scanner.nextLine();
+        System.out.print("Enter your Patient ID to cancel your queue entry: ");
+        String patientId = scanner.nextLine();
 
-        RemovalResult result = Control.QueueControl.removeFromQueue(queueId);
+        RemovalResult result = Control.QueueControl.removeFromQueue(patientId);
 
         if (result.isSuccess()) {
             System.out.println("Your queue entry has been successfully cancelled.");
@@ -312,7 +312,7 @@ public class QueueUI {
         System.out.print("Enter Queue ID: ");
         String queueId = scanner.nextLine();
 
-        RemovalResult result = QueueControl.removeFromQueue(queueId);
+        RemovalResult result = QueueControl.removeQueueById(queueId);
 
         if (result.isSuccess()) {
             System.out.println("Remove Success: " + result.getMessage());
@@ -504,7 +504,7 @@ public class QueueUI {
                         dayStats.completedPatients,
                         dayStats.completionRate);
             } else {
-                System.out.printf("%-12s | %-6s | %-7s | %-10s | %-8s | %-10s\n",
+                System.out.printf("%-12s | %-6s | %-7s | %-10s | %-8s | %-12s\n",
                         UtilityClass.formatDate(targetDate),
                         "0", "0", "0", "0", "N/A");
             }

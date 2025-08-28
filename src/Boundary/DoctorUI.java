@@ -60,7 +60,7 @@ public class DoctorUI {
                     break;
                 case "5":
                     exit = true;
-                    TARCareMedicalCentre.adminMainMenu();
+                    TARCareMedicalCentre.staffMainMenu();
                     break;
                 default:
                     System.out.println("Invalid Option!!! Pls try again");
