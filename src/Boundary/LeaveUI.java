@@ -67,7 +67,7 @@ public class LeaveUI {
 
         MyList<DoctorLeave> leaves = LeaveManagement.getAllLeaves();
 
-        if (leaves.isEmpty()) {
+        if (LeaveManagement.emptyLeave()) {
             System.out.println("❌ No leave records found.");
             return;
         }
@@ -190,7 +190,7 @@ public class LeaveUI {
 
             // Fetch leaves for this doctor
             leavesForDoctor = LeaveManagement.findLeavesByDoctorId(doctorID);
-            if (leavesForDoctor.isEmpty()) {
+            if (LeaveManagement.hasNoLeaves(doctorID)) {
                 System.out.println("ℹ️ No leave records found for " + doctorID + ".");
                 // Let user try a different doctor or exit
                 System.out.print("Try another Doctor ID? (Y/N): ");

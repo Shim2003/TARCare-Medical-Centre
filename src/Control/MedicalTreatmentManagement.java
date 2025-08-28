@@ -213,7 +213,7 @@ public class MedicalTreatmentManagement {
         }
         int total = treatmentHistory.size();
         double percentage = total == 0 ? 0 : ((double) count / total) * 100;
-        return percentage;
+        return roundTwoDecimals(percentage);
     }
 
     //calculate the percentage of outcome by month and year
@@ -229,7 +229,7 @@ public class MedicalTreatmentManagement {
         }
         int total = treatmentHistory.size();
         double percentage = total == 0 ? 0 : ((double) count / total) * 100;
-        return percentage;
+        return roundTwoDecimals(percentage);
     }
 
     //calculate the percentage of outcome by month and year
@@ -245,7 +245,7 @@ public class MedicalTreatmentManagement {
         }
         int total = treatmentHistory.size();
         double percentage = total == 0 ? 0 : ((double) count / total) * 100;
-        return percentage;
+        return roundTwoDecimals(percentage);
     }
 
     //calculate the percentage of outcome by month and year
@@ -261,13 +261,19 @@ public class MedicalTreatmentManagement {
         }
         int total = treatmentHistory.size();
         double percentage = total == 0 ? 0 : ((double) count / total) * 100;
-        return percentage;
+        return roundTwoDecimals(percentage);
     }
+
+    // round to 2 decimal places
+    public static double roundTwoDecimals(double value) {
+        return Math.round(value * 100.0) / 100.0;
+    }
+
 
     //get all medical treatment list that need to follow up
     public static MyList<MedicalTreatment> getFollowUpList() {
         MyList<MedicalTreatment> treatmentHistory = getMedicalTreatmentList();
-        if (treatmentHistory == null) {
+        if (treatmentHistory.isEmpty()) {
             return null;
         }
         MyList<MedicalTreatment> followUpList = new DynamicList<>();
@@ -283,7 +289,7 @@ public class MedicalTreatmentManagement {
     //get all medical treatment list that success
     public static MyList<MedicalTreatment> getSuccessList() {
         MyList<MedicalTreatment> treatmentHistory = getMedicalTreatmentList();
-        if (treatmentHistory == null) {
+        if (treatmentHistory.isEmpty()) {
             return null;
         }
         MyList<MedicalTreatment> SuccessList = new DynamicList<>();
@@ -299,7 +305,7 @@ public class MedicalTreatmentManagement {
     //get all medical treatment list that success
     public static MyList<MedicalTreatment> getOngoingList() {
         MyList<MedicalTreatment> treatmentHistory = getMedicalTreatmentList();
-        if (treatmentHistory == null) {
+        if (treatmentHistory.isEmpty()) {
             return null;
         }
         MyList<MedicalTreatment> ongoingList = new DynamicList<>();
@@ -315,7 +321,7 @@ public class MedicalTreatmentManagement {
     //get all medical treatment list that failed
     public static MyList<MedicalTreatment> getFailedList() {
         MyList<MedicalTreatment> treatmentHistory = getMedicalTreatmentList();
-        if (treatmentHistory == null) {
+        if (treatmentHistory.isEmpty()) {
             return null;
         }
         MyList<MedicalTreatment> failedList = new DynamicList<>();

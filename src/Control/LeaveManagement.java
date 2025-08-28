@@ -66,6 +66,10 @@ public class LeaveManagement {
         return leaveList;
     }
 
+    public static boolean emptyLeave() {
+        return leaveList.isEmpty();
+    }
+
     public static String generateNextLeaveId() {
         int max = 0;
 
@@ -107,6 +111,11 @@ public class LeaveManagement {
             }
         }
         return result;
+    }
+
+    public static boolean hasNoLeaves(String doctorID) {
+        DynamicList<DoctorLeave> result = findLeavesByDoctorId(doctorID);
+        return result.isEmpty(); // ✅ true if no leaves found
     }
 
     public static boolean isDoctorOnLeave(String doctorID, LocalDate date) {
