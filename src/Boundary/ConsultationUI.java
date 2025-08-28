@@ -76,7 +76,7 @@ public class ConsultationUI {
                 case 1 -> consultationManagement.startNextConsultation();
                 case 2 -> consultationManagement.viewCurrentConsulting();
                 case 3 -> {
-                    System.out.print("Enter Doctor ID to end consultation: ");
+                    System.out.print("Enter Patient ID to end consultation: ");
                     String id = sc.nextLine();
                     consultationManagement.endConsultation(id);
                 }

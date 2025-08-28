@@ -107,10 +107,8 @@ public class TARCareMedicalCentre {
             QueueUI.displayCurrentQueue();
             System.out.println("1. Patient Profile Management");
             System.out.println("2. Queue Management");
-            System.out.println("3. Consultation Management");
-            System.out.println("4. Appointment Management");
-            System.out.println("5. Doctor(s) & Timetable info");
-            System.out.println("6. Back to Role Selection");
+            System.out.println("3. Doctor(s) & Timetable info");
+            System.out.println("4. Back to Role Selection");
 
             System.out.print("Enter your choice (1-6): ");
             String choice = scanner.nextLine();
@@ -123,15 +121,9 @@ public class TARCareMedicalCentre {
                     QueueUI.patientQueueMenu();
                     break;
                 case "3":
-                    ConsultationUI.run();
-                break;
-                case "4":
-                    AppointmentUI.run1();
-                    break;
-                case "5":
                     DoctorUI.DoctorUserMode();
                     break;
-                case "6":
+                case "4":
                     mainMenu();
 //                    return;
                 default:
