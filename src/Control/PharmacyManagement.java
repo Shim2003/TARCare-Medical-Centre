@@ -14,7 +14,7 @@ import Utility.UtilityClass;
 import java.util.Date;
 /**
  * 
- * @author jecsh
+ * @author Shim
  */
 public class PharmacyManagement {
     private static MyList<Medicine> medicines = new DynamicList<>();
@@ -100,7 +100,7 @@ public class PharmacyManagement {
         for (int i = 0; i < prescription.getMedicineItems().size(); i++) {
             MedicalTreatmentItem item = prescription.getMedicineItems().get(i);
             Medicine medicine = findByName(item.getMedicineName());
-            int quantityNeeded = PrescriptionCalculator.calculateQuantityNeeded(item);
+            int quantityNeeded = UtilityClass.calculateQuantityNeeded(item);
             
             if (medicine == null || medicine.getQuantity() < quantityNeeded) {
                 return false; // Cannot process due to insufficient stock
@@ -111,7 +111,7 @@ public class PharmacyManagement {
         for (int i = 0; i < prescription.getMedicineItems().size(); i++) {
             MedicalTreatmentItem item = prescription.getMedicineItems().get(i);
             Medicine medicine = findByName(item.getMedicineName());
-            int quantityNeeded = PrescriptionCalculator.calculateQuantityNeeded(item); // FIX: Use static call
+            int quantityNeeded = UtilityClass.calculateQuantityNeeded(item); // FIX: Use static call
             
             // Update stock using calculated quantity
             int newQuantity = medicine.getQuantity() - quantityNeeded;
@@ -133,7 +133,7 @@ public class PharmacyManagement {
             Medicine medicine = findByName(item.getMedicineName());
             
             if (medicine != null) {
-                int quantityNeeded = PrescriptionCalculator.calculateQuantityNeeded(item); // FIX: Use static call
+                int quantityNeeded = UtilityClass.calculateQuantityNeeded(item); // FIX: Use static call
                 totalCost += medicine.getPrice() * quantityNeeded;
             }
         }
@@ -264,10 +264,19 @@ public class PharmacyManagement {
         return medicines.findAll(medicine -> isMedicineExpired(medicine));
     }
 
-    public MyList<Medicine> getMedicinesNearExpiry(int days) {
-        Date futureDate = UtilityClass.addDaysToDate(new Date(), days);
-        return medicines.filter(m -> m.getExpiryDate().before(futureDate) && 
-                                m.getExpiryDate().after(new Date()));
+    public MyList<Medicine> getMedicinesNearExpiry(int months) {
+        Date currentDate = new Date();
+        Date futureDate = UtilityClass.addMonthsToDate(currentDate, months);
+
+        return medicines.filter(m -> {
+            if (m.getExpiryDate() == null) {
+                return false;
+            }
+
+            // Medicine expires after now AND before/on the future date
+            return m.getExpiryDate().after(currentDate)
+                    && m.getExpiryDate().before(futureDate);
+        });
     }
     
     public int removeExpiredMedicines() {
@@ -320,27 +329,64 @@ public class PharmacyManagement {
             Double minPrice,
             Double maxPrice) {
 
+        // Start with all medicines and apply filters cumulatively
         MyList<Medicine> results = medicines;
 
+        // Apply name pattern filter
         if (namePattern != null && !namePattern.trim().isEmpty()) {
-            results = searchMedicinesByPattern(namePattern);
+            results = results.filter(m
+                    -> m.getMedicineName().toLowerCase().contains(namePattern.toLowerCase()));
         }
+
+        // Apply category filter
         if (category != null && !category.trim().isEmpty()) {
-            results = ((DynamicList<Medicine>) results)
-                    .filter(m -> m.getCategory().equalsIgnoreCase(category.trim()));
+            results = results.filter(m
+                    -> m.getCategory().equalsIgnoreCase(category));
         }
+
+        // Apply manufacturer filter
         if (manufacturer != null && !manufacturer.trim().isEmpty()) {
-            results = ((DynamicList<Medicine>) results)
-                    .filter(m -> m.getManufacturer().equalsIgnoreCase(manufacturer.trim()));
+            results = results.filter(m
+                    -> m.getManufacturer().equalsIgnoreCase(manufacturer));
         }
+
+        // Apply price range filter
         if (minPrice != null || maxPrice != null) {
             double min = (minPrice == null) ? Double.MIN_VALUE : minPrice;
             double max = (maxPrice == null) ? Double.MAX_VALUE : maxPrice;
-            results = ((DynamicList<Medicine>) results)
-                    .filter(m -> m.getPrice() >= min && m.getPrice() <= max);
+            results = results.filter(m
+                    -> m.getPrice() >= min && m.getPrice() <= max);
         }
 
         return results;
     }
+    
+    public static String generateNewPrescriptionId() {
+        if (prescriptionQueue.isEmpty()) {
+            return "RX001";
+        } else {
+            String lastId = prescriptionQueue.get(prescriptionQueue.size() - 1).getPrescriptionID();
+            int numericPart = Integer.parseInt(lastId.substring(2));
+            numericPart++;
+            return String.format("RX%03d", numericPart);
+        }
+    }
 
+    public MyList<Medicine> createInventorySnapshot() { return medicines.clone(); }
+    
+    public double calculateSnapshotTotalValue(MyList<Medicine> snapshot) {
+        double totalValue = 0;
+        for (int i = 0; i < snapshot.size(); i++) {
+            Medicine med = snapshot.get(i);
+            totalValue += med.getPrice() * med.getQuantity();
+        }
+        return totalValue;
+    }
+
+    public double calculateSnapshotAverageStock(MyList<Medicine> snapshot) {
+        if (snapshot.isEmpty()) return 0;
+
+        var stats = medicines.getStatistics(Medicine::getQuantity);
+        return stats.average;
+    }
 }

@@ -147,4 +147,184 @@ public class MedicalTreatmentManagement {
     public static void deleteAllTreatments() {
         treatmentList.clear();
     }
+
+    //display the treatment history that is successful in the outcome based on list received
+    public static MyList<MedicalTreatment> getSuccessfulTreatmentHistory(int year, int month) {
+        MyList<MedicalTreatment> treatmentHistory = getMonthlyTreatments(year, month);
+        MyList<MedicalTreatment> successfulList = new DynamicList<>();
+        for (int i = 0; i < treatmentHistory.size(); i++) {
+            MedicalTreatment treatment = treatmentHistory.get(i);
+            if (treatment.getTreatmentOutcome().equalsIgnoreCase("Successful")) {
+                successfulList.add(treatment);
+            }
+        }
+        return successfulList;
+    }
+
+    //display the treatment history that needs follow up in the outcome.
+    public static MyList<MedicalTreatment> getFollowUpTreatmentHistory(int year, int month) {
+        MyList<MedicalTreatment> treatmentHistory = getMonthlyTreatments(year, month);
+        MyList<MedicalTreatment> followUpList = new DynamicList<>();
+        for (int i = 0; i < treatmentHistory.size(); i++) {
+            MedicalTreatment treatment = treatmentHistory.get(i);
+            if (treatment.getTreatmentOutcome().equalsIgnoreCase("Follow up")) {
+                followUpList.add(treatment);
+            }
+        }
+        return followUpList;
+    }
+
+    //display the treatment history that is failed in the outcome.
+    public static MyList<MedicalTreatment> getFailedTreatmentHistory(int year, int month) {
+        MyList<MedicalTreatment> treatmentHistory = getMonthlyTreatments(year, month);
+        MyList<MedicalTreatment> failList = new DynamicList<>();
+        for (int i = 0; i < treatmentHistory.size(); i++) {
+            MedicalTreatment treatment = treatmentHistory.get(i);
+            if (treatment.getTreatmentOutcome().equalsIgnoreCase("Failed")) {
+                failList.add(treatment);
+            }
+        }
+        return failList;
+    }
+
+    //display the treatment history that is ongoing in the outcome.
+    public static MyList<MedicalTreatment> getOngoingTreatmentHistory(int year, int month) {
+        MyList<MedicalTreatment> treatmentHistory = getMonthlyTreatments(year, month);
+        MyList<MedicalTreatment> ongoingList = new DynamicList<>();
+        for (int i = 0; i < treatmentHistory.size(); i++) {
+            MedicalTreatment treatment = treatmentHistory.get(i);
+            if (treatment.getTreatmentOutcome().equalsIgnoreCase("Ongoing")) {
+                ongoingList.add(treatment);
+            }
+        }
+        return ongoingList;
+    }
+
+    //calculate the percentage of outcome by month and year
+    public static double calculatePercentageOfSuccessOutcome(int year, int month) {
+        MyList<MedicalTreatment> treatmentHistory = getMonthlyTreatments(year, month);
+        int count = 0;
+
+        for (int i = 0; i < treatmentHistory.size(); i++) {
+            MedicalTreatment treatment = treatmentHistory.get(i);
+            if (treatment.getTreatmentOutcome().equalsIgnoreCase("Successful")) {
+                count++;
+            }
+        }
+        int total = treatmentHistory.size();
+        double percentage = total == 0 ? 0 : ((double) count / total) * 100;
+        return percentage;
+    }
+
+    //calculate the percentage of outcome by month and year
+    public static double calculatePercentageOfFollowUpOutcome(int year, int month) {
+        MyList<MedicalTreatment> treatmentHistory = getMonthlyTreatments(year, month);
+        int count = 0;
+
+        for (int i = 0; i < treatmentHistory.size(); i++) {
+            MedicalTreatment treatment = treatmentHistory.get(i);
+            if (treatment.getTreatmentOutcome().equalsIgnoreCase("Follow up")) {
+                count++;
+            }
+        }
+        int total = treatmentHistory.size();
+        double percentage = total == 0 ? 0 : ((double) count / total) * 100;
+        return percentage;
+    }
+
+    //calculate the percentage of outcome by month and year
+    public static double calculatePercentageOfOngoingOutcome(int year, int month) {
+        MyList<MedicalTreatment> treatmentHistory = getMonthlyTreatments(year, month);
+        int count = 0;
+
+        for (int i = 0; i < treatmentHistory.size(); i++) {
+            MedicalTreatment treatment = treatmentHistory.get(i);
+            if (treatment.getTreatmentOutcome().equalsIgnoreCase("Ongoing")) {
+                count++;
+            }
+        }
+        int total = treatmentHistory.size();
+        double percentage = total == 0 ? 0 : ((double) count / total) * 100;
+        return percentage;
+    }
+
+    //calculate the percentage of outcome by month and year
+    public static double calculatePercentageOfFailOutcome(int year, int month) {
+        MyList<MedicalTreatment> treatmentHistory = getMonthlyTreatments(year, month);
+        int count = 0;
+
+        for (int i = 0; i < treatmentHistory.size(); i++) {
+            MedicalTreatment treatment = treatmentHistory.get(i);
+            if (treatment.getTreatmentOutcome().equalsIgnoreCase("Failed")) {
+                count++;
+            }
+        }
+        int total = treatmentHistory.size();
+        double percentage = total == 0 ? 0 : ((double) count / total) * 100;
+        return percentage;
+    }
+
+    //get all medical treatment list that need to follow up
+    public static MyList<MedicalTreatment> getFollowUpList() {
+        MyList<MedicalTreatment> treatmentHistory = getMedicalTreatmentList();
+        if (treatmentHistory == null) {
+            return null;
+        }
+        MyList<MedicalTreatment> followUpList = new DynamicList<>();
+        for (int i = 0; i < treatmentHistory.size(); i++) {
+            MedicalTreatment treatment = treatmentHistory.get(i);
+            if (treatment.getTreatmentOutcome().equalsIgnoreCase("Follow up")) {
+                followUpList.add(treatment);
+            }
+        }
+        return followUpList;
+    }
+
+    //get all medical treatment list that success
+    public static MyList<MedicalTreatment> getSuccessList() {
+        MyList<MedicalTreatment> treatmentHistory = getMedicalTreatmentList();
+        if (treatmentHistory == null) {
+            return null;
+        }
+        MyList<MedicalTreatment> SuccessList = new DynamicList<>();
+        for (int i = 0; i < treatmentHistory.size(); i++) {
+            MedicalTreatment treatment = treatmentHistory.get(i);
+            if (treatment.getTreatmentOutcome().equalsIgnoreCase("Successful")) {
+                SuccessList.add(treatment);
+            }
+        }
+        return SuccessList;
+    }
+
+    //get all medical treatment list that success
+    public static MyList<MedicalTreatment> getOngoingList() {
+        MyList<MedicalTreatment> treatmentHistory = getMedicalTreatmentList();
+        if (treatmentHistory == null) {
+            return null;
+        }
+        MyList<MedicalTreatment> ongoingList = new DynamicList<>();
+        for (int i = 0; i < treatmentHistory.size(); i++) {
+            MedicalTreatment treatment = treatmentHistory.get(i);
+            if (treatment.getTreatmentOutcome().equalsIgnoreCase("Ongoing")) {
+                ongoingList.add(treatment);
+            }
+        }
+        return ongoingList;
+    }
+
+    //get all medical treatment list that failed
+    public static MyList<MedicalTreatment> getFailedList() {
+        MyList<MedicalTreatment> treatmentHistory = getMedicalTreatmentList();
+        if (treatmentHistory == null) {
+            return null;
+        }
+        MyList<MedicalTreatment> failedList = new DynamicList<>();
+        for (int i = 0; i < treatmentHistory.size(); i++) {
+            MedicalTreatment treatment = treatmentHistory.get(i);
+            if (treatment.getTreatmentOutcome().equalsIgnoreCase("Failed")) {
+                failedList.add(treatment);
+            }
+        }
+        return failedList;
+    }
 }

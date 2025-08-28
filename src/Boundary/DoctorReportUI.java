@@ -26,13 +26,13 @@ public class DoctorReportUI {
     private static final Scanner scanner = new Scanner(System.in);
 
     public static void ReportMenu() {
-        boolean validOption = false;
+        boolean exit = false;
 
-        while (!validOption) {
+        while (!exit) {
             System.out.println("\n**** Doctor Module ****");
             System.out.println("--- Summary Reports ---");
             System.out.println("1. Work & Leave Utilization");
-            System.out.println("2. Top Doctors by Leave Taken");
+            System.out.println("2. Top Doctors by Leave Taken (Current Month)");
             System.out.println("3. Top Doctors by Working Hours");
             System.out.println("4. Back");
             System.out.print("Enter your choice: ");
@@ -41,32 +41,25 @@ public class DoctorReportUI {
 
             switch (choice) {
                 case "1":
-                    validOption = true;
                     DisplayWorkLeaveDays();
                     UtilityClass.pressEnterToContinue();
-                    ReportMenu();
                     break;
                 case "2":
-                    validOption = true;
                     DisplayTopLeaveDoctors();
                     UtilityClass.pressEnterToContinue();
-                    ReportMenu();
                     break;
                 case "3":
-                    validOption = true;
                     displayTopHardworkingDoctorsUI();
                     UtilityClass.pressEnterToContinue();
-                    ReportMenu();
                     break;
-                case "4":
-                    validOption = true;
+                case "4": // Back
+                    exit = true; // break out of the loop
                     DoctorUI.DoctorStaffMode();
                     break;
                 default:
                     System.out.println("Invalid Option!!! Pls try again");
                     UtilityClass.pressEnterToContinue();
             }
-
         }
     }
 
@@ -76,7 +69,7 @@ public class DoctorReportUI {
         MyList<Schedule> schedules = ScheduleManagement.getAllSchedules();
         YearMonth currentMonth = YearMonth.now();
 
-        System.out.println("\n===================== Doctor Monthly Report =====================");
+        System.out.println("\n===================== majibaiDoctor Monthly Report =====================");
         System.out.printf("%-10s %-20s %-12s %-12s %-12s\n",
                 "DoctorID", "Name", "WorkDays", "LeaveDays", "Utilization");
 
@@ -142,12 +135,13 @@ public class DoctorReportUI {
         UtilityClass.quickSort(summaries, (a, b) -> Integer.compare(b.leaveDays, a.leaveDays));
 
         // print report
-        System.out.println("\n=============== Top Doctors by Leave Taken ===============");
-        System.out.printf("%-10s %-20s %-12s %-12s\n", "DoctorID", "Name", "LeaveDays", "LeaveRecords");
+        System.out.printf("\n %02d/%4d\n", month, year);
+        System.out.println("=============== Doctors by Leave Taken ===============");
+        System.out.printf("%-8s %-28s %-12s %-12s\n", "DoctorID", "Name", "LeaveDays", "LeaveRecords");
 
         for (int i = 0; i < summaries.size(); i++) {
             LeaveSummary s = summaries.get(i);
-            System.out.printf("%-10s %-20s %-12d %-12d\n", s.id, "Dr " + s.name, s.leaveDays, s.leaveCount);
+            System.out.printf("%-8s %-28s %-12d %-12d\n", s.id, "Dr " + s.name, s.leaveDays, s.leaveCount);
         }
 
         System.out.println("==========================================================");

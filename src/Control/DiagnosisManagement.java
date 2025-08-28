@@ -116,6 +116,37 @@ public class DiagnosisManagement {
         return filteredDiagnoses;
     }
 
+    // get the diagnosis list by year only
+    public static MyList<Diagnosis> getDiagnosesByYear(int year) {
+        MyList<Diagnosis> filteredDiagnoses = new DynamicList<>();
+        for (int i = 0; i < diagnosisList.size(); i++) {
+            Diagnosis diagnosis = diagnosisList.get(i);
+            Date diagnosisDate = diagnosis.getDiagnosisDate();
+            if (diagnosisDate != null) {
+                int diagnosisYear = diagnosisDate.getYear() + 1900;
+                if (diagnosisYear == year) {
+                    filteredDiagnoses.add(diagnosis);
+                }
+            }
+        }
+        return filteredDiagnoses;
+    }
+
+    public static MyList<Diagnosis> getDiagnosisListBySeverityLevelAndYear(String severity, int year) {
+        MyList<Diagnosis> filteredDiagnoses = new DynamicList<>();
+        for (int i = 0; i < diagnosisList.size(); i++) {
+            Diagnosis diagnosis = diagnosisList.get(i);
+            Date diagnosisDate = diagnosis.getDiagnosisDate();
+            if (diagnosisDate != null) {
+                int diagnosisYear = diagnosisDate.getYear() + 1900;
+                if (diagnosisYear == year && diagnosis.getSeverityLevel().equalsIgnoreCase(severity)) {
+                    filteredDiagnoses.add(diagnosis);
+                }
+            }
+        }
+        return filteredDiagnoses;
+    }
+
     // print the diagnosis list based on the severity level
     public static MyList<Diagnosis> filterDiagnosisBySeverityLevel(String severityLevel) {
         if (severityLevel == null || severityLevel.isEmpty()) {

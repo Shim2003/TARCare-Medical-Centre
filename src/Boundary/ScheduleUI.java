@@ -32,9 +32,9 @@ public class ScheduleUI {
 //    }
     public static void ManageSchedule() {
 
-        boolean validOption = false;
+        boolean exit = false;
 
-        while (!validOption) {
+        while (!exit) {
             System.out.println("\n-*-*- Schedule(s) Management -*-*-");
             System.out.println("1. Check Schedules");
             System.out.println("2. Add a new schedule");
@@ -47,31 +47,23 @@ public class ScheduleUI {
 
             switch (choice) {
                 case "1":
-                    validOption = true;
                     DisplayAllSchedules();
                     UtilityClass.pressEnterToContinue();
-                    ManageSchedule();
                     break;
                 case "2":
-                    validOption = true;
                     AddScheduleUI();
                     UtilityClass.pressEnterToContinue();
-                    ManageSchedule();
                     break;
                 case "3":
-                    validOption = true;
                     editScheduleUI();
                     UtilityClass.pressEnterToContinue();
-                    ManageSchedule();
                     break;
                 case "4":
-                    validOption = true;
                     removeScheduleUI();
                     UtilityClass.pressEnterToContinue();
-                    ManageSchedule();
                     break;
                 case "5":
-                    validOption = true;
+                    exit = true;
                     DoctorUI.DoctorStaffMode();
                     break;
                 default:
@@ -169,7 +161,7 @@ public class ScheduleUI {
             if (doctor == null) {
                 System.out.println("❌ Doctor not found. Try again.");
             } else {
-                System.out.println("✅ Doctor found: Dr. " + doctor.getName());
+                System.out.println(" Doctor found: Dr. " + doctor.getName());
                 break;
             }
         }
@@ -224,7 +216,7 @@ public class ScheduleUI {
             // Step 7: Conflict Check
             if (ScheduleManagement.hasConflict(schedule)) {
                 System.out.println("⚠️ Conflict detected! Doctor already has a schedule during this time.");
-                System.out.println("👉 Please enter a different day/time.\n");
+                System.out.println(" Please enter a different day/time.\n");
                 continue; // loop back to Step 3
             }
 

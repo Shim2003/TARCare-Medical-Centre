@@ -6,7 +6,6 @@ package DAO;
 
 import ADT.DynamicList;
 import ADT.MyList;
-import Boundary.PharmacyUI;
 import Control.AppointmentManagement;
 import Control.ConsultationManagement;
 import Control.DiagnosisManagement;
@@ -59,6 +58,8 @@ public class ClinicData {
         addSampleDoctor();
         addSamplePrescriptions();
         addSampleStockRequests();
+        addSampleDiagnosis();
+        addSampleMedicalTreatment();
     }
 
     public static void addSamplePatients() {
@@ -181,7 +182,6 @@ public class ClinicData {
                 completedList.add(c);
             }
 
-            System.out.println("Added 10 sample consultations with LocalDateTime.");
         } catch (Exception e) {
             System.out.println("Error adding sample consultations: " + e.getMessage());
         }
@@ -217,7 +217,6 @@ public class ClinicData {
                 AppointmentManagement.addScheduledAppointment(a);
             }
 
-            System.out.println("Added 10 sample appointments with LocalDateTime.");
         } catch (Exception e) {
             System.out.println("Error adding sample appointments: " + e.getMessage());
         }
@@ -281,8 +280,6 @@ public class ClinicData {
             diagnosisList.add(d8);
             diagnosisList.add(d9);
             diagnosisList.add(d10);
-
-            System.out.println("Added 10 sample diagnoses with auto-generated IDs.");
 
         } catch (Exception e) {
             System.out.println("Error adding sample diagnoses: " + e.getMessage());
@@ -376,7 +373,7 @@ public class ClinicData {
     }
 
     public static void addSampleMedicalTreatment() {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyy");
 
         try {
         MyList<MedicalTreatment> treatmentList = MedicalTreatmentManagement.getMedicalTreatmentList();
@@ -399,67 +396,67 @@ public class ClinicData {
         meds5.add(new MedicalTreatmentItem("Omeprazole", "20mg", "Once daily", "14 days", "Oral"));
 
         // Sample treatments
-        MedicalTreatment t1 = new MedicalTreatment("DIAG001", "P1001", "D001",
-                new Date(), null, "Active", "Ongoing",
+        MedicalTreatment t1 = new MedicalTreatment("TRMT1001", "P1001", "D001",
+                new Date(), null, "Active", "Failed",
                 "Rest and hydration advised", "Patient stable", meds1);
 
-        MedicalTreatment t2 = new MedicalTreatment("DIAG002", "P1002", "D002",
-                new Date(), null, "Active", "Ongoing",
+        MedicalTreatment t2 = new MedicalTreatment("TRMT1002", "P1002", "D002",
+                new Date(), null, "Active", "Failed",
                 "Antiviral medication prescribed", "Monitor temperature", meds2);
 
-        MedicalTreatment t3 = new MedicalTreatment("DIAG003", "P1003", "D003",
-                new Date(), null, "Completed", "Successful",
+        MedicalTreatment t3 = new MedicalTreatment("TRMT1003", "P1003", "D003",
+                new Date(), null, "Completed", "Follow up",
                 "Avoid triggers like bright light", "Headache improving", meds3);
 
-        MedicalTreatment t4 = new MedicalTreatment("DIAG004", "P1004", "D004",
-                new Date(), null, "Active", "Needs Follow-up",
+        MedicalTreatment t4 = new MedicalTreatment("TRMT1004", "P1004", "D004",
+                new Date(), null, "Active", "Follow up",
                 "Physical therapy scheduled", "Muscle pain reduced slightly", meds4);
 
-        MedicalTreatment t5 = new MedicalTreatment("DIAG005", "P1005", "D005",
+        MedicalTreatment t5 = new MedicalTreatment("TRMT1005", "P1005", "D005",
                 new Date(), null, "Completed", "Successful",
                 "Diet modifications suggested", "Patient responding well", meds5);
 
-        MedicalTreatment t6 = new MedicalTreatment("DIAG006", "P1006", "D006",
+        MedicalTreatment t6 = new MedicalTreatment("TRMT1006", "P1006", "D006",
                 new Date(), null, "Active", "Ongoing",
                 "Antibiotics prescribed", "Throat pain persists", new DynamicList<>());
 
-        MedicalTreatment t7 = new MedicalTreatment("DIAG007", "P1007", "D007",
+        MedicalTreatment t7 = new MedicalTreatment("TRMT1007", "P1007", "D007",
                 new Date(), null, "Completed", "Successful",
                 "Advised to avoid allergens", "No sneezing reported", new DynamicList<>());
 
-        MedicalTreatment t8 = new MedicalTreatment("DIAG008", "P1008", "D008",
+        MedicalTreatment t8 = new MedicalTreatment("TRMT1008", "P1008", "D008",
                 new Date(), null, "Active", "Ongoing",
                 "Rest and fluids advised", "Fever persists", new DynamicList<>());
 
-        MedicalTreatment t9 = new MedicalTreatment("DIAG009", "P1009", "D009",
-                new Date(), null, "Active", "Needs Follow-up",
+        MedicalTreatment t9 = new MedicalTreatment("TRMT1009", "P1009", "D009",
+                new Date(), null, "Active", "Follow up",
                 "Stress management counseling", "Fatigue continues", new DynamicList<>());
 
-        MedicalTreatment t10 = new MedicalTreatment("DIAG010", "P1010", "D010",
+        MedicalTreatment t10 = new MedicalTreatment("TRMT1010", "P1010", "D010",
                 new Date(), null, "Active", "Ongoing",
                 "Vestibular therapy planned", "Patient still dizzy", new DynamicList<>());
             
-        Date treatmentDate = sdf.parse("2023/04/01");
-        Date followUpDate = sdf.parse("2023/04/15");
+        Date treatmentDate = sdf.parse("04/01/2023");
+        Date followUpDate = sdf.parse("04/12/2024");
 
-        MedicalTreatment t11 = new MedicalTreatment("DIAG011", "P1011", "D011",
-                treatmentDate, followUpDate, "Completed", "Partially",
+        MedicalTreatment t11 = new MedicalTreatment("TRMT1011", "P1011", "D011",
+                treatmentDate, followUpDate, "Completed", "Failed",
                 "Patient advised to avoid caffeine", "Patient still experiencing symptoms", new DynamicList<>());
 
-        MedicalTreatment t12 = new MedicalTreatment("DIAG012", "P1012", "D012",
+        MedicalTreatment t12 = new MedicalTreatment("TRMT1012", "P1012", "D012",
                 treatmentDate, followUpDate, "Completed", "Successful",
                 "Patient advised to avoid spicy foods", "Patient no longer experiencing symptoms", new DynamicList<>());
 
-        MedicalTreatment t13 = new MedicalTreatment("DIAG013", "P1013", "D013",
-                treatmentDate, followUpDate, "Completed", "Unsuccessful",
+        MedicalTreatment t13 = new MedicalTreatment("TRMT1013", "P1013", "D013",
+                treatmentDate, followUpDate, "Completed", "Successful",
                 "Patient advised to avoid alcohol", "Patient still experiencing symptoms", new DynamicList<>());
 
-        MedicalTreatment t14 = new MedicalTreatment("DIAG014", "P1014", "D014",
-                treatmentDate, followUpDate, "Completed", "Successful",
+        MedicalTreatment t14 = new MedicalTreatment("TRMT1014", "P1014", "D014",
+                treatmentDate, followUpDate, "Completed", "Follow up",
                 "Patient advised to avoid dairy products", "Patient no longer experiencing symptoms", new DynamicList<>());
 
-        MedicalTreatment t15 = new MedicalTreatment("DIAG015", "P1015", "D015",
-                treatmentDate, followUpDate, "Completed", "Unsuccessful",
+        MedicalTreatment t15 = new MedicalTreatment("TRMT1015", "P1015", "D015",
+                treatmentDate, followUpDate, "Completed", "Successful",
                 "Patient advised to avoid gluten", "Patient still experiencing symptoms", new DynamicList<>());
 
         // add them into treatmentList
@@ -479,10 +476,9 @@ public class ClinicData {
         treatmentList.add(t14);
         treatmentList.add(t15);
 
-        System.out.println("Added sample medical treatments for first 15 diagnoses.");
-    } catch (Exception e) {
-        System.out.println("Error adding sample treatments: " + e.getMessage());
-    }
+        } catch (Exception e) {
+                System.out.println("Error adding sample treatments: " + e.getMessage());
+        }
     }
 
     public static void addSampleQueueData() {
@@ -819,7 +815,7 @@ public class ClinicData {
                 "L003",
                 "D004",
                 LocalDate.of(2025, 8, 13), // multi-day leave
-                LocalDate.of(2025, 8, 25),
+                LocalDate.of(2025, 8, 28),
                 "Family vacation"
         ));
 
@@ -828,6 +824,14 @@ public class ClinicData {
                 "D004",
                 LocalDate.of(2025, 9, 15), // multi-day leave
                 LocalDate.of(2025, 9, 25),
+                "Family vacation"
+        ));
+        
+        LeaveManagement.addLeave(new DoctorLeave(
+                "L005",
+                "D005",
+                LocalDate.of(2025, 8, 30), // multi-day leave
+                LocalDate.of(2025, 9, 10),
                 "Family vacation"
         ));
     }
@@ -861,8 +865,18 @@ public class ClinicData {
                 LocalTime.of(9, 0), LocalTime.of(12, 0)));
         ScheduleManagement.addSchedule(new Schedule("S014", "D001", DayOfWeek.THURSDAY,
                 LocalTime.of(13, 0), LocalTime.of(18, 0)));
-        ScheduleManagement.addSchedule(new Schedule("S020", "D002", DayOfWeek.FRIDAY,
+        ScheduleManagement.addSchedule(new Schedule("S015", "D002", DayOfWeek.FRIDAY,
                 LocalTime.of(9, 0), LocalTime.of(13, 30)));
+        ScheduleManagement.addSchedule(new Schedule("S016", "D005", DayOfWeek.SATURDAY,
+                LocalTime.of(9, 0), LocalTime.of(13, 0)));
+        ScheduleManagement.addSchedule(new Schedule("S017", "D002", DayOfWeek.SATURDAY,
+                LocalTime.of(9, 0), LocalTime.of(12, 0)));
+        ScheduleManagement.addSchedule(new Schedule("S018", "D003", DayOfWeek.SATURDAY,
+                LocalTime.of(14, 0), LocalTime.of(19, 0)));
+        ScheduleManagement.addSchedule(new Schedule("S019", "D004", DayOfWeek.SATURDAY,
+                LocalTime.of(15, 0), LocalTime.of(19, 0)));
+        ScheduleManagement.addSchedule(new Schedule("S020", "D005", DayOfWeek.SATURDAY,
+                LocalTime.of(15, 0), LocalTime.of(19, 0)));
     }
 
     public static void addSampleDoctor() {
@@ -872,16 +886,16 @@ public class ClinicData {
         SimpleDateFormat sdf = new SimpleDateFormat(UtilityClass.DATE_FORMAT);
         try {
             Doctor d1 = new Doctor("D001", "Lee Wee Teck", sdf.parse("01/01/1990"), 'M',
-                    "0123456789", "leewt@example.com", "Bachelor of Medicine, TARUMT", UtilityClass.statusFree);
+                    "0123456789", "leewt@example.com", "Bachelor of Medicine, TARUMT", UtilityClass.workingStatusOff);
 
             Doctor d2 = new Doctor("D002", "Lee Chong Wei", sdf.parse("02/01/1985"), 'M',
-                    "0123456780", "chongwei@example.com", "Bachelor of Surgery, UTAR", UtilityClass.statusFree);
+                    "0123456780", "chongwei@example.com", "Bachelor of Surgery, UTAR", UtilityClass.workingStatusOff);
 
             Doctor d3 = new Doctor("D003", "Aaron Chia Teng Feng", sdf.parse("15/11/1997"), 'M',
-                    "0123666789", "aaron@example.com", "Bachelor of Medicine, TARUMT", UtilityClass.statusFree);
+                    "0123666789", "aaron@example.com", "Bachelor of Medicine, TARUMT", UtilityClass.workingStatusOff);
 
             Doctor d4 = new Doctor("D004", "Soh Wooi Yik", sdf.parse("27/03/1998"), 'M',
-                    "0123666789", "wooiyik@example.com", "Bachelor of Medicine, SUNWAY", UtilityClass.statusConsulting);
+                    "0123666789", "wooiyik@example.com", "Bachelor of Medicine, SUNWAY", UtilityClass.workingStatusOff);
 
             Doctor d5 = new Doctor("D005", "Lee Zii Jia", sdf.parse("05/03/1998"), 'M',
                     "0123666789", "lzj@example.com", "Bachelor of Medicine, University of Melaya", UtilityClass.workingStatusOff);

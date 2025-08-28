@@ -9,7 +9,6 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.Scanner;
 import Control.PharmacyManagement;
-import Control.PrescriptionCalculator;
 import Entity.Medicine;
 import Entity.MedicalTreatmentItem;
 import Entity.Prescription;
@@ -225,11 +224,11 @@ public class PharmacyUI {
                 String dosageForm = medicine != null ? medicine.getDosageForm() : "unit";
 
                 System.out.println("  - " + item.getMedicineName() + 
-                                 " | Dosage: " + PrescriptionCalculator.getCompleteDosageDescription(item, dosageForm) +
+                                 " | Dosage: " + UtilityClass.getCompleteDosageDescription(item, dosageForm) +
                                  " | Frequency: " + item.getFrequency() +
                                  " | Duration: " + item.getDuration() +
                                  " | Method: " + item.getMethod() +
-                                 " | Calculated Quantity: " + PrescriptionCalculator.calculateQuantityNeeded(item));
+                                 " | Calculated Quantity: " + UtilityClass.calculateQuantityNeeded(item));
             }
             System.out.println();
         }
@@ -256,7 +255,7 @@ public class PharmacyUI {
         for (int i = 0; i < nextPrescription.getMedicineItems().size(); i++) {
             MedicalTreatmentItem item = nextPrescription.getMedicineItems().get(i);
             Medicine medicine = service.findByName(item.getMedicineName());
-            int quantityNeeded = PrescriptionCalculator.calculateQuantityNeeded(item);
+            int quantityNeeded = UtilityClass.calculateQuantityNeeded(item);
 
             if (medicine == null) {
                 System.out.println("[X] " + item.getMedicineName() + " - MEDICINE NOT FOUND");
@@ -1117,32 +1116,25 @@ public class PharmacyUI {
     private static void cloneInventorySnapshot() {
         System.out.println("\n--- Clone Inventory Snapshot ---");
 
-        DynamicList<Medicine> medicines = (DynamicList<Medicine>) service.getAll();
-        if (medicines.isEmpty()) {
+        MyList<Medicine> snapshot = service.createInventorySnapshot();
+
+        if (snapshot.isEmpty()) {
             System.out.println("No medicines to clone.");
             return;
         }
 
-        // Create a clone of the current inventory
-        MyList<Medicine> snapshot = medicines.clone();
-
         System.out.println("Inventory snapshot created with " + snapshot.size() + " medicines.");
         System.out.println("This snapshot can be used for backup or comparison purposes.");
 
-        // Show snapshot summary
-        var stats = snapshot.getStatistics(Medicine::getQuantity);
-        double totalValue = 0;
-        for (int i = 0; i < snapshot.size(); i++) {
-            Medicine med = snapshot.get(i);
-            totalValue += med.getPrice() * med.getQuantity();
-        }
+        double totalValue = service.calculateSnapshotTotalValue(snapshot);
+        double averageStock = service.calculateSnapshotAverageStock(snapshot);
 
         System.out.println("\n=== SNAPSHOT SUMMARY ===");
         System.out.println("Total medicines: " + snapshot.size());
-        System.out.println("Total inventory value: RM" + String.format("%.2f", totalValue));
-        System.out.printf("Average stock per medicine: %.2f units%n", stats.average);
+        System.out.println("Total inventory value: RM " + String.format("%.2f", totalValue));
+        System.out.printf("Average stock per medicine: %.2f units%n", averageStock);
 
-        // Optionally save snapshot details to display later
+        // ✅ Display logic only
         System.out.print("Display full snapshot details? (y/n): ");
         String show = sc.nextLine().trim().toLowerCase();
         if (show.equals("y") || show.equals("yes")) {
