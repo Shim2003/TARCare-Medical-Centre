@@ -178,7 +178,7 @@ public class DoctorReportUI {
         UtilityClass.quickSort(summaries, (a, b) -> Integer.compare(b.getTotalHours(), a.getTotalHours()));
 
         // Print report
-        System.out.println("\n========== Top Hardworking Doctors ==========");
+        System.out.println("\n========== Top Hardworking Doctors ==========\n");
         System.out.printf("Month: %s %d\n", month.getMonth(), month.getYear());
         System.out.printf("%-10s %-20s %-15s\n", "DoctorID", "Name", "TotalHours");
 
