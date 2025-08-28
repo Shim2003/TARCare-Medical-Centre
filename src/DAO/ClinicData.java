@@ -156,23 +156,23 @@ public class ClinicData {
             samples[4].setStartTime(LocalDateTime.of(2025, 8, 22, 9, 15));
             samples[4].setEndTime(LocalDateTime.of(2025, 8, 22, 9, 50));
 
-            samples[5] = new Consultation("C1006", "P1006", "D006", "Sore Throat");
+            samples[5] = new Consultation("C1006", "P1006", "D001", "Sore Throat");
             samples[5].setStartTime(LocalDateTime.of(2025, 8, 22, 10, 30));
             samples[5].setEndTime(LocalDateTime.of(2025, 8, 22, 11, 0));
 
-            samples[6] = new Consultation("C1007", "P1007", "D007", "Allergy");
+            samples[6] = new Consultation("C1007", "P1007", "D002", "Allergy");
             samples[6].setStartTime(LocalDateTime.of(2025, 8, 23, 8, 45));
             samples[6].setEndTime(LocalDateTime.of(2025, 8, 23, 9, 15));
 
-            samples[7] = new Consultation("C1008", "P1008", "D008", "Flu");
+            samples[7] = new Consultation("C1008", "P1008", "D003", "Flu");
             samples[7].setStartTime(LocalDateTime.of(2025, 8, 23, 10, 15));
             samples[7].setEndTime(LocalDateTime.of(2025, 8, 23, 10, 50));
 
-            samples[8] = new Consultation("C1009", "P1009", "D009", "Fatigue");
+            samples[8] = new Consultation("C1009", "P1009", "D004", "Fatigue");
             samples[8].setStartTime(LocalDateTime.of(2025, 8, 24, 13, 0));
             samples[8].setEndTime(LocalDateTime.of(2025, 8, 24, 13, 45));
 
-            samples[9] = new Consultation("C1010", "P1010", "D010", "Dizziness");
+            samples[9] = new Consultation("C1010", "P1010", "D005", "Dizziness");
             samples[9].setStartTime(LocalDateTime.of(2025, 8, 24, 14, 15));
             samples[9].setEndTime(LocalDateTime.of(2025, 8, 24, 14, 55));
 
@@ -202,16 +202,16 @@ public class ClinicData {
                     LocalDateTime.of(2025, 8, 21, 14, 45), "Back Pain");
             samples[4] = new Appointment("A1005", "P1005", "D005",
                     LocalDateTime.of(2025, 8, 22, 9, 20), "Stomach Ache");
-            samples[5] = new Appointment("A1006", "P1006", "D006",
+            samples[5] = new Appointment("A1006", "P1006", "D001",
                     LocalDateTime.of(2025, 8, 22, 10, 40), "Sore Throat");
-            samples[6] = new Appointment("A1007", "P1007", "D007",
-                    LocalDateTime.of(2025, 8, 23, 8, 50), "Allergy");
-            samples[7] = new Appointment("A1008", "P1008", "D008",
-                    LocalDateTime.of(2025, 8, 23, 10, 10), "Flu");
-            samples[8] = new Appointment("A1009", "P1009", "D009",
-                    LocalDateTime.of(2025, 8, 24, 13, 30), "Fatigue");
-            samples[9] = new Appointment("A1010", "P1010", "D010",
-                    LocalDateTime.of(2025, 8, 24, 14, 20), "Dizziness");
+            samples[6] = new Appointment("A1007", "P1007", "D002",
+                    LocalDateTime.of(2025, 9, 23, 8, 50), "Allergy");
+            samples[7] = new Appointment("A1008", "P1008", "D003",
+                    LocalDateTime.of(2025, 9, 23, 10, 10), "Flu");
+            samples[8] = new Appointment("A1009", "P1009", "D004",
+                    LocalDateTime.of(2025, 9, 24, 13, 30), "Fatigue");
+            samples[9] = new Appointment("A1010", "P1010", "D005",
+                    LocalDateTime.of(2025, 9, 24, 14, 20), "Dizziness");
 
             for (Appointment a : samples) {
                 AppointmentManagement.addScheduledAppointment(a);
