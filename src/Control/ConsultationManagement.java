@@ -19,11 +19,11 @@ import java.time.format.DateTimeFormatter;
  */
 public class ConsultationManagement {
 
-    private static DynamicList<Patient> completedPatients = new DynamicList<>();
-    private static DynamicList<Consultation> ongoingConsultations = new DynamicList<>();
+    private static MyList<Patient> completedPatients = new DynamicList<>();
+    private static MyList<Consultation> ongoingConsultations = new DynamicList<>();
     private static MyList<CurrentServingDAO> currentConsulting = QueueControl.getCurrentServingPatient();
-    private static DynamicList<Consultation> completedConsultations = new DynamicList<>();
-    private static DynamicList<Consultation> backupConsultations = new DynamicList<>();
+    private static MyList<Consultation> completedConsultations = new DynamicList<>();
+    private static MyList<Consultation> backupConsultations = new DynamicList<>();
     
     // Get all consultations (completed) from Consultation entity
     public static DynamicList<Consultation> getAllConsultations() {
@@ -36,7 +36,7 @@ public class ConsultationManagement {
     // Initialize the consultation ID counter based on the highest existing consultation ID
     public static void initializeConsultationCounter() {
         int maxId = 1000;
-        DynamicList<Consultation> completedList = getCompletedConsultations();
+        MyList<Consultation> completedList = getCompletedConsultations();
 
         for (int i = 0; i < completedList.size(); i++) {
             String id = completedList.get(i).getConsultationId();
@@ -55,17 +55,17 @@ public class ConsultationManagement {
     }
     
     // Get the list of ongoing consultations
-    public static DynamicList<Consultation> getOngoingConsultationsList() {
+    public static MyList<Consultation> getOngoingConsultationsList() {
         return ongoingConsultations;
     }
 
     // Get the list of completed consultations
-    public static DynamicList<Consultation> getCompletedConsultationsList() {
+    public static MyList<Consultation> getCompletedConsultationsList() {
         return completedConsultations;
     }
     
     // Get ongoing consultations list
-    public static DynamicList<Consultation> getOngoingConsultations() {
+    public static MyList<Consultation> getOngoingConsultations() {
         return ongoingConsultations;
     }
     
@@ -546,7 +546,7 @@ public class ConsultationManagement {
     }
     
     // Getter for completedConsultations
-    public static DynamicList<Consultation> getCompletedConsultations() {
+    public static MyList<Consultation> getCompletedConsultations() {
         return completedConsultations;
     }
     

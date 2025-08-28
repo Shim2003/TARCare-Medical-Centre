@@ -4,20 +4,12 @@
  */
 package Boundary;
 import Control.DoctorManagement;
-import Control.ScheduleManagement;
-import Control.ConsultationManagement;
-import Control.LeaveManagement;
 import Control.PatientManagement;
 import Control.ConsultationManagement;
-import DAO.ClinicData;
 import java.util.Scanner;
-import Boundary.DiagnosisUI;
-import Boundary.MedicalTreatmentUI;
 import Entity.Doctor; 
-import ADT.MyList; 
 import Entity.*;
 import Utility.UtilityClass;
-import ADT.DynamicList;
 import java.time.format.DateTimeFormatter;
 import java.time.Duration;
 
