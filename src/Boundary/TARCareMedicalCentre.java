@@ -56,7 +56,7 @@ public class TARCareMedicalCentre {
 
     public static void staffMainMenu() {
         while (true) {
-            System.out.println("\n--- Staff Main Menu ---");
+            System.out.println("\n---         Staff Main Menu        ---");
             QueueUI.displayCurrentQueue();
             System.out.println("1. Patient Management");
             System.out.println("2. Doctor Management");
@@ -103,7 +103,7 @@ public class TARCareMedicalCentre {
 
     public static void patientMainMenu() {
         while (true) {
-            System.out.println("\n--- Patient Main Menu ---");
+            System.out.println("\n---        Patient Main Menu       ---");
             QueueUI.displayCurrentQueue();
             System.out.println("1. Patient Profile Management");
             System.out.println("2. Queue Management");

@@ -28,7 +28,7 @@ public class PatientUI {
             System.out.println("3. Search Patient by Patient ID");
             System.out.println("4. Remove Patient");
             System.out.println("5. Generate Patient Report");
-            System.out.println("6. Back to Sdmin Main Menu");
+            System.out.println("6. Back to Admin Main Menu");
 
             System.out.print("Enter your choice (1-6): ");
             String choice = scanner.nextLine();
