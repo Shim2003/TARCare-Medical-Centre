@@ -32,12 +32,14 @@ public class AppointmentManagement {
     private static int appointmentCounter = 1001; // A1001
 
     public static String generateNextAppointmentId() {
-        String id;
-        do {
-            id = "A" + (appointmentCounter++);
-        } while (appointmentIdExists(id));  // if exists
+        String id = "A" + appointmentCounter;
+        while (appointmentIdExists(id)) {
+            id = "A" + (++appointmentCounter);
+        }
+        appointmentCounter++; // appointmentCounter++
         return id;
     }
+
 
     // Check if the appointment ID exists
     private static boolean appointmentIdExists(String id) {
@@ -52,6 +54,16 @@ public class AppointmentManagement {
     public static void addScheduledAppointment(Appointment a) {
         scheduledAppointments.add(a);
     }
+    
+    public static String peekNextAppointmentId() {
+        int tempCounter = appointmentCounter; 
+        String id = "A" + tempCounter;
+        while (appointmentIdExists(id)) {
+            id = "A" + (++appointmentCounter);
+        }
+        return id; // Do not modify appointmentCounter
+    }
+
 
     public static void scheduleNextAppointment(String patientId, String doctorId, String dateTimeStr, String reason) {
         // Check if the patient exists
