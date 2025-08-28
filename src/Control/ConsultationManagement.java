@@ -33,6 +33,7 @@ public class ConsultationManagement {
     private static DynamicList<Consultation> ongoingConsultations = new DynamicList<>();
     private static MyList<CurrentServingDAO> currentConsulting = QueueControl.getCurrentServingPatient();
     private static DynamicList<Consultation> completedConsultations = new DynamicList<>();
+    private static MyList<Consultation> backup;
     
     public static DynamicList<Consultation> getAllConsultations() {
         return Consultation.getCompletedConsultations();
@@ -496,15 +497,6 @@ public class ConsultationManagement {
         return completedConsultations.contains(c);
     }
     
-    public static void showFirstAndLastConsultation() {
-        if (!completedConsultations.isEmpty()) {
-            System.out.println("First consultation: " + completedConsultations.getFirst());
-            System.out.println("Last consultation: " + completedConsultations.getLast());
-        } else {
-            System.out.println("No completed consultations.");
-        }
-    }
-    
     public static void updateConsultation(int index, Consultation newConsultation) {
         if (index >= 0 && index < completedConsultations.size()) {
             completedConsultations.replace(index, newConsultation);
@@ -515,21 +507,21 @@ public class ConsultationManagement {
     }
     
     public static void exportConsultationsToArray() {
-        Object[] objArr = completedConsultations.toArray();  // Can only get Object[]
+        Object[] objArr = backup.toArray();  // Can only get Object[]
         Consultation[] arr = new Consultation[objArr.length];
 
         for (int i = 0; i < objArr.length; i++) {
             arr[i] = (Consultation) objArr[i];  // Manual casting
         }
 
-        System.out.println("\n=== Exported Consultations to Array ===");
+        System.out.println("\n=== Back Consultations  ===");
         for (Consultation c : arr) {
             System.out.println("Consultation ID: " + c.getConsultationId() +
                     ", Patient: " + c.getPatientId() +
                     ", Doctor: " + c.getDoctorId() +
                     ", Status: Completed");
         }
-        System.out.println("Total consultations exported: " + arr.length);
+        System.out.println("Total consultations backed up: " + arr.length);
     }
 
     
@@ -560,7 +552,7 @@ public class ConsultationManagement {
     }
     
     public static void backupConsultations() {
-        MyList<Consultation> backup = completedConsultations.clone();
+        backup = completedConsultations.clone();
         System.out.println("Backup created with " + backup.size() + " consultations.");
     }
     
@@ -568,6 +560,7 @@ public class ConsultationManagement {
     public static DynamicList<Consultation> getCompletedConsultations() {
         return completedConsultations;
     }
+    
     
     public static void compareConsultations(MyList<Consultation> otherList) {
         if (completedConsultations.equals(otherList)) {

@@ -134,9 +134,7 @@ public class ConsultationUI {
         do {
             System.out.println("\n====== ANALYTICS & UTILITIES ======");
             System.out.println(" 1. Show Consultation Duration Statistics");
-            System.out.println(" 2. Show First & Last Completed Consultation");
-            System.out.println(" 3. Backup & Compare Consultations");
-            System.out.println(" 4. Export Completed Consultations to Array");
+            System.out.println(" 2. Backup Consultations");
             System.out.println(" 0. Back");
             System.out.println("======================================");
             System.out.print("Enter your choice: ");
@@ -151,12 +149,11 @@ public class ConsultationUI {
 
             switch (choice) {
                 case 1 -> consultationManagement.showConsultationDurationStats();
-                case 2 -> consultationManagement.showFirstAndLastConsultation();
-                case 3 -> {
+                case 2 -> {
                     consultationManagement.backupConsultations();
                     consultationManagement.compareConsultations(consultationManagement.getCompletedConsultations());
+                    consultationManagement.exportConsultationsToArray();
                 }
-                case 4 -> consultationManagement.exportConsultationsToArray();
                 case 0 -> System.out.println("Returning...");
                 default -> System.out.println("Invalid choice.");
             }
