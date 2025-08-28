@@ -69,7 +69,7 @@ public class DoctorReportUI {
         MyList<Schedule> schedules = ScheduleManagement.getAllSchedules();
         YearMonth currentMonth = YearMonth.now();
 
-        System.out.printf("\n==================== Current Month (%s) Report ====================", currentMonth);
+        System.out.printf("\n==================== Current Month (%s) Report ====================\n", currentMonth);
         System.out.printf("%-10s %-20s %-12s %-12s %-12s\n",
                 "DoctorID", "Name", "WorkDays", "LeaveDays", "Utilization");
 
@@ -135,7 +135,7 @@ public class DoctorReportUI {
         UtilityClass.quickSort(summaries, (a, b) -> Integer.compare(b.leaveDays, a.leaveDays));
 
         // print report
-        System.out.printf("\n============= Doctors by Leave Taken (%4d/%02d) =============", year, month);
+        System.out.printf("\n============= Doctors by Leave Taken (%4d/%02d) =============\n", year, month);
         System.out.printf("%-8s %-28s %-12s %-12s\n", "DoctorID", "Name", "LeaveDays", "LeaveRecords");
 
         for (int i = 0; i < summaries.size(); i++) {
