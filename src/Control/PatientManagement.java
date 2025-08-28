@@ -235,6 +235,34 @@ public class PatientManagement {
         return new AppointmentInfo(nextAppointment, days, hours);
     }
 
+    public static int totalNumberOfPatient() {
+        return patientList.size();
+    }
+
+    public static boolean isEmpty(MyList<Patient> list) {
+        return list.isEmpty();
+    }
+
+    public static int getPatientsByAgeGroupSize(String ageGroup) {
+        return getPatientsByAgeGroup(ageGroup).size();
+    }
+
+    public static int getMalePatientsCount() {
+        return getMalePatients().size();
+    }
+
+    public static int getFemalePatientsCount() {
+        return getFemalePatients().size();
+    }
+
+    public static int getOldestPatientsCount(int n) {
+        return getOldestPatients(n).size();
+    }
+
+    public static int getYoungestPatientsCount(int n) {
+        return getYoungestPatients(n).size();
+    }
+
     /**
      * Inner class for gender statistics data
      */

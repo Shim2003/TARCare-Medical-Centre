@@ -117,7 +117,8 @@ public class QueueUI {
 
             // Show position in queue
             MyList<QueueEntry> waitingList = QueueControl.getQueueListByStatus(UtilityClass.statusWaiting);
-            System.out.println("Patients waiting: " + waitingList.size());
+            int waitingCount = QueueControl.getWaitingPatientsCount();
+            System.out.println("Patients waiting: " + waitingCount);
 
         } else {
             System.out.println("\nFailed to join queue.");
@@ -132,7 +133,7 @@ public class QueueUI {
         System.out.println("         SERVE NEXT PATIENT");
         System.out.println("========================================");
 
-        if ((QueueControl.getQueueListByStatus(Utility.UtilityClass.statusReadyToConsult).size() + QueueControl.getCurrentServingPatient().size()) >= 3) {
+        if ((QueueControl.getReadyToConsultCount() + QueueControl.getCurrentServingPatientCount()) >= 3) {
             System.out.println("STATUS: Doctor is currently busy with other patients");
             System.out.println("        Please wait and try again later");
             UtilityClass.pressEnterToContinue();
@@ -144,19 +145,21 @@ public class QueueUI {
                 Utility.UtilityClass.statusWaiting
         );
 
-        if (waitingPatients.isEmpty()) {
+        if (QueueControl.isQueueListByStatusEmpty(Utility.UtilityClass.statusWaiting)) {
             System.out.println("STATUS: No patients waiting in queue");
             UtilityClass.pressEnterToContinue();
             return;
         }
 
         // Display current queue
+        int waitingPatientsCount = QueueControl.getWaitingPatientsCount();
         System.out.println("\n+--------------------------------------+");
         System.out.println("|     CURRENT WAITING LIST             |");
-        System.out.println("|     (" + waitingPatients.size() + " patients)                     |");
+        System.out.println("|     (" + waitingPatientsCount + " patients)                     |");
         System.out.println("+--------------------------------------+");
-        for (int i = 0; i < waitingPatients.size(); i++) {
-            System.out.printf("| %2d. %-32s |%n", (i + 1), waitingPatients.get(i).toString());
+        int index = 1;
+        for (QueueEntry entry : waitingPatients) {
+            System.out.printf("| %2d. %-32s |%n", index++, entry.toString());
         }
         System.out.println("+--------------------------------------+");
 
@@ -185,7 +188,7 @@ public class QueueUI {
 
         MyList<QueueEntry> servingList = QueueControl.getQueueListByStatus(Utility.UtilityClass.statusReadyToConsult);
 
-        if (servingList.isEmpty()) {
+        if (QueueControl.isQueueListByStatusEmpty(Utility.UtilityClass.statusReadyToConsult)) {
             String msg = "No patients are currently being served.";
             int width = msg.length();
             String border = "+" + "-".repeat(width + 2) + "+";
@@ -200,11 +203,12 @@ public class QueueUI {
         System.out.println(header);
         System.out.printf("| %-15s | %-15s |\n", "Queue ID", "Patient Name");
         System.out.println(header);
-        
-        for (int i = 0; i < servingList.size(); i++) {
-            QueueEntry cs = servingList.get(i);
+
+        int index = 1;
+        for (QueueEntry cs : servingList) {
             String patientName = PatientManagement.getPatientNameById(cs.getPatientId());
             System.out.printf("| %-15s | %-15s |\n", cs.getQueueNumber(), patientName);
+            index++;
         }
         System.out.println(header);
     }
@@ -238,13 +242,14 @@ public class QueueUI {
 
         MyList<QueueEntry> filteredList = Control.QueueControl.getQueueListByStatus(selectedStatus);
 
-        if (filteredList.isEmpty()) {
+        if (QueueControl.isQueueListByStatusEmpty(selectedStatus)) {
             System.out.println("No queue entries found with status: " + selectedStatus);
         } else {
+            int filteredCount = QueueControl.getQueueListByStatusCount(selectedStatus);
             System.out.println("\nQueue Entries with status: " + selectedStatus);
-            System.out.println("Total entries: " + filteredList.size());
+            System.out.println("Total entries: " + filteredCount);
             System.out.println("-".repeat(50));
-            for (int i = 0; i < filteredList.size(); i++) {
+            for (int i = 0; i < filteredCount; i++) {
                 System.out.printf("%2d. %s%n", (i + 1), filteredList.get(i).toString());
             }
         }
@@ -362,16 +367,17 @@ public class QueueUI {
     }
 
     private static void removeAllQueueRecords() {
-        MyList<QueueEntry> allRecords = QueueControl.getQueueList();
 
-        if (allRecords.isEmpty()) {
+        if (QueueControl.isQueueEmpty()) {
             System.out.println("No queue records to remove.");
             UtilityClass.pressEnterToContinue();
             return;
         }
 
+        int totalRecords = QueueControl.getTotalQueueCount();
+
         System.out.println("\n--- Remove All Queue Records ---");
-        System.out.println("Total queue records: " + allRecords.size());
+        System.out.println("Total queue records: " + totalRecords);
         System.out.print("Are you sure you want to remove ALL queue records? This action cannot be undone. (Y/N): ");
 
         String input = scanner.nextLine().trim();
@@ -388,7 +394,6 @@ public class QueueUI {
             String confirmation = scanner.nextLine();
 
             if ("CONFIRM".equals(confirmation)) {
-                int totalRecords = allRecords.size();
                 QueueControl.clearAllQueueRecords();
                 System.out.println("Successfully removed all " + totalRecords + " queue records.");
             } else {
@@ -449,6 +454,8 @@ public class QueueUI {
         System.out.println("STATUS DISTRIBUTION:");
         System.out.printf("|- Waiting: %d (%.1f%%)\n", todayStats.waitingPatients,
                 (double) todayStats.waitingPatients / todayStats.totalPatients * 100);
+        System.out.printf("|- Ready To Consult: %d (%.1f%%)\n", todayStats.readyToConsultingPatients,
+                (double) todayStats.consultingPatients / todayStats.totalPatients * 100);
         System.out.printf("|- Consulting: %d (%.1f%%)\n", todayStats.consultingPatients,
                 (double) todayStats.consultingPatients / todayStats.totalPatients * 100);
         System.out.printf("|- Completed: %d (%.1f%%)\n", todayStats.completedPatients,
@@ -457,6 +464,7 @@ public class QueueUI {
         // Visual representation
         System.out.println("\nVISUAL BREAKDOWN:");
         displayStatusBar("Waiting", todayStats.waitingPatients, todayStats.totalPatients);
+        displayStatusBar("Ready To Consult", todayStats.readyToConsultingPatients, todayStats.totalPatients);
         displayStatusBar("Consulting", todayStats.consultingPatients, todayStats.totalPatients);
         displayStatusBar("Completed", todayStats.completedPatients, todayStats.totalPatients);
 
@@ -572,6 +580,5 @@ public class QueueUI {
             System.out.println("Invalid patient ID or patient not found in queue.");
         }
     }
-    
-    
+
 }
