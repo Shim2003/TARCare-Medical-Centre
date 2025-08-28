@@ -32,9 +32,9 @@ public class ScheduleUI {
 //    }
     public static void ManageSchedule() {
 
-        boolean validOption = false;
+        boolean exit = false;
 
-        while (!validOption) {
+        while (!exit) {
             System.out.println("\n-*-*- Schedule(s) Management -*-*-");
             System.out.println("1. Check Schedules");
             System.out.println("2. Add a new schedule");
@@ -47,31 +47,23 @@ public class ScheduleUI {
 
             switch (choice) {
                 case "1":
-                    validOption = true;
                     DisplayAllSchedules();
                     UtilityClass.pressEnterToContinue();
-                    ManageSchedule();
                     break;
                 case "2":
-                    validOption = true;
                     AddScheduleUI();
                     UtilityClass.pressEnterToContinue();
-                    ManageSchedule();
                     break;
                 case "3":
-                    validOption = true;
                     editScheduleUI();
                     UtilityClass.pressEnterToContinue();
-                    ManageSchedule();
                     break;
                 case "4":
-                    validOption = true;
                     removeScheduleUI();
                     UtilityClass.pressEnterToContinue();
-                    ManageSchedule();
                     break;
                 case "5":
-                    validOption = true;
+                    exit = true;
                     DoctorUI.DoctorStaffMode();
                     break;
                 default:

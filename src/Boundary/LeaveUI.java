@@ -25,9 +25,9 @@ public class LeaveUI {
 
     public static void ManageLeave() {
 
-        boolean validOption = false;
+        boolean exit = false;
 
-        while (!validOption) {
+        while (!exit) {
             System.out.println("\n-*-*- Leave(s) Management -*-*-");
             System.out.println("1. Check Leave(s)");
             System.out.println("2. Apply Leave(s)");
@@ -39,25 +39,19 @@ public class LeaveUI {
 
             switch (choice) {
                 case "1":
-                    validOption = true;
                     displayAllLeavesUI();
                     UtilityClass.pressEnterToContinue();
-                    ManageLeave();
                     break;
                 case "2":
-                    validOption = true;
                     addLeaveUI();
                     UtilityClass.pressEnterToContinue();
-                    ManageLeave();
                     break;
                 case "3":
-                    validOption = true;
                     cancelLeaveUI();
                     UtilityClass.pressEnterToContinue();
-                    ManageLeave();
                     break;
                 case "4":
-                    validOption = true;
+                    exit = true;
                     DoctorUI.DoctorStaffMode();
                     break;
                 default:

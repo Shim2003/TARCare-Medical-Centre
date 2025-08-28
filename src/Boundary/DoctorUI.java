@@ -27,9 +27,9 @@ public class DoctorUI {
     private static final Scanner scanner = new Scanner(System.in);
 
     public static void DoctorStaffMode() {
-        boolean validOption = false;
+        boolean exit = false;
 
-        while (!validOption) {
+        while (!exit) {
             System.out.println("\n*-*-*-*-*-*-* Doctor Module *-*-*-*-*-*-*");
             System.out.println("\t  --- Welcome Staff ---");
             System.out.println("1. Manage Doctors");
@@ -43,23 +43,23 @@ public class DoctorUI {
 
             switch (choice) {
                 case "1":
-                    validOption = true;
+
                     ManageDoctor();
                     break;
                 case "2":
-                    validOption = true;
+
                     ScheduleUI.ManageSchedule();
                     break;
                 case "3":
-                    validOption = true;
+
                     LeaveUI.ManageLeave();
                     break;
                 case "4":
-                    validOption = true;
+
                     DoctorReportUI.ReportMenu();
                     break;
                 case "5":
-                    validOption = true;
+                    exit = true;
                     TARCareMedicalCentre.adminMainMenu();
                     break;
                 default:
@@ -72,10 +72,10 @@ public class DoctorUI {
 
     public static void DoctorUserMode() {
 
-        boolean validOption = false;
+        boolean exit = false;
 
-        while (!validOption) {
-           System.out.println("\n*-*-*-*-*-*-* Doctor Module *-*-*-*-*-*-*");
+        while (!exit) {
+            System.out.println("\n*-*-*-*-*-*-* Doctor Module *-*-*-*-*-*-*");
             System.out.println("\t  ------ Welcome ------");
             System.out.println("1. Show All Doctors");
             System.out.println("2. Show Current Free Doctor(s)");
@@ -89,37 +89,37 @@ public class DoctorUI {
 
             switch (choice) {
                 case "1":
-                    validOption = true;
+
                     ShowDoctors();
                     UtilityClass.pressEnterToContinue();
-                    DoctorUserMode();
+
                     break;
                 case "2":
-                    validOption = true;
+
                     ShowCurrentFreeDoctors();
                     UtilityClass.pressEnterToContinue();
-                    DoctorUserMode();
+
                     break;
                 case "3":
-                    validOption = true;
+
                     ShowDoctorsSchedulesByDayUI();
                     UtilityClass.pressEnterToContinue();
-                    DoctorUserMode();
+
                     break;
                 case "4":
-                    validOption = true;
+
                     DisplayAllTimetableWithLeaves();
                     UtilityClass.pressEnterToContinue();
-                    DoctorUserMode();
+
                     break;
                 case "5":
-                    validOption = true;
+
                     ScheduleUI.DisplayAllTimetable();
                     UtilityClass.pressEnterToContinue();
-                    DoctorUserMode();
+
                     break;
                 case "6":
-                    validOption = true;
+                    exit = true;
                     TARCareMedicalCentre.patientMainMenu();
                 default:
                     System.out.println("Invalid Option!!! Pls try again");
@@ -132,9 +132,9 @@ public class DoctorUI {
 
     public static void ManageDoctor() {
 
-        boolean validOption = false;
+        boolean exit = false;
 
-        while (!validOption) {
+        while (!exit) {
             System.out.println("\n-*-*- Doctor(s) Management -*-*-");
             System.out.println("1. Check All Doctors");
             System.out.println("2. Register a new doctor");
@@ -147,29 +147,23 @@ public class DoctorUI {
 
             switch (choice) {
                 case "1":
-                    validOption = true;
                     DisplayAllDoctors();
                     UtilityClass.pressEnterToContinue();
-                    ManageDoctor();
                     break;
                 case "2":
-                    validOption = true;
                     addDoctorUI();
+                    UtilityClass.pressEnterToContinue();
                     break;
                 case "3":
-                    validOption = true;
                     editDoctorDetailsUI();
                     UtilityClass.pressEnterToContinue();
-                    ManageDoctor();
                     break;
                 case "4":
-                    validOption = true;
                     removeDoctorUI();
                     UtilityClass.pressEnterToContinue();
-                    ManageDoctor();
                     break;
                 case "5":
-                    validOption = true;
+                    exit = true;
                     DoctorStaffMode();
                     break;
                 default:
@@ -221,7 +215,7 @@ public class DoctorUI {
         System.out.println("Total of " + doctorList.size() + " doctor(s)");
 
     }
-    
+
     public static void ShowCurrentFreeDoctors() {
 
         MyList<Doctor> doctorList = DoctorManagement.getFreeDoctors();
@@ -441,12 +435,10 @@ public class DoctorUI {
             // Add doctor using add() method
             if (DoctorManagement.add(newDoctor)) {
                 System.out.println("Doctor registered successfully!");
-                UtilityClass.pressEnterToContinue();
-                ManageDoctor();
+
             } else {
                 System.out.println("Failed to register doctor. Try again.");
-                UtilityClass.pressEnterToContinue();
-                ManageDoctor();
+
             }
 
         } catch (Exception e) {
@@ -552,7 +544,7 @@ public class DoctorUI {
 
         if (success) {
             System.out.println(" Doctor details updated successfully.");
-           
+
         } else {
             System.out.println(" Failed to update doctor details.");
         }

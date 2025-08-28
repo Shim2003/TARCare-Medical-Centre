@@ -815,7 +815,7 @@ public class ClinicData {
                 "L003",
                 "D004",
                 LocalDate.of(2025, 8, 13), // multi-day leave
-                LocalDate.of(2025, 8, 25),
+                LocalDate.of(2025, 8, 28),
                 "Family vacation"
         ));
 
@@ -824,6 +824,14 @@ public class ClinicData {
                 "D004",
                 LocalDate.of(2025, 9, 15), // multi-day leave
                 LocalDate.of(2025, 9, 25),
+                "Family vacation"
+        ));
+        
+        LeaveManagement.addLeave(new DoctorLeave(
+                "L005",
+                "D005",
+                LocalDate.of(2025, 8, 30), // multi-day leave
+                LocalDate.of(2025, 9, 10),
                 "Family vacation"
         ));
     }
@@ -857,8 +865,18 @@ public class ClinicData {
                 LocalTime.of(9, 0), LocalTime.of(12, 0)));
         ScheduleManagement.addSchedule(new Schedule("S014", "D001", DayOfWeek.THURSDAY,
                 LocalTime.of(13, 0), LocalTime.of(18, 0)));
-        ScheduleManagement.addSchedule(new Schedule("S020", "D002", DayOfWeek.FRIDAY,
+        ScheduleManagement.addSchedule(new Schedule("S015", "D002", DayOfWeek.FRIDAY,
                 LocalTime.of(9, 0), LocalTime.of(13, 30)));
+        ScheduleManagement.addSchedule(new Schedule("S016", "D005", DayOfWeek.SATURDAY,
+                LocalTime.of(9, 0), LocalTime.of(13, 0)));
+        ScheduleManagement.addSchedule(new Schedule("S017", "D002", DayOfWeek.SATURDAY,
+                LocalTime.of(9, 0), LocalTime.of(12, 0)));
+        ScheduleManagement.addSchedule(new Schedule("S018", "D003", DayOfWeek.SATURDAY,
+                LocalTime.of(14, 0), LocalTime.of(19, 0)));
+        ScheduleManagement.addSchedule(new Schedule("S019", "D004", DayOfWeek.SATURDAY,
+                LocalTime.of(15, 0), LocalTime.of(19, 0)));
+        ScheduleManagement.addSchedule(new Schedule("S020", "D005", DayOfWeek.SATURDAY,
+                LocalTime.of(15, 0), LocalTime.of(19, 0)));
     }
 
     public static void addSampleDoctor() {
@@ -868,16 +886,16 @@ public class ClinicData {
         SimpleDateFormat sdf = new SimpleDateFormat(UtilityClass.DATE_FORMAT);
         try {
             Doctor d1 = new Doctor("D001", "Lee Wee Teck", sdf.parse("01/01/1990"), 'M',
-                    "0123456789", "leewt@example.com", "Bachelor of Medicine, TARUMT", UtilityClass.statusFree);
+                    "0123456789", "leewt@example.com", "Bachelor of Medicine, TARUMT", UtilityClass.workingStatusOff);
 
             Doctor d2 = new Doctor("D002", "Lee Chong Wei", sdf.parse("02/01/1985"), 'M',
-                    "0123456780", "chongwei@example.com", "Bachelor of Surgery, UTAR", UtilityClass.statusFree);
+                    "0123456780", "chongwei@example.com", "Bachelor of Surgery, UTAR", UtilityClass.workingStatusOff);
 
             Doctor d3 = new Doctor("D003", "Aaron Chia Teng Feng", sdf.parse("15/11/1997"), 'M',
-                    "0123666789", "aaron@example.com", "Bachelor of Medicine, TARUMT", UtilityClass.statusFree);
+                    "0123666789", "aaron@example.com", "Bachelor of Medicine, TARUMT", UtilityClass.workingStatusOff);
 
             Doctor d4 = new Doctor("D004", "Soh Wooi Yik", sdf.parse("27/03/1998"), 'M',
-                    "0123666789", "wooiyik@example.com", "Bachelor of Medicine, SUNWAY", UtilityClass.statusConsulting);
+                    "0123666789", "wooiyik@example.com", "Bachelor of Medicine, SUNWAY", UtilityClass.workingStatusOff);
 
             Doctor d5 = new Doctor("D005", "Lee Zii Jia", sdf.parse("05/03/1998"), 'M',
                     "0123666789", "lzj@example.com", "Bachelor of Medicine, University of Melaya", UtilityClass.workingStatusOff);
