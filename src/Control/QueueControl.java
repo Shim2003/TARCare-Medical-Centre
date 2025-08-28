@@ -120,7 +120,7 @@ public class QueueControl {
         return queueList.findAll(entry -> entry.getStatus().equalsIgnoreCase(status));
     }
 
-    public static RemovalResult removeFromQueue(String patientId) {
+    public static RemovalResult removeQueueByPatientId(String patientId) {
         if (patientId == null || patientId.trim().isEmpty()) {
             return new RemovalResult(false, "Invalid input. Please enter a valid Patient ID.");
         }

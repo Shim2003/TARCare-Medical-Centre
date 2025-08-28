@@ -256,7 +256,7 @@ public class QueueUI {
         System.out.print("Enter your Patient ID to cancel your queue entry: ");
         String patientId = scanner.nextLine();
 
-        RemovalResult result = Control.QueueControl.removeFromQueue(patientId);
+        RemovalResult result = Control.QueueControl.removeQueueByPatientId(patientId);
 
         if (result.isSuccess()) {
             System.out.println("Your queue entry has been successfully cancelled.");
