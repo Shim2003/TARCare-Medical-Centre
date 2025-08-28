@@ -89,34 +89,24 @@ public class DoctorUI {
 
             switch (choice) {
                 case "1":
-
                     ShowDoctors();
                     UtilityClass.pressEnterToContinue();
-
                     break;
                 case "2":
-
                     ShowCurrentFreeDoctors();
                     UtilityClass.pressEnterToContinue();
-
                     break;
                 case "3":
-
                     ShowDoctorsSchedulesByDayUI();
                     UtilityClass.pressEnterToContinue();
-
                     break;
                 case "4":
-
                     DisplayAllTimetableWithLeaves();
                     UtilityClass.pressEnterToContinue();
-
                     break;
                 case "5":
-
                     ScheduleUI.DisplayAllTimetable();
                     UtilityClass.pressEnterToContinue();
-
                     break;
                 case "6":
                     exit = true;
@@ -241,7 +231,7 @@ public class DoctorUI {
         DayOfWeek day = null;
 
         while (day == null) {
-            System.out.print("\nEnter a day of the week (e.g., MONDAY, Tuesday, fri): ");
+            System.out.print("\nEnter a day of the week (e.g., MONDAY, Tuesday): ");
             String input = scanner.nextLine().trim().toUpperCase();
 
             try {
