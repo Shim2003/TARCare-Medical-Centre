@@ -4,8 +4,8 @@
  */
 package Boundary;
 
-import static Boundary.PatientUI.staffUserMenu;
 import static Boundary.PatientUI.patientUserMenu;
+import static Boundary.PatientUI.staffUserMenu;
 import DAO.ClinicData;
 import java.util.Scanner;
 
@@ -24,7 +24,7 @@ public class TARCareMedicalCentre {
         ClinicData.run();
         mainMenu();
     }
-
+    
     public static void mainMenu() {
         System.out.println("--- Welcome to TAR UMT Clinic Management System ---");
 

@@ -877,6 +877,8 @@ public class ClinicData {
                 LocalTime.of(15, 0), LocalTime.of(19, 0)));
         ScheduleManagement.addSchedule(new Schedule("S020", "D005", DayOfWeek.SATURDAY,
                 LocalTime.of(15, 0), LocalTime.of(19, 0)));
+                ScheduleManagement.addSchedule(new Schedule("S021", "D006", DayOfWeek.FRIDAY,
+                LocalTime.of(0, 0), LocalTime.of(23, 59)));
     }
 
     public static void addSampleDoctor() {
@@ -900,11 +902,16 @@ public class ClinicData {
             Doctor d5 = new Doctor("D005", "Lee Zii Jia", sdf.parse("05/03/1998"), 'M',
                     "0123666789", "lzj@example.com", "Bachelor of Medicine, University of Melaya", UtilityClass.workingStatusOff);
 
+                    Doctor d6 = new Doctor("D006", "Brandon Tan", sdf.parse("05/03/1998"), 'M',
+                    "0123666789", "lzj@example.com", "Bachelor of Medicine, University of Melaya", UtilityClass.workingStatusOff);
+
+
             DoctorManagement.add(d1);
             DoctorManagement.add(d2);
             DoctorManagement.add(d3);
             DoctorManagement.add(d4);
             DoctorManagement.add(d5);
+            DoctorManagement.add(d6);
 //            System.out.println("Doctors loaded: " + doctorList.size()); // DEBUG
 
             // 🔹 Once doctors are added, update each doctor's working status
