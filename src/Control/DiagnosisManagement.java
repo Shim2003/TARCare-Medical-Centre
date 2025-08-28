@@ -187,4 +187,69 @@ public class DiagnosisManagement {
         }
         return null;
     }
+
+    public static String getMedicineForSymptom(String symptom) {
+        switch (symptom.toLowerCase()) {
+            case "cough":
+                return "Cough Syrup";
+            case "nasal congestion":
+                return "Decongestant Spray";
+            case "mild fever":
+            case "high fever":
+            case "fever":
+            case "chills":
+                return "Paracetamol";
+            case "body aches":
+            case "muscle pain":
+            case "stiffness":
+            case "muscle aches":
+                return "Pain Reliever (Ibuprofen)";
+            case "fatigue":
+            case "persistent fatigue":
+            case "weakness":
+                return "Vitamin Supplements";
+            case "severe headache":
+            case "sensitivity to light":
+            case "headache":
+                return "Pain Reliever (Aspirin)";
+            case "nausea":
+            case "bloating":
+                return "Antimetic Tablets";
+            case "stomach pain":
+                return "Antacid";
+            case "sore throat":
+            case "difficulty swallowing":
+                return "Lozenges / Antibiotics if persistent";
+            case "swollen lymph nodes":
+                return "Anti-inflammatory Medicine";
+            case "sneezing":
+            case "runny nose":
+            case "itchy eyes":
+                return "Antihistamine";
+            case "dizziness":
+            case "balance issues":
+                return "Vertigo Medicine";
+            case "memory issues":
+            case "difficulty concentrating":
+                return "Cognitive Support Supplement";
+            case "pale skin":
+                return "Iron Supplements";
+            case "frequent urination":
+            case "burning sensation":
+            case "urgency to urinate":
+                return "Antibiotics (for UTI)";
+            case "increased thirst":
+            case "weight loss":
+                return "Insulin / Diabetes Medicine";
+            case "persistent sadness":
+            case "lack of interest":
+                return "Antidepressants";
+            case "shortness of breath":
+            case "wheezing":
+            case "chest tightness":
+                return "Inhaler (Bronchodilator)";
+            default:
+                return "General Checkup Needed";
+        }
+    }
 }

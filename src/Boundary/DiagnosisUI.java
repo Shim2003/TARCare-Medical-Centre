@@ -435,25 +435,11 @@ public class DiagnosisUI {
     // Allow users to enter the severity level to filter the diagnosis list and display the diagnosis ID and its patient ID
     public static void severityAndSymptomCheck() {
         System.out.println("\n\n=== Filter Diagnosis by Severity Level ===");
-        int year;
-        int month = 0;
-        // Prompt user to enter the year
-        System.out.print("Enter the year (e.g., 2025): ");
-        String yearInput = scanner.nextLine().trim();
-
-        try {
-            year = Integer.parseInt(yearInput);
-            if (year < 2020 || year > Year.now().getValue()) {
-                System.out.println("Please enter a valid year between 2020 and the current year.");
-                return;
-            }
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid input. Please enter a valid year.");
-            return;
-        }
+        int year = 0, month = 0;
+        EnterYearAndMonth(year, month);
 
         //display all the diagnosis based on severity level and its count
-        MyList<Diagnosis> filteredList = DiagnosisManagement.getDiagnosesByYear(year);
+        MyList<Diagnosis> filteredList = DiagnosisManagement.getDiagnosesByYearAndMonth(year, month);
 
         if (filteredList.isEmpty()) {
             System.out.println("No diagnoses found for the specified year and month.");
@@ -496,10 +482,10 @@ public class DiagnosisUI {
         System.out.println("===========================================");
         System.out.println("Severity Level | Count");
         System.out.println("===========================================");
-        System.out.printf("Low           | %d\n", lowCount);
-        System.out.printf("Medium        | %d\n", mediumCount);
-        System.out.printf("High          | %d\n", highCount);
-        System.out.printf("Critical      | %d\n\n", criticalCount);
+        System.out.printf("Low            | %d\n", lowCount);
+        System.out.printf("Medium         | %d\n", mediumCount);
+        System.out.printf("High           | %d\n", highCount);
+        System.out.printf("Critical       | %d\n\n", criticalCount);
 
         // Calculate top 3 symptoms
         DynamicList<String> topSymptoms = new DynamicList<>();
@@ -545,6 +531,16 @@ public class DiagnosisUI {
         for (int i = 0; i < topN; i++) {
             System.out.printf("%d. %s - %d occurrences\n", i + 1, topSymptoms.get(i), symptomCounts[i]);
         }
+        
+        // give the medicine recommend for those top 3 symptoms in order to ready more stock and avoid under stock level
+        System.out.println("\nRecommend Medicine:");
+        System.out.println("===========================================");
+        for (int i = 0; i < topN; i++) {
+            String symptom = topSymptoms.get(i);
+            String medicine = DiagnosisManagement.getMedicineForSymptom(topSymptoms.get(i));
+            System.out.printf("%d. %s -> %s\n", i+1, symptom, medicine);
+        }
+        System.out.println("===========================================");
     }
 
     // General method that helps users to enter the year and month
