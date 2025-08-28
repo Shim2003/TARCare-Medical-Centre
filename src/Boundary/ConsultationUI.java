@@ -8,6 +8,7 @@ import Control.ScheduleManagement;
 import Control.ConsultationManagement;
 import Control.LeaveManagement;
 import Control.PatientManagement;
+import Control.ConsultationManagement;
 import DAO.ClinicData;
 import java.util.Scanner;
 
@@ -18,6 +19,7 @@ public class ConsultationUI {
 
     public static void run() {
         int choice;
+        ConsultationManagement.syncCurrentConsultingToOngoing();
         do {
             System.out.println("\n======================================");
             System.out.println("          Consultation Module        ");
@@ -159,13 +161,5 @@ public class ConsultationUI {
                 default -> System.out.println("Invalid choice.");
             }
         } while (choice != 0);
-    }
-
-    public static void main(String[] args) {
-        ClinicData.run();
-        
-        // TODO code application logic here
-        ConsultationUI ui = new ConsultationUI();
-        ui.run();
     }
 }
