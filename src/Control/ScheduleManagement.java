@@ -40,7 +40,6 @@ public class ScheduleManagement {
         return false;
     }
 
-
     public static boolean hasConflict(Schedule newSchedule) {
         for (int i = 0; i < scheduleList.size(); i++) {
             Schedule existing = scheduleList.get(i);
@@ -87,6 +86,11 @@ public class ScheduleManagement {
         return scheduleList;
     }
 
+    //    get number of doctor
+    public static int getScheduleCount() {
+        return scheduleList.size();
+    }
+
     public static boolean removeScheduleById(String scheduleID) {
         for (int i = 0; i < scheduleList.size(); i++) {
             Schedule schedule = scheduleList.get(i);
@@ -123,6 +127,10 @@ public class ScheduleManagement {
     // Find schedules for a specific doctor
     public static MyList<Schedule> findSchedulesByDoctorId(String doctorID) {
         return scheduleList.findAll(s -> s.getDoctorID().equals(doctorID));
+    }
+
+    public static int getScheduleCountByDay(DayOfWeek day) {
+        return findSchedulesByDay(day).size();
     }
 
     // Find a single schedule by its ID

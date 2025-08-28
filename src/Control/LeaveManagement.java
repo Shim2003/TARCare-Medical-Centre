@@ -6,9 +6,11 @@ package Control;
 
 import ADT.DynamicList;
 import ADT.MyList;
+import DAO.LeaveSummary;
 import Entity.Doctor;
 import Entity.DoctorLeave;
 import Entity.Schedule;
+import Utility.UtilityClass;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -272,6 +274,25 @@ public class LeaveManagement {
         }
 
         return leaveDays;
+    }
+
+    public static MyList<LeaveSummary> getTopLeaveDoctors(YearMonth currentMonth) {
+        MyList<Doctor> doctors = DoctorManagement.getAllDoctors();
+        MyList<LeaveSummary> summaries = new DynamicList<>();
+
+        for (Doctor doc : doctors) {
+            int leaveDays = LeaveManagement.countLeaveDaysInMonth(doc.getDoctorID(), currentMonth);
+            int leaveCount = LeaveManagement.countLeaveRecordsInMonth(doc.getDoctorID(), currentMonth);
+
+            if (leaveDays > 0) {
+                summaries.add(new LeaveSummary(doc.getDoctorID(), doc.getName(), leaveDays, leaveCount));
+            }
+        }
+
+        // sort
+        UtilityClass.quickSort(summaries, (a, b) -> Integer.compare(b.getLeaveDays(), a.getLeaveDays()));
+
+        return summaries;
     }
 
 }

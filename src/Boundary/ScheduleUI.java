@@ -83,8 +83,7 @@ public class ScheduleUI {
                 "SchedID", "DoctorID", "Day", "Start", "End");
         System.out.println("-------------------------------------------------------------------");
 
-        for (int i = 0; i < schedulesList.size(); i++) {
-            Schedule s = schedulesList.get(i);
+        for (Schedule s : schedulesList) {
             System.out.printf("%-10s %-10s %-12s %-10s %-10s%n",
                     s.getScheduleID(),
                     s.getDoctorID(),
@@ -113,21 +112,19 @@ public class ScheduleUI {
             boolean found = false;
 
             // Loop schedules for this day
-            for (int i = 0; i < schedules.size(); i++) {
-                Schedule s = schedules.get(i);
-
+            for (Schedule s : schedules) {
                 // Match day
                 if (s.getDayOfWeek().getValue() - 1 == d) {
                     // Find doctor name
                     String doctorName = "";
-                    for (int j = 0; j < doctors.size(); j++) {
-                        if (doctors.get(j).getDoctorID().equals(s.getDoctorID())) {
-                            doctorName = doctors.get(j).getName();
+                    for (Doctor doc : doctors) {
+                        if (doc.getDoctorID().equals(s.getDoctorID())) {
+                            doctorName = doc.getName();
                             break;
                         }
                     }
 
-                    System.out.print("Dr. " + doctorName + " (" + s.getStartTime() + "-" + s.getEndTime() + ") " + "| ");
+                    System.out.print("Dr. " + doctorName + " (" + s.getStartTime() + "-" + s.getEndTime() + ") | ");
                     found = true;
                 }
             }

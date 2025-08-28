@@ -6,6 +6,7 @@ package Control;
 
 import ADT.DynamicList;
 import ADT.MyList;
+import DAO.DoctorWorkSummary;
 import Entity.Doctor;
 import Entity.Schedule;
 import Utility.UtilityClass;
@@ -106,6 +107,11 @@ public class DoctorManagement {
 //    get number of doctor
     public static int getDoctorCount() {
         return doctorList.size();
+    }
+    
+     // ✅ Method to get free doctor count
+    public static int getDoctorCountFree() {
+        return getFreeDoctors().size();
     }
 
     public static DynamicList<Doctor> getFreeDoctors() {
@@ -234,30 +240,6 @@ public class DoctorManagement {
 
         return summaries;
     }
-
-// ================= Data Holder ==================
-    public static class DoctorWorkSummary {
-    private String id, name;
-    private int totalHours;
-
-    public DoctorWorkSummary(String id, String name, int totalHours) {
-        this.id = id;
-        this.name = name;
-        this.totalHours = totalHours;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public int getTotalHours() {
-        return totalHours;
-    }
-}
 
 //help to generate most hardworking doctor report
 

@@ -72,10 +72,9 @@ public class LeaveUI {
             return;
         }
 
-        for (int i = 0; i < leaves.size(); i++) {
-            DoctorLeave leave = leaves.get(i);
-
-            System.out.println((i + 1) + ". LeaveID: " + leave.getLeaveID()
+        int index = 1; // ✅ manual counter since for-each has no index
+        for (DoctorLeave leave : leaves) {
+            System.out.println(index++ + ". LeaveID: " + leave.getLeaveID()
                     + " | DoctorID: " + leave.getDoctorID()
                     + " | From: " + leave.getDateFrom()
                     + " | To: " + leave.getDateTo()
@@ -211,9 +210,9 @@ public class LeaveUI {
 
         // 2) Display the leaves for this doctor
         System.out.println("\nLeave records for Doctor ID " + doctorID + ":");
-        for (int i = 0; i < leavesForDoctor.size(); i++) {
-            DoctorLeave leave = leavesForDoctor.get(i);
-            System.out.println((i + 1) + ". LeaveID: " + leave.getLeaveID()
+        int index = 1; // ✅ manual counter
+        for (DoctorLeave leave : leavesForDoctor) {
+            System.out.println(index++ + ". LeaveID: " + leave.getLeaveID()
                     + " | From: " + leave.getDateFrom()
                     + " | To: " + leave.getDateTo()
                     + " | Reason: " + leave.getReason());
@@ -231,8 +230,8 @@ public class LeaveUI {
             }
 
             boolean found = false;
-            for (int i = 0; i < leavesForDoctor.size(); i++) {
-                if (leavesForDoctor.get(i).getLeaveID().equalsIgnoreCase(leaveIDToCancel)) {
+            for (DoctorLeave leave : leavesForDoctor) {
+                if (leave.getLeaveID().equalsIgnoreCase(leaveIDToCancel)) {
                     found = true;
                     break;
                 }
