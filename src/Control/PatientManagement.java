@@ -18,7 +18,7 @@ import java.util.Comparator;
 public class PatientManagement {
 
     // list to store patient details
-    private static DynamicList<Patient> patientList = new DynamicList<>();
+    private static MyList<Patient> patientList = new DynamicList<>();
 
     public static boolean add(Patient p) {
         if (p != null) {
