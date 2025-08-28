@@ -13,7 +13,7 @@ import java.util.function.Predicate;
  *
  * @author shim
  */
-public interface MyList<T> {
+public interface MyList<T> extends Iterable<T>{
 
     void add(T item);
 
