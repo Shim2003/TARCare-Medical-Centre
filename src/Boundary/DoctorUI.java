@@ -202,21 +202,26 @@ public class DoctorUI {
     public static void ShowCurrentFreeDoctors() {
 
         MyList<Doctor> doctorList = DoctorManagement.getFreeDoctors();
-        System.out.println("\n------------------------------------------------ AVAILABLE NOW ------------------------------------------------");
-        System.out.printf(" %-20s | %-15s | %-30s | %-20s |\n",
-                "Full Name", "Contact", "Email", "Working Status");
-        System.out.println("----------------------------------------------------------------------------------------------------------------");
-
-        // ✅ for-each loop
-        for (Doctor d : doctorList) {
+        if (!DoctorManagement.areAllDoctorsBusy()) {
+            System.out.println("\n------------------------------------------------ AVAILABLE NOW ------------------------------------------------");
             System.out.printf(" %-20s | %-15s | %-30s | %-20s |\n",
-                    d.getName(),
-                    d.getContactNumber(),
-                    d.getEmail(),
-                    d.getWorkingStatus());
+                    "Full Name", "Contact", "Email", "Working Status");
+            System.out.println("----------------------------------------------------------------------------------------------------------------");
+
+            // ✅ for-each loop
+            for (Doctor d : doctorList) {
+                System.out.printf(" %-20s | %-15s | %-30s | %-20s |\n",
+                        d.getName(),
+                        d.getContactNumber(),
+                        d.getEmail(),
+                        d.getWorkingStatus());
+            }
+
+            System.out.printf("\nTotal of %d doctor(s) available now", DoctorManagement.getDoctorCountFree());
+        } else {
+            System.out.println("No doctors are free now.....");
         }
 
-        System.out.printf("\nTotal of %d doctor(s) available now", DoctorManagement.getDoctorCountFree());
     }
 
     public static void ShowDoctorsSchedulesByDayUI() {
