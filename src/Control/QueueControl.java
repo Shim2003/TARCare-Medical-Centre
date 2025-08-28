@@ -198,17 +198,18 @@ public class QueueControl {
         MyList<QueueEntry> dayEntries = getQueueByDate(date);
 
         if (dayEntries.isEmpty()) {
-            return new DAO.DailyQueueStats(date, 0, 0, 0, 0, 0.0);
+            return new DAO.DailyQueueStats(date, 0, 0, 0, 0, 0, 0.0);
         }
 
         int total = dayEntries.size();
         int waiting = dayEntries.findAll(e -> e.getStatus().equals(UtilityClass.statusWaiting)).size();
         int consulting = dayEntries.findAll(e -> e.getStatus().equals(UtilityClass.statusConsulting)).size();
+        int ready = dayEntries.findAll(e -> e.getStatus().equals(UtilityClass.statusReadyToConsult)).size();
         int completed = dayEntries.findAll(e -> e.getStatus().equals(UtilityClass.statusCompleted)).size();
 
         double completionRate = total > 0 ? (double) completed / total * 100 : 0;
 
-        return new DailyQueueStats(date, total, waiting, consulting, completed, completionRate);
+        return new DailyQueueStats(date, total, waiting, ready, consulting, completed, completionRate);
     }
 
     public static boolean removeFromCurrentServing(String patientId) {
@@ -234,6 +235,42 @@ public class QueueControl {
         }
 
         return false;
+    }
+
+    public static int getQueueListByStatusCount(String status) {
+        return getQueueListByStatus(status).size();
+    }
+
+    public static int getCurrentServingPatientCount() {
+        return currentServingPatient.size();
+    }
+
+    public static int getTotalQueueCount() {
+        return queueList.size();
+    }
+
+    public static int getWaitingPatientsCount() {
+        return getQueueListByStatusCount(UtilityClass.statusWaiting);
+    }
+
+    public static int getConsultingPatientsCount() {
+        return getQueueListByStatusCount(UtilityClass.statusConsulting);
+    }
+
+    public static int getCompletedPatientsCount() {
+        return getQueueListByStatusCount(UtilityClass.statusCompleted);
+    }
+
+    public static int getReadyToConsultCount() {
+        return getQueueListByStatusCount(UtilityClass.statusReadyToConsult);
+    }
+
+    public static boolean isQueueEmpty() {
+        return queueList.isEmpty();
+    }
+
+    public static boolean isQueueListByStatusEmpty(String status) {
+        return getQueueListByStatus(status).isEmpty();
     }
 
 }

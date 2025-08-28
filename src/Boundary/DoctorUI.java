@@ -43,19 +43,15 @@ public class DoctorUI {
 
             switch (choice) {
                 case "1":
-
                     ManageDoctor();
                     break;
                 case "2":
-
                     ScheduleUI.ManageSchedule();
                     break;
                 case "3":
-
                     LeaveUI.ManageLeave();
                     break;
                 case "4":
-
                     DoctorReportUI.ReportMenu();
                     break;
                 case "5":
@@ -166,23 +162,21 @@ public class DoctorUI {
 
     public static void DisplayAllDoctors() {
 
-        MyList<Doctor> doctorList = DoctorManagement.getAllDoctors();
         System.out.println("\n------------------------------------------------------------ DOCTOR LIST ---------------------------------------------------------------------------");
         System.out.printf("| %-5s | %-20s | %-15s | %-8s | %-15s | %-25s | %-25s |\n",
                 "ID", "Full Name", "Birth Date", "Gender", "Contact", "Email", "Qualifications");
         System.out.println("------------------------------------------------------------------------------------------------------------------------------------------------------");
 
-        for (int i = 0; i < doctorList.size(); i++) {
-            Doctor d = doctorList.get(i);
+        MyList<Doctor> doctorList = DoctorManagement.getAllDoctors();
+
+        for (Doctor d : doctorList) {  // ✅ now works with for-each
             System.out.printf("| %-5s | %-20s | %-15s | %-8s | %-15s | %-25s | %-25s |\n",
                     d.getDoctorID(), d.getName(), UtilityClass.formatDate(d.getDateOfBirth()),
                     d.getGender(), d.getContactNumber(),
                     d.getEmail(), d.getQualification());
-
         }
 
-        System.out.println("Total of " + doctorList.size() + " doctor(s)");
-
+        System.out.println("Total of " + DoctorManagement.getDoctorCount() + " doctor(s)");
     }
 
     public static void ShowDoctors() {
@@ -193,17 +187,16 @@ public class DoctorUI {
                 "Full Name", "Contact", "Email", "Working Status");
         System.out.println("----------------------------------------------------------------------------------------------------------------");
 
-        for (int i = 0; i < doctorList.size(); i++) {
-            Doctor d = doctorList.get(i);
+        // ✅ for-each loop
+        for (Doctor d : doctorList) {
             System.out.printf(" %-20s | %-15s | %-30s | %-20s |\n",
                     d.getName(),
                     d.getContactNumber(),
-                    d.getEmail(), d.getWorkingStatus());
-
+                    d.getEmail(),
+                    d.getWorkingStatus());
         }
 
-        System.out.println("Total of " + doctorList.size() + " doctor(s)");
-
+        System.out.println("Total of " + DoctorManagement.getDoctorCount() + " doctor(s)");
     }
 
     public static void ShowCurrentFreeDoctors() {
@@ -214,17 +207,16 @@ public class DoctorUI {
                 "Full Name", "Contact", "Email", "Working Status");
         System.out.println("----------------------------------------------------------------------------------------------------------------");
 
-        for (int i = 0; i < doctorList.size(); i++) {
-            Doctor d = doctorList.get(i);
+        // ✅ for-each loop
+        for (Doctor d : doctorList) {
             System.out.printf(" %-20s | %-15s | %-30s | %-20s |\n",
                     d.getName(),
                     d.getContactNumber(),
-                    d.getEmail(), d.getWorkingStatus());
-
+                    d.getEmail(),
+                    d.getWorkingStatus());
         }
 
-        System.out.println("Total of " + doctorList.size() + " doctor(s) available now");
-
+        System.out.printf("\nTotal of %d doctor(s) available now", DoctorManagement.getDoctorCountFree());
     }
 
     public static void ShowDoctorsSchedulesByDayUI() {
@@ -253,8 +245,8 @@ public class DoctorUI {
                 "Full Name", "Contact", "Email", "Status", "Start Time", "End Time");
         System.out.println("----------------------------------------------------------------------------------------------------------------");
 
-        for (int i = 0; i < scheduleList.size(); i++) {
-            Schedule s = scheduleList.get(i);
+        // ✅ for-each loop
+        for (Schedule s : scheduleList) {
             Doctor d = DoctorManagement.findDoctorById(s.getDoctorID());
 
             if (d != null) {
@@ -268,7 +260,8 @@ public class DoctorUI {
             }
         }
 
-        System.out.println("Total of " + scheduleList.size() + " schedule(s) found for " + day);
+        System.out.println("Total of " + ScheduleManagement.getScheduleCountByDay(day)
+                + " schedule(s) found for " + day);
     }
 
     public static void DisplayAllTimetableWithLeaves() {
@@ -278,8 +271,6 @@ public class DoctorUI {
         String[] days = {"MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"};
 
         LocalDate today = LocalDate.now();
-
-        // Find the Monday of the current week
         LocalDate monday = today.with(DayOfWeek.MONDAY);
 
         System.out.println("\n---------------------- DOCTOR TIMETABLE FOR THE WEEK OF " + monday + " ----------------------\n");
@@ -293,28 +284,24 @@ public class DoctorUI {
 
             boolean found = false;
 
-            // Loop through schedules
-            for (int i = 0; i < schedules.size(); i++) {
-                Schedule s = schedules.get(i);
-
-                // Check if this schedule is for the current day
+            // ✅ for-each loop for schedules
+            for (Schedule s : schedules) {
                 if (s.getDayOfWeek() == currentDay) {
                     Doctor doctor = null;
-                    for (int j = 0; j < doctors.size(); j++) {
-                        if (doctors.get(j).getDoctorID().equals(s.getDoctorID())) {
-                            doctor = doctors.get(j);
+
+                    // ✅ for-each loop for doctors
+                    for (Doctor doc : doctors) {
+                        if (doc.getDoctorID().equals(s.getDoctorID())) {
+                            doctor = doc;
                             break;
                         }
                     }
 
                     if (doctor != null) {
-                        // Check if doctor is on leave for this date
                         if (LeaveManagement.isDoctorOnLeave(doctor.getDoctorID(), currentDate)) {
-                            // Skip this doctor (he's on leave that day)
-                            continue;
+                            continue; // skip if on leave
                         }
 
-                        // Print doctor schedule
                         System.out.print("Dr. " + doctor.getName() + " (" + s.getStartTime() + "-" + s.getEndTime() + ") | ");
                         found = true;
                     }

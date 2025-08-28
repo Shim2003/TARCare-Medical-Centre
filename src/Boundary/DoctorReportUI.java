@@ -9,6 +9,8 @@ import ADT.MyList;
 import Control.DoctorManagement;
 import Control.LeaveManagement;
 import Control.ScheduleManagement;
+import DAO.DoctorWorkSummary;
+import DAO.LeaveSummary;
 import Entity.Doctor;
 import Entity.DoctorLeave;
 import Entity.Schedule;
@@ -69,13 +71,11 @@ public class DoctorReportUI {
         MyList<Schedule> schedules = ScheduleManagement.getAllSchedules();
         YearMonth currentMonth = YearMonth.now();
 
-        System.out.printf("\n==================== Current Month (%s) Report ====================\n", currentMonth);
-        System.out.printf("%-10s %-20s %-12s %-12s %-12s\n",
-                "DoctorID", "Name", "WorkDays", "LeaveDays", "Utilization");
+        System.out.printf("\n============================== Current Month (%s) Report ==============================\n", currentMonth);
+        System.out.printf("%-10s %-20s %-20s %-20s %-12s\n",
+                "DoctorID", "Name", "WorkDays", "Actual LeaveDays", "Utilization");
 
-        for (int i = 0; i < doctors.size(); i++) {
-            Doctor doc = doctors.get(i);
-
+        for (Doctor doc : doctors) {
             int workDayCount = ScheduleManagement.countWorkingDaysInMonth(doc.getDoctorID(), currentMonth);
 
             // use the new method here
@@ -88,59 +88,26 @@ public class DoctorReportUI {
             int totalDays = workDayCount + leaveDayCount;
             double utilization = (totalDays == 0) ? 0 : ((double) workDayCount / totalDays) * 100;
 
-            System.out.printf("%-10s %-20s %-12d %-12d %-10.2f%%\n",
+            System.out.printf("%-10s %-20s %-20d %-20d %-10.2f%%\n",
                     doc.getDoctorID(), doc.getName(), workDayCount, leaveDayCount, utilization);
         }
 
-        System.out.println("======================================================================");
+        System.out.println("==========================================================================================");
     }
 
     public static void DisplayTopLeaveDoctors() {
-        MyList<Doctor> doctors = DoctorManagement.getAllDoctors();
         YearMonth currentMonth = YearMonth.now();
         int year = currentMonth.getYear();
         int month = currentMonth.getMonthValue();
 
-        // inner helper class
-        class LeaveSummary {
+        MyList<LeaveSummary> summaries = LeaveManagement.getTopLeaveDoctors(currentMonth);
 
-            String id, name;
-            int leaveDays;
-            int leaveCount;
-
-            LeaveSummary(String id, String name, int leaveDays, int leaveCount) {
-                this.id = id;
-                this.name = name;
-                this.leaveDays = leaveDays;
-                this.leaveCount = leaveCount;
-            }
-        }
-
-        // use your own ADT
-        MyList<LeaveSummary> summaries = new DynamicList<>();
-
-        // build summary list
-        for (int i = 0; i < doctors.size(); i++) {
-            Doctor doc = doctors.get(i);
-
-            int leaveDays = LeaveManagement.countLeaveDaysInMonth(doc.getDoctorID(), currentMonth);
-            int leaveCount = LeaveManagement.countLeaveRecordsInMonth(doc.getDoctorID(), currentMonth);
-
-            if (leaveDays > 0) {
-                summaries.add(new LeaveSummary(doc.getDoctorID(), doc.getName(), leaveDays, leaveCount));
-            }
-        }
-
-        // sort using your UtilityClass
-        UtilityClass.quickSort(summaries, (a, b) -> Integer.compare(b.leaveDays, a.leaveDays));
-
-        // print report
         System.out.printf("\n============= Doctors by Leave Taken (%4d/%02d) =============\n", year, month);
         System.out.printf("%-8s %-28s %-12s %-12s\n", "DoctorID", "Name", "LeaveDays", "LeaveRecords");
 
-        for (int i = 0; i < summaries.size(); i++) {
-            LeaveSummary s = summaries.get(i);
-            System.out.printf("%-8s %-28s %-12d %-12d\n", s.id, "Dr " + s.name, s.leaveDays, s.leaveCount);
+        for (LeaveSummary s : summaries) {
+            System.out.printf("%-8s %-28s %-12d %-12d\n",
+                    s.getId(), "Dr " + s.getName(), s.getLeaveDays(), s.getLeaveCount());
         }
 
         System.out.println("==========================================================");
@@ -172,7 +139,7 @@ public class DoctorReportUI {
     }
 
     public static void displayTopHardworkingDoctors(YearMonth month) {
-        MyList<DoctorManagement.DoctorWorkSummary> summaries = DoctorManagement.calculateDoctorWorkingHours(month);
+        MyList<DoctorWorkSummary> summaries = DoctorManagement.calculateDoctorWorkingHours(month);
 
         // Sort by total working hours (descending)
         UtilityClass.quickSort(summaries, (a, b) -> Integer.compare(b.getTotalHours(), a.getTotalHours()));
@@ -182,9 +149,11 @@ public class DoctorReportUI {
         System.out.printf("Month: %s %d\n", month.getMonth(), month.getYear());
         System.out.printf("%-10s %-20s %-15s\n", "DoctorID", "Name", "TotalHours");
 
-        for (int i = 0; i < summaries.size(); i++) {
-            DoctorManagement.DoctorWorkSummary s = summaries.get(i);
-            System.out.printf("%-10s %-20s %-15d\n", s.getId(), s.getName(), s.getTotalHours());
+        for (DoctorWorkSummary s : summaries) {
+            System.out.printf("%-10s %-20s %-15d\n",
+                    s.getId(),
+                    s.getName(),
+                    s.getTotalHours());
         }
 
         System.out.println("=============================================");

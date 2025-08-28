@@ -10,9 +10,9 @@ import java.util.Date;
 import java.util.Scanner;
 
 /**
- * PatientUI - Boundary layer for patient user interface
- * Contains all display logic and user interactions
- * 
+ * PatientUI - Boundary layer for patient user interface Contains all display
+ * logic and user interactions
+ *
  * @author Lee Wei Hao
  */
 public class PatientUI {
@@ -294,7 +294,7 @@ public class PatientUI {
 
         System.out.print("Are you sure you want to remove this patient? (Y/N): ");
         char confirm = scanner.nextLine().toUpperCase().charAt(0);
-        
+
         if (confirm == 'Y') {
             boolean removed = PatientManagement.remove(patient);
             if (removed) {
@@ -343,7 +343,7 @@ public class PatientUI {
     public static void generateGenderDistributionReport() {
         MyList<Patient> patientList = PatientManagement.getPatientList();
 
-        if (patientList.isEmpty()) {
+        if (PatientManagement.isEmpty(patientList)) {
             System.out.println("\n" + "=".repeat(50));
             System.out.println("           GENDER DISTRIBUTION REPORT");
             System.out.println("=".repeat(50));
@@ -390,7 +390,7 @@ public class PatientUI {
 
     public static void generateTotalPatientsReport() {
         MyList<Patient> patientList = PatientManagement.getPatientList();
-        int totalPatients = patientList.size();
+        int totalPatients = PatientManagement.totalNumberOfPatient();
 
         if (totalPatients == 0) {
             System.out.println("\n" + "=".repeat(50));
@@ -404,10 +404,10 @@ public class PatientUI {
 
         // Ask user for sorting preference
         String sortBy = getSortingPreference();
-        if (sortBy == null){
+        if (sortBy == null) {
             return;
         }
-        
+
         MyList<Patient> sortedPatientList = PatientManagement.getPatientsSortedBy(sortBy);
 
         int patientsPerPage = 10;
@@ -544,10 +544,20 @@ public class PatientUI {
         System.out.println("|" + "-".repeat(5) + "|" + "-".repeat(10) + "|" + "-".repeat(20) + "|"
                 + "-".repeat(15) + "|" + "-".repeat(6) + "|" + "-".repeat(8) + "|" + "-".repeat(25) + "|");
 
-        // Display patients for current page
-        for (int i = startIndex; i < endIndex; i++) {
-            Patient p = patientList.get(i);
-            int displayNumber = i + 1;
+        int currentIndex = 0;
+        for (Patient p : patientList) {
+            // Skip patients before current page
+            if (currentIndex < startIndex) {
+                currentIndex++;
+                continue;
+            }
+
+            // Stop when we've displayed enough patients for current page
+            if (currentIndex >= endIndex) {
+                break;
+            }
+
+            int displayNumber = currentIndex + 1;
             int age = PatientManagement.calculateAge(p);
 
             System.out.printf("| %-3d | %-8s | %-18s | %-13s | %-4d | %-6s | %-23s |\n",
@@ -558,6 +568,8 @@ public class PatientUI {
                     age,
                     String.valueOf(p.getGender()),
                     p.getContactNumber());
+
+            currentIndex++;
         }
 
         System.out.println("-".repeat(96));
@@ -567,7 +579,7 @@ public class PatientUI {
     public static void generateAgeStatisticsReport() {
         MyList<Patient> patientList = PatientManagement.getPatientList();
 
-        if (patientList.isEmpty()) {
+        if (PatientManagement.isEmpty(patientList)) {
             System.out.println("\n" + "=".repeat(60));
             System.out.println("           AGE STATISTICS REPORT");
             System.out.println("=".repeat(60));
@@ -594,44 +606,41 @@ public class PatientUI {
         System.out.printf("|- Age Range: %.0f years\n", ageStats.max - ageStats.min);
         System.out.printf("|- Standard Deviation: %.1f years\n", ageStats.standardDeviation);
 
-        // Age group analysis
-        MyList<Patient> pediatric = PatientManagement.getPatientsByAgeGroup("pediatric");
-        MyList<Patient> adult = PatientManagement.getPatientsByAgeGroup("adult");
-        MyList<Patient> geriatric = PatientManagement.getPatientsByAgeGroup("geriatric");
+        int pediatricCount = PatientManagement.getPatientsByAgeGroupSize("pediatric");
+        int adultCount = PatientManagement.getPatientsByAgeGroupSize("adult");
+        int geriatricCount = PatientManagement.getPatientsByAgeGroupSize("geriatric");
 
         System.out.println("\nAGE GROUP BREAKDOWN:");
         System.out.printf("|- Pediatric (0-17 years): %d patients (%.1f%%)\n",
-                pediatric.size(), (double) pediatric.size() / ageStats.count * 100);
+                pediatricCount, (double) pediatricCount / ageStats.count * 100);
         System.out.printf("|- Adult (18-64 years): %d patients (%.1f%%)\n",
-                adult.size(), (double) adult.size() / ageStats.count * 100);
+                adultCount, (double) adultCount / ageStats.count * 100);
         System.out.printf("|- Geriatric (65+ years): %d patients (%.1f%%)\n",
-                geriatric.size(), (double) geriatric.size() / ageStats.count * 100);
+                geriatricCount, (double) geriatricCount / ageStats.count * 100);
 
-        // Show top 3 oldest and youngest using sorting
+        // Show top 3 oldest and youngest using for-each
         System.out.println("\nAGE EXTREMES:");
         MyList<Patient> oldest = PatientManagement.getOldestPatients(3);
         MyList<Patient> youngest = PatientManagement.getYoungestPatients(3);
 
         System.out.println("Oldest Patients:");
-        for (int i = 0; i < oldest.size(); i++) {
-            Patient p = oldest.get(i);
-            System.out.printf("  %d. %s - %d years old\n", i + 1, p.getFullName(), PatientManagement.calculateAge(p));
+        int rank = 1;
+        for (Patient p : oldest) {
+            System.out.printf("  %d. %s - %d years old\n",
+                    rank++, p.getFullName(), PatientManagement.calculateAge(p));
         }
 
         System.out.println("Youngest Patients:");
-        for (int i = 0; i < youngest.size(); i++) {
-            Patient p = youngest.get(i);
-            System.out.printf("  %d. %s - %d years old\n", i + 1, p.getFullName(), PatientManagement.calculateAge(p));
+        rank = 1;
+        for (Patient p : youngest) {
+            System.out.printf("  %d. %s - %d years old\n",
+                    rank++, p.getFullName(), PatientManagement.calculateAge(p));
         }
 
         System.out.println("=".repeat(70));
         UtilityClass.pressEnterToContinue();
     }
 
-    /**
-     * Display appointment status for a patient
-     * @param patientId The patient ID to check appointments for
-     */
     public static void displayAppointmentStatus(String patientId) {
         AppointmentInfo nextAppointmentInfo = PatientManagement.checkPatientAppointments(patientId);
 
