@@ -6,22 +6,12 @@ package Control;
 
 import ADT.DynamicList;
 import ADT.MyList;
-import Boundary.DiagnosisUI;
-import Boundary.MedicalTreatmentUI;
 import DAO.CurrentServingDAO;
-import Entity.Consultation;
-import Entity.Doctor;
-import Entity.Patient;
-import Entity.QueueEntry;
+import Entity.*;
 import Utility.UtilityClass;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.Scanner;
-import java.util.List;
 
 /**
  *
@@ -33,20 +23,17 @@ public class ConsultationManagement {
     private static DynamicList<Consultation> ongoingConsultations = new DynamicList<>();
     private static MyList<CurrentServingDAO> currentConsulting = QueueControl.getCurrentServingPatient();
     private static DynamicList<Consultation> completedConsultations = new DynamicList<>();
-    private static MyList<Consultation> backup;
+    private static DynamicList<Consultation> backupConsultations = new DynamicList<>();
     
+    // Get all consultations (completed) from Consultation entity
     public static DynamicList<Consultation> getAllConsultations() {
         return Consultation.getCompletedConsultations();
-    }
-
-    // Utility method: convert Date to LocalDateTime
-    private static LocalDateTime toLocalDateTime(Date date) {
-        return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
     }
     
     // Counter
     private static int consultationCounter = 1001; // C1001
     
+    // Initialize the consultation ID counter based on the highest existing consultation ID
     public static void initializeConsultationCounter() {
         int maxId = 1000;
         DynamicList<Consultation> completedList = getCompletedConsultations();
@@ -62,69 +49,78 @@ public class ConsultationManagement {
         consultationCounter = maxId + 1;
     }
 
+    // Generate the next unique consultation ID
     private static String generateNextConsultationId() {
         return "C" + (consultationCounter++);
     }
-
-
-    // Check whether the ID exists in completed or ongoing consultations.
-    private static boolean isConsultationIdExists(String id) {
-            // The inspection has been completed.
-        for (int i = 0; i < completedConsultations.size(); i++) {
-            Consultation c = completedConsultations.get(i);
-            if (c.getConsultationId().equalsIgnoreCase(id)) {
-                return true;
-            }
-        }
-        // The inspection is underway.
-        for (int i = 0; i < ongoingConsultations.size(); i++) {
-            Consultation c = ongoingConsultations.get(i);
-            if (c.getConsultationId().equalsIgnoreCase(id)) {
-                return true;
-            }
-        }
-        return false;
+    
+    // Get the list of ongoing consultations
+    public static DynamicList<Consultation> getOngoingConsultationsList() {
+        return ongoingConsultations;
     }
 
-
-    private static Scanner sc = new Scanner(System.in); 
-
-    public static void showCompletedConsultations() {
-        System.out.println("--- Completed Consultations ---");
-        if (completedConsultations.isEmpty()) {
-            System.out.println("No completed consultations.");
-            return;
-        }
-
-        Iterator<Consultation> it = completedConsultations.iterator(); // Use DynamicList iterator
-        while (it.hasNext()) {
-            Consultation c = it.next();
-            System.out.println(c);
-        }
+    // Get the list of completed consultations
+    public static DynamicList<Consultation> getCompletedConsultationsList() {
+        return completedConsultations;
     }
     
-    // Show ongoing consultations
-    public static void showOngoingConsultations() {
-        System.out.println("===== Ongoing Consultations =====");
-        if (ongoingConsultations.isEmpty()) {
-            System.out.println("No ongoing consultations.");
-        } else {
-            for (int i = 0; i < ongoingConsultations.size(); i++) {
-                System.out.println("Index " + i + " -> " + ongoingConsultations.get(i));
-            }
+    // Get ongoing consultations list
+    public static DynamicList<Consultation> getOngoingConsultations() {
+        return ongoingConsultations;
+    }
+    
+    // Convert ongoing consultations into a display-friendly string array
+    public static String[] getOngoingConsultationsForDisplayArray() {
+        
+        MyList<Consultation> ongoingList = getOngoingConsultationsList();
+
+        if (ongoingList.isEmpty()) return new String[0];
+
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+        String[] displayArr = new String[ongoingList.size()];
+
+        for (int i = 0; i < ongoingList.size(); i++) {
+            Consultation c = ongoingList.get(i);
+            String startTime = (c.getStartTime() != null) ? c.getStartTime().format(dtf) : "-";
+            String endTime = (c.getEndTime() != null) ? c.getEndTime().format(dtf) : "-";
+            String duration = (c.getStartTime() != null && c.getEndTime() != null)
+                    ? formatDuration(Duration.between(c.getStartTime(), c.getEndTime()).getSeconds())
+                    : "-";
+            String symptoms = (c.getSymptoms() != null && !c.getSymptoms().isEmpty()) ? c.getSymptoms() : "-";
+
+            displayArr[i] = "Consultation ID: " + c.getConsultationId()
+                    + ", Patient: " + c.getPatientId()
+                    + ", Doctor: " + c.getDoctorId()
+                    + ", Start Time: " + startTime
+                    + ", End Time: " + endTime
+                    + ", Duration: " + duration
+                    + ", Symptoms: " + symptoms
+                    + ", Status: Ongoing";
         }
-        System.out.println("=================================");
+
+        return displayArr;
     }
 
-    // Print all doctors status
-    public static void printAllDoctorsStatus(String header) {
-        System.out.println("\n=== " + header + " ===");
-        MyList<Doctor> allDoctors = DoctorManagement.getAllDoctors();
-        for (int i = 0; i < allDoctors.size(); i++) {
-            Doctor d = allDoctors.get(i);
-            System.out.println(d.getDoctorID() + " - " + d.getName() + " : " + d.getWorkingStatus());
+    // Convert consultation report for a given ID into an array of Consultation objects
+    public static Consultation[] getConsultationReportArray(String id) {
+        MyList<Consultation> list = getConsultationReport(id);
+
+        if (list.isEmpty()) return new Consultation[0];
+
+        Consultation[] arr = new Consultation[list.size()];
+        for (int i = 0; i < list.size(); i++) {
+            arr[i] = list.get(i);
         }
-        System.out.println("==========================\n");
+        return arr;
+    }
+
+    // Get a list of all doctors
+    public static MyList<Doctor> getAllDoctors() {
+        return DoctorManagement.getAllDoctors();
+    }
+    
+    public static MyList<Doctor> getAllDoctorsStatus() {
+        return DoctorManagement.getAllDoctors();
     }
     
     // Get next waiting patient
@@ -146,39 +142,35 @@ public class ConsultationManagement {
         }
         return currentConsulting.get(currentConsulting.size() - 1); 
     }
+    
+    // Get the most recent current consulting record
+    public static MyList<CurrentServingDAO> getCurrentConsulting() {
+        return currentConsulting;
+    }
+    
+    // Get the list of current consulting records
+    public static boolean canStartConsultation() {
+        return currentConsulting.size() < 3;
+    }
 
     // Start next consultation
-    public static void startNextConsultation() {
+    public static Consultation startNextConsultation(String doctorId, String symptoms) {
 
         // Limit maximum concurrent consultations to 3
         if (currentConsulting.size() >= 3) {
-            System.out.println("Maximum consultations reached (3). Please wait for a consultation to finish.");
-            return;
+            return null;
         }
-
-        printAllDoctorsStatus("All Doctors Status Before Assignment");
 
         // Get next waiting patient
         QueueEntry nextPatient = getNextWaitingPatient();
-
         if (nextPatient == null) {
-            System.out.println("No patient has been called or no free doctors available.");
-            return;
+            return null;
         }
 
         // Manually input doctor ID
-        Doctor assignedDoctor = null;
-        while (assignedDoctor == null) {
-            System.out.print("Enter Doctor ID to assign for Patient " + nextPatient.getPatientId() + ": ");
-            String doctorId = sc.nextLine();
-            Doctor d = DoctorManagement.findDoctorById(doctorId);
-            if (d == null) {
-                System.out.println("Doctor ID not found. Try again.");
-            } else if (!d.getWorkingStatus().equals(UtilityClass.statusFree)) {
-                System.out.println("Doctor is not free. Please choose another doctor.");
-            } else {
-                assignedDoctor = d; // Found free doctor
-            }
+        Doctor assignedDoctor = DoctorManagement.findDoctorById(doctorId);
+        if (assignedDoctor == null || !assignedDoctor.getWorkingStatus().equals(UtilityClass.statusFree)) {
+            return null; // doctor can no used
         }
 
         assignedDoctor.setWorkingStatus(UtilityClass.statusConsulting); // Update doctor status
@@ -192,40 +184,22 @@ public class ConsultationManagement {
 
         // Create Consultation object and add to ongoingConsultations
         Patient patient = PatientManagement.findPatientById(nextPatient.getPatientId());
-        if (patient != null) {
-            String consultationId = generateNextConsultationId();
-            Consultation consultation = new Consultation(
-                    consultationId,
-                    patient.getPatientID(),
-                    assignedDoctor.getDoctorID(),
-                    "" // symptoms left empty, doctor will input
-            );
-
-            // Let doctor input patient symptoms
-            System.out.print("Enter Symptoms for Patient " + patient.getFullName() + ": ");
-            String symptoms = sc.nextLine();
-            consultation.setSymptoms(symptoms);
-            consultation.setStartTime(LocalDateTime.now());
-
-            ongoingConsultations.add(consultation);
-
-            System.out.println("\n================ Consultation Started ================");
-            System.out.println("Consultation ID: " + consultation.getConsultationId());
-            System.out.println("Doctor: " + assignedDoctor.getName() + " (ID: " + assignedDoctor.getDoctorID() + ")");
-            System.out.println("Patient: " + patient.getFullName() + " (ID: " + patient.getPatientID() + ")");
-            System.out.println("Start Time: " + UtilityClass.formatLocalDateTime(consultation.getStartTime()));
-            System.out.println("Symptoms: " + (consultation.getSymptoms().isEmpty() ? "-" : consultation.getSymptoms()));
-            System.out.println("Doctor Status: " + assignedDoctor.getWorkingStatus());
-            System.out.println("======================================================\n");
-        } else {
-            System.out.println("Patient data not found.");
+        if (patient == null) {
+            return null;
         }
 
-        // Print all doctors status (for debugging)
-        printAllDoctorsStatus("All Doctors Status After Assignment");
+        String consultationId = generateNextConsultationId();
+        Consultation consultation = new Consultation(
+            consultationId,
+            patient.getPatientID(),
+            assignedDoctor.getDoctorID(),
+            "" // symptoms left empty, doctor will input
+        );
         
-        DiagnosisUI.addDiagnosis();
-        MedicalTreatmentUI.createTreatment();
+        consultation.setStartTime(LocalDateTime.now());
+        ongoingConsultations.add(consultation);
+
+        return consultation;
     }
     
     // Calculate consultation duration
@@ -243,15 +217,47 @@ public class ConsultationManagement {
 
         return String.format("%02d:%02d:%02d", hours, minutes, seconds);
     }
+    
+    // Get display list of all completed consultations
+    public static DynamicList<String> getCompletedConsultationsDisplayList() {
+        DynamicList<String> displayList = new DynamicList<>();
 
-    // View current consulting patients
-    public static void viewCurrentConsulting() {
-        if (currentConsulting.size() == 0) {
-            System.out.println("No patients currently consulting.");
-            return;
+        for (int i = 0; i < completedConsultations.size(); i++) {
+            Consultation c = completedConsultations.get(i);
+
+            String startTime = (c.getStartTime() != null) 
+                ? UtilityClass.formatLocalDateTime(c.getStartTime()) 
+                : "-";
+            String endTime = (c.getEndTime() != null) 
+                ? UtilityClass.formatLocalDateTime(c.getEndTime()) 
+                : "-";
+            String duration = (c.getStartTime() != null && c.getEndTime() != null) 
+                ? formatDuration(Duration.between(c.getStartTime(), c.getEndTime()).getSeconds()) 
+                : "-";
+            String symptoms = (c.getSymptoms() != null && !c.getSymptoms().isEmpty()) 
+                ? c.getSymptoms() 
+                : "-";
+
+            String display = String.format(
+                "Consultation ID: %s%nPatient ID: %s%nDoctor ID: %s%nStart Time: %s%nEnd Time: %s%nDuration: %s%nSymptoms: %s%n",
+                c.getConsultationId(),
+                c.getPatientId(),
+                c.getDoctorId(),
+                startTime,
+                endTime,
+                duration,
+                symptoms
+            );
+
+            displayList.add(display);
         }
 
-        System.out.println("\n--- Consulting Patients ---");
+        return displayList;
+    }
+
+    // View current consulting patients
+    public static DynamicList<String> getCurrentConsultingInfo() {
+        DynamicList<String> result = new DynamicList<>();
         for (int i = 0; i < currentConsulting.size(); i++) {
             CurrentServingDAO cs = currentConsulting.get(i);
             Patient p = PatientManagement.findPatientById(cs.getPatientId());
@@ -275,14 +281,15 @@ public class ConsultationManagement {
                 duration = getConsultationDuration(consultation.getStartTime());
             }
 
-            System.out.println("Patient: " + patientName + " (ID: " + cs.getPatientId() + ")"
+            result.add("Patient: " + patientName + " (ID: " + cs.getPatientId() + ")"
                     + " | Doctor: " + doctorName + " (ID: " + cs.getDoctorId() + ")"
                     + " | Duration: " + duration);
         }
+        return result;
     }
 
     // End consultation and save patient info
-    public static void endConsultation(String patientId) {
+    public static boolean endConsultation(String patientId) {
         // Find patient in queue
         QueueEntry queueEntry = null;
         MyList<QueueEntry> queueList = QueueControl.getQueueList();
@@ -295,12 +302,10 @@ public class ConsultationManagement {
         }
 
         if (queueEntry == null) {
-            System.out.println("No ongoing consultation found for Patient ID: " + patientId);
-            return;
+            return false;
         }
 
         queueEntry.setStatus(UtilityClass.statusCompleted);
-        System.out.println("Consultation ended for Patient ID: " + patientId);
 
         // Find corresponding consultation in ongoingConsultations
         Consultation consultation = null;
@@ -316,30 +321,13 @@ public class ConsultationManagement {
 
         if (consultation != null) {
             consultation.setEndTime(LocalDateTime.now());
-
-            long totalSeconds = Duration.between(consultation.getStartTime(), consultation.getEndTime()).getSeconds();
-            long hours = totalSeconds / 3600;
-            long minutes = (totalSeconds % 3600) / 60;
-            long seconds = totalSeconds % 60;
-
-            String formattedDuration = String.format("%02dh %02dm %02ds", hours, minutes, seconds);
-            System.out.println("Consultation ID: " + consultation.getConsultationId());
-            System.out.println("Consultation Duration: " + formattedDuration);
-
             completedConsultations.add(consultation);
-            if (consultationIndex != -1) {
-                ongoingConsultations.remove(consultationIndex);  // Remove by index
-            }
+            if (consultationIndex != -1) ongoingConsultations.remove(consultationIndex);
         }
 
         // Save patient info
         Patient patient = PatientManagement.findPatientById(patientId);
-        if (patient != null) {
-            completedPatients.add(patient);
-            System.out.println("Patient info saved to completed consultations.");
-        } else {
-            System.out.println("Warning: Patient data not found to save.");
-        }
+        if (patient != null) completedPatients.add(patient);
 
         // Update doctor status in currentConsulting
         int currentIndex = -1;
@@ -355,17 +343,48 @@ public class ConsultationManagement {
             Doctor doctor = DoctorManagement.findDoctorById(current.getDoctorId());
             if (doctor != null) {
                 doctor.setWorkingStatus(UtilityClass.statusFree);
-                System.out.println("Doctor " + doctor.getName() + " is now free.");
             }
             currentConsulting.remove(currentIndex); // Remove by index
         }
+        return true;
     }
     
-    // Method to view all completed patients
-    public static void viewCompletedPatients() {
-        DynamicList<String> addedPatientIds = new DynamicList<>();
+    // ConsultationManagement.java
+    public static boolean hasCurrentConsulting() {
+        return !currentConsulting.isEmpty();
+    }
 
-        System.out.println("--- Completed Patients ---");
+    // Print current consulting information to console
+    public static void printCurrentConsultingInfo() {
+        for (int i = 0; i < currentConsulting.size(); i++) {
+            CurrentServingDAO cs = currentConsulting.get(i);
+            Patient p = PatientManagement.findPatientById(cs.getPatientId());
+            Doctor d = DoctorManagement.findDoctorById(cs.getDoctorId());
+            String patientName = (p != null) ? p.getFullName() : "Unknown Patient";
+            String doctorName = (d != null) ? d.getName() : "Unknown Doctor";
+
+            Consultation consultation = null;
+            for (int j = 0; j < ongoingConsultations.size(); j++) {
+                Consultation c = ongoingConsultations.get(j);
+                if (c.getPatientId().equals(cs.getPatientId())) {
+                    consultation = c;
+                    break;
+                }
+            }
+
+            String duration = (consultation != null && consultation.getStartTime() != null)
+                              ? getConsultationDuration(consultation.getStartTime())
+                              : "N/A";
+
+            System.out.println("Patient: " + patientName + " (ID: " + cs.getPatientId() + ")"
+                             + " | Doctor: " + doctorName + " (ID: " + cs.getDoctorId() + ")"
+                             + " | Duration: " + duration);
+        }
+    }
+
+    // Print all completed patients information to console
+    public static void printCompletedPatientsInfo() {
+        DynamicList<String> addedPatientIds = new DynamicList<>();
         for (int i = 0; i < completedConsultations.size(); i++) {
             Consultation c = completedConsultations.get(i);
             String patientId = c.getPatientId();
@@ -376,56 +395,49 @@ public class ConsultationManagement {
                 System.out.println(patientId + " - " + name);
             }
         }
-
-        if (addedPatientIds.isEmpty()) {
-            System.out.println("No completed patients.");
-        }
     }
 
-    // View consultation report: can search by PatientID or ConsultationID
-    public static void viewConsultationReport(String id) {
-        boolean found = false;
-        boolean searchByConsultationId = isConsultationId(id);
+    // Print all doctors' working status with a header
+    public static void printAllDoctorsStatus(String header) {
+        System.out.println("=== " + header + " ===");
+        MyList<Doctor> doctors = DoctorManagement.getAllDoctors();
+        for (int i = 0; i < doctors.size(); i++) {
+            Doctor d = doctors.get(i);
+            System.out.println(d.getDoctorID() + " - " + d.getName() + " : " + d.getWorkingStatus());
+        }
+    }
+    
+    // Method to view all completed patients
+    public static DynamicList<String> getCompletedPatientsInfo() {
+        DynamicList<String> result = new DynamicList<>();
+        DynamicList<String> addedPatientIds = new DynamicList<>();
 
-        System.out.println("\n============================================");
-        System.out.println("            CONSULTATION REPORT              ");
-        System.out.println("       Search ID: " + id);
-        System.out.println("============================================");
-
-        int count = 1;
         for (int i = 0; i < completedConsultations.size(); i++) {
             Consultation c = completedConsultations.get(i);
-
-            // Support both match types: PatientID or ConsultationID
-            if (c.getPatientId().equalsIgnoreCase(id) || c.getConsultationId().equalsIgnoreCase(id)) {
-                found = true;
-                System.out.println("Consultation #" + count++);
-                System.out.println("--------------------------------------------");
-                System.out.printf("%-15s: %s\n", "Consultation ID", c.getConsultationId());
-                System.out.printf("%-15s: %s\n", "Doctor ID", c.getDoctorId());
-                System.out.printf("%-15s: %s\n", "Patient ID", c.getPatientId());
-                System.out.printf("%-15s: %s\n", "Start Time", c.getStartTime() != null
-                        ? c.getStartTime().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")) : "-");
-                System.out.printf("%-15s: %s\n", "End Time", c.getEndTime() != null
-                        ? c.getEndTime().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")) : "-");
-                String symptoms = (c.getSymptoms() == null || c.getSymptoms().isEmpty()) ? "-" : c.getSymptoms();
-                System.out.printf("%-15s: %s\n", "Symptoms", symptoms);
-                System.out.println("--------------------------------------------\n");
-
-                // If input is ConsultationID, only need one entry
-                if (searchByConsultationId) {
-                    break;
-                }
+            String patientId = c.getPatientId();
+            if (!addedPatientIds.contains(patientId)) {
+                addedPatientIds.add(patientId);
+                Patient p = PatientManagement.findPatientById(patientId);
+                String name = (p != null) ? p.getFullName() : "Unknown";
+                result.add(patientId + " - " + name);
             }
         }
+        return result;
+    }
 
-        if (!found) {
-            System.out.println("No consultation records found for this ID.\n");
-        } else if (!searchByConsultationId) {
-            System.out.println("Total consultations found for Patient " + id + ": " + (count - 1));
+    // View consultation report
+    public static DynamicList<Consultation> getConsultationReport(String id) {
+        DynamicList<Consultation> result = new DynamicList<>();
+        boolean searchByConsultationId = isConsultationId(id);
+
+        for (int i = 0; i < completedConsultations.size(); i++) {
+            Consultation c = completedConsultations.get(i);
+            if (c.getPatientId().equalsIgnoreCase(id) || c.getConsultationId().equalsIgnoreCase(id)) {
+                result.add(c);
+                if (searchByConsultationId) break;
+            }
         }
-
-        System.out.println("============================================\n");
+        return result;
     }
 
     // Helper method: check if it's a ConsultationID
@@ -433,105 +445,46 @@ public class ConsultationManagement {
         return id != null && id.toUpperCase().startsWith("C");
     }
 
-
     // Helper method: format duration
-    private static String formatDuration(long totalSeconds) {
+    public static String formatDuration(long totalSeconds) {
         long hours = totalSeconds / 3600;
         long minutes = (totalSeconds % 3600) / 60;
         long seconds = totalSeconds % 60;
         return String.format("%02dh %02dm %02ds", hours, minutes, seconds);
     }
-
     
     // Delete Consultation record by Consultation ID
-    public static void deleteConsultationById(String consultationId) {
-        if (completedConsultations.isEmpty()) {
-            System.out.println("No consultations available to delete.");
-            return;
-        }
-
-        boolean deleted = false;
-        for (int i = 0; i < completedConsultations.size(); i++) {
-            Consultation c = completedConsultations.get(i);
-            if (c.getConsultationId().equals(consultationId)) {
-                completedConsultations.remove(i);
-                deleted = true;
-                System.out.println("Consultation " + consultationId + " has been deleted.");
-                break;
-            }
-        }
-
-        if (!deleted) {
-            System.out.println("Consultation ID " + consultationId + " not found.");
-        }
+    public static boolean deleteConsultationById(String consultationId) {
+        return completedConsultations.removeIf(
+            c -> c.getConsultationId().equals(consultationId)
+        );
     }
     
-    public static void insertConsultationAt(int index, Consultation consultation) {
+    // Insert a consultation into ongoing consultations at a specific index
+    public static boolean insertConsultationAt(int index, Consultation consultation) {
         if (index < 0 || index > ongoingConsultations.size()) {
-            System.out.println("Invalid index.");
-            return;
+            return false;
         }
         ongoingConsultations.add(index, consultation);
-        System.out.println("Inserted consultation at index " + index);
+        return true;
     }
     
-    public static void removeConsultationAt(int index) {
-        if (index >= 0 && index < completedConsultations.size()) {
-            Consultation removed = completedConsultations.remove(index);
-            System.out.println("Removed consultation: " + removed.getConsultationId());
-        } else {
-            System.out.println("Invalid index.");
-        }
-    }
-    
-    public static void findConsultationIndex(Consultation c) {
-        int index = completedConsultations.indexOf(c);
-        if (index != -1) {
-            System.out.println("Consultation found at index " + index);
-        } else {
-            System.out.println("Consultation not found.");
-        }
-    }
-    
-    public static boolean hasConsultation(Consultation c) {
-        return completedConsultations.contains(c);
-    }
-    
-    public static void updateConsultation(int index, Consultation newConsultation) {
-        if (index >= 0 && index < completedConsultations.size()) {
-            completedConsultations.replace(index, newConsultation);
-            System.out.println("Consultation updated at index " + index);
-        } else {
-            System.out.println("Invalid index.");
-        }
-    }
-    
-    public static void exportConsultationsToArray() {
-        Object[] objArr = backup.toArray();  // Can only get Object[]
+    // Export backup consultations to an array
+    public static Consultation[] exportConsultationsToArray() {
+        if (backupConsultations == null) return new Consultation[0];
+
+        Object[] objArr = backupConsultations.toArray();
         Consultation[] arr = new Consultation[objArr.length];
-
         for (int i = 0; i < objArr.length; i++) {
-            arr[i] = (Consultation) objArr[i];  // Manual casting
+            arr[i] = (Consultation) objArr[i];
         }
-
-        System.out.println("\n=== Back Consultations  ===");
-        for (Consultation c : arr) {
-            System.out.println("Consultation ID: " + c.getConsultationId() +
-                    ", Patient: " + c.getPatientId() +
-                    ", Doctor: " + c.getDoctorId() +
-                    ", Status: Completed");
-        }
-        System.out.println("Total consultations backed up: " + arr.length);
+        return arr; // UI decides how to display
     }
 
-    
-    public static void showConsultationDurationStats() {
-        if (completedConsultations.isEmpty()) {
-            System.out.println("No completed consultations to calculate statistics.");
-            return;
-        }
+    // Get statistical data for consultation durations
+    public static ConsultationStats getConsultationDurationStats() {
+        if (completedConsultations.isEmpty()) return null;
 
-        // Get statistics: in minutes
         DynamicList.ListStatistics<Consultation> stats = completedConsultations.getStatistics(
             c -> {
                 if (c.getStartTime() != null && c.getEndTime() != null) {
@@ -542,18 +495,54 @@ public class ConsultationManagement {
             }
         );
 
-        System.out.println("===== Consultation Duration Statistics (in minutes) =====");
-        System.out.println("Number of consultations: " + stats.count);
-        System.out.println("Average duration     : " + stats.average);
-        System.out.println("Maximum duration     : " + stats.max);
-        System.out.println("Minimum duration     : " + stats.min);
-        System.out.println("Standard deviation   : " + stats.standardDeviation);
-        System.out.println("==========================================================");
+        return new ConsultationStats(
+        stats.count,
+        stats.average,
+        (long) stats.max,
+        (long) stats.min,
+        stats.standardDeviation
+        );
+    }
+
+    // Backup completed consultations into backupConsultations list
+    public static void backupConsultations() {
+        backupConsultations.clear();
+        for (int i = 0; i < completedConsultations.size(); i++) {
+            backupConsultations.add(completedConsultations.get(i));
+        }
     }
     
-    public static void backupConsultations() {
-        backup = completedConsultations.clone();
-        System.out.println("Backup created with " + backup.size() + " consultations.");
+    // Get backup consultations
+    public static MyList<Consultation> getBackup() {
+        return backupConsultations;
+    }
+    
+    // Get backup consultations in a display-friendly format
+    public static DynamicList<String> getBackupDisplayList() {
+        DynamicList<String> displayList = new DynamicList<>();
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+
+        for (int i = 0; i < backupConsultations.size(); i++) {
+            Consultation c = backupConsultations.get(i);
+
+            String startTime = (c.getStartTime() != null) ? UtilityClass.formatLocalDateTime(c.getStartTime()) : "-";
+            String endTime = (c.getEndTime() != null) ? UtilityClass.formatLocalDateTime(c.getEndTime()) : "-";
+            String duration = (c.getStartTime() != null && c.getEndTime() != null)
+                    ? formatDuration(Duration.between(c.getStartTime(), c.getEndTime()).getSeconds())
+                    : "-";
+            String symptoms = (c.getSymptoms() != null && !c.getSymptoms().isEmpty()) ? c.getSymptoms() : "-";
+
+            displayList.add("Consultation ID: " + c.getConsultationId());
+            displayList.add("Patient ID: " + c.getPatientId());
+            displayList.add("Doctor ID: " + c.getDoctorId());
+            displayList.add("Start Time: " + startTime);
+            displayList.add("End Time: " + endTime);
+            displayList.add("Duration: " + duration);
+            displayList.add("Symptoms: " + symptoms);
+            displayList.add("");
+        }
+
+        return displayList;
     }
     
     // Getter for completedConsultations
@@ -561,29 +550,16 @@ public class ConsultationManagement {
         return completedConsultations;
     }
     
-    
-    public static void compareConsultations(MyList<Consultation> otherList) {
-        if (completedConsultations.equals(otherList)) {
-            System.out.println("The consultation lists are equal.");
-        } else {
-            System.out.println("The consultation lists are different.");
-        }
-    }
-    
+    // Synchronize current consulting records to ongoing consultations
     public static void syncCurrentConsultingToOngoing() {
         for (int i = 0; i < currentConsulting.size(); i++) {
             CurrentServingDAO cs = currentConsulting.get(i);
 
             // Check if this patient is already in the ongoingConsultations list
-            boolean exists = false;
-            for (int j = 0; j < ongoingConsultations.size(); j++) {
-                Consultation c = ongoingConsultations.get(j);
-                if (c.getPatientId().equals(cs.getPatientId()) &&
-                    c.getDoctorId().equals(cs.getDoctorId())) {
-                    exists = true;
-                    break;
-                }
-            }
+            boolean exists = ongoingConsultations.filter(
+                c -> c.getPatientId().equals(cs.getPatientId()) &&
+                     c.getDoctorId().equals(cs.getDoctorId())
+            ).size() > 0;
 
             if (!exists) {
                 Patient patient = PatientManagement.findPatientById(cs.getPatientId());
