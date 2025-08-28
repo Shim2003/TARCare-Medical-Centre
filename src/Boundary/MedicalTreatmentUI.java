@@ -251,13 +251,11 @@ public class MedicalTreatmentUI {
         System.out.print("Enter Diagnosis ID: " + diagnosisId + "\n");
 
         // Get the current serving patient ID from the queue list
-//        String patientId = DiagnosisManagement.getCurrentServingPatient();
-        String patientId = "P1001";
+        String patientId = DiagnosisManagement.getCurrentServingPatient();
         System.out.println("Patient ID: " + patientId);
 
         // Get the current serving doctor ID from the queue list
-//        String doctorId = DiagnosisManagement.getCurrentServingDoctor();
-        String doctorId = "D1001";
+        String doctorId = DiagnosisManagement.getCurrentServingDoctor();
         System.out.println("Doctor ID: " + doctorId);
 
         int i = 1;
