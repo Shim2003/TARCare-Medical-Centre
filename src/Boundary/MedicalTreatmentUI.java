@@ -675,7 +675,7 @@ public class MedicalTreatmentUI {
         String monthYearStr = monthName + " " + year;
 
         System.out.println("\n=========================================================================");
-        System.out.println(">                          MONTHLY PATIENT REPORT                        <");
+        System.out.println(">                         MONTHLY TREATMENT REPORT                       <");
         System.out.println("==========================================================================");
 
         System.out.printf("Reporting Period: %s | Generated: %s\n", monthYearStr, sdf.format(new Date()));
@@ -694,7 +694,7 @@ public class MedicalTreatmentUI {
         MyList<MedicalTreatment> success = MedicalTreatmentManagement.getSuccessfulTreatmentHistory(year, month);
         // display the treatment history report based on the outcome in portion by portion,"Successful", "Needs Follow up", "Failed", "Ongoing"
         System.out.println("\n==========================================================================");
-        System.out.println("Successful Treatments:");
+        System.out.println(">> Successful Treatments:");
         System.out.println("==========================================================================");
         System.out.println("Treatment ID | Patient ID | Treatment Date | Treatment Status | Outcome ");
         System.out.println("==========================================================================");
@@ -714,7 +714,7 @@ public class MedicalTreatmentUI {
             
         // display the treatment history report based on the outcome in portion by portion,"Successful", "Needs Follow up", "Failed", "Ongoing"
         System.out.println("\n==========================================================================");
-        System.out.println("Needs Follow Up Treatments:");
+        System.out.println(">> Needs Follow Up Treatments:");
         System.out.println("==========================================================================");
         System.out.println("Treatment ID | Patient ID | Treatment Date | Treatment Status | Outcome");
         System.out.println("==========================================================================");
@@ -734,7 +734,7 @@ public class MedicalTreatmentUI {
 
         // display the treatment history report based on the outcome in portion by portion,"Successful", "Needs Follow up", "Failed", "Ongoing"
         System.out.println("\n==========================================================================");
-        System.out.println("Failed Treatments:");
+        System.out.println(">> Failed Treatments:");
         System.out.println("==========================================================================");
         System.out.println("Treatment ID | Patient ID | Treatment Date | Treatment Status | Outcome");
         System.out.println("==========================================================================");
@@ -754,7 +754,7 @@ public class MedicalTreatmentUI {
 
         // display the treatment history report based on the outcome in portion by portion,"Successful", "Needs Follow up", "Failed", "Ongoing"
         System.out.println("\n==========================================================================");
-        System.out.println("Ongoing Treatments:");
+        System.out.println(">> Ongoing Treatments:");
         System.out.println("==========================================================================");
         System.out.println("Treatment ID | Patient ID | Treatment Date | Treatment Status | Outcome");
         System.out.println("==========================================================================");
@@ -797,7 +797,7 @@ public class MedicalTreatmentUI {
             try {
                 choice = Integer.parseInt(scanner.nextLine().trim());
             } catch (NumberFormatException e) {
-                System.out.println("Invalid input. Please enter a number (1–5).");
+                System.out.println("Invalid input. Please enter a number (1-5).");
                 continue;
             }
 
@@ -806,8 +806,8 @@ public class MedicalTreatmentUI {
                 return;
             }
 
-            String outcomeLabel = "";
-            MyList<MedicalTreatment> treatmentList = null;
+            String outcomeLabel;
+            MyList<MedicalTreatment> treatmentList;
 
             switch (choice) {
                 case 1:
