@@ -149,9 +149,10 @@ public class MedicalTreatmentUI {
             System.out.println("1. Delete Treatment History By Treatment ID");
             System.out.println("2. Delete All Treatment History By Patient ID");
             System.out.println("3. Delete All Treatment History");
-            System.out.println("4. Exit to Previous Menu");
+            System.out.println("4. Restore Deleted Treatment History");
+            System.out.println("5. Exit to Previous Menu");
 
-            System.out.print("Enter your choice (1-4): ");
+            System.out.print("Enter your choice (1-5): ");
 
             try {
                 int choice = scanner.nextInt();
@@ -161,10 +162,13 @@ public class MedicalTreatmentUI {
                     case 1 ->
                         deleteTreatmentById();
                     case 2 ->
-                        viewPatientTreatmentHistoryByPatientId();
+                        deleteAllTreatmentsByPatientId();
                     case 3 ->
                         deleteAllTreatmentHistory();
                     case 4 -> {
+                        restoreTreatmentHistory();
+                    }
+                    case 5 -> {
                         System.out.println("Exiting to Main Menu...");
                         medicalTreatmentMenu(); // Exit to main menu
                     }
@@ -180,7 +184,6 @@ public class MedicalTreatmentUI {
         }
     }
 
-    
     // Method to create a new medical treatment
     // This method will prompt the user for input and create a new treatment record
     public static void createTreatment() {
@@ -306,7 +309,7 @@ public class MedicalTreatmentUI {
 
         System.out.println("\n" + "=".repeat(68));
         System.out.println("PATIENT TREATMENT HISTORY - PATIENT ID: " + patientId);
-        System.out.println("Total Records Found: " + MedicalTreatmentManagement.getTreatmentListSize());
+        System.out.println("Total Records Found: " + MedicalTreatmentManagement.getTreatmentHistoryById(patientId));
         System.out.println("=".repeat(68) + "\n");
 
         for (int i = 0; i < MedicalTreatmentManagement.getTreatmentListSize(); i++) {
@@ -573,6 +576,8 @@ public class MedicalTreatmentUI {
         String confirm = scanner.nextLine().trim().toLowerCase();
 
         if (confirm.equals("y")) {
+            // clone the current list
+            MedicalTreatmentManagement.cloneTreatmentList();
             boolean deleted = MedicalTreatmentManagement.deleteTreatmentById(treatmentId);
             if (deleted) {
                 System.out.println(">> Treatment ID " + treatmentId + " deleted successfully.");
@@ -599,6 +604,7 @@ public class MedicalTreatmentUI {
         String confirm = scanner.nextLine().trim().toLowerCase();
 
         if (confirm.equals("y")) {
+            MedicalTreatmentManagement.cloneTreatmentList();
             boolean deletedCount = MedicalTreatmentManagement.deleteAllTreatmentsByPatientId(patientId);
             if (deletedCount) {
                 System.out.println(">> All treatments for Patient ID " + patientId + " deleted successfully. Total deleted: " + deletedCount);
@@ -614,14 +620,29 @@ public class MedicalTreatmentUI {
     // delete all the treatment history in once
     public static void deleteAllTreatmentHistory() {
         System.out.println("\n=== Delete All Treatment History ===");
-        System.out.print("Are you sure you want to delete ALL treatment history? This action cannot be undone. (y/n): ");
+        System.out.print("Are you sure you want to delete ALL treatment history?(y/n): ");
         String confirm = scanner.nextLine().trim().toLowerCase();
 
         if (confirm.equals("y")) {
+            MedicalTreatmentManagement.cloneTreatmentList();
             MedicalTreatmentManagement.deleteAllTreatments();
             System.out.println(">> All treatment history deleted successfully.");
         } else {
             System.out.println("Deletion cancelled.");
+        }
+    }
+
+    // restore the list of latest change made
+    public static void restoreTreatmentHistory() {
+        System.out.println("\n=== Restore Treatment History ===");
+        System.out.print("Are you sure you want to restore the latest changes? This action cannot be undone. (y/n): ");
+        String confirm = scanner.nextLine().trim().toLowerCase();
+
+        if (confirm.equals("y")) {
+            MedicalTreatmentManagement.restoreTreatmentList();
+            System.out.println(">> Treatment history restored successfully.");
+        } else {
+            System.out.println("Restoration cancelled.");
         }
     }
 

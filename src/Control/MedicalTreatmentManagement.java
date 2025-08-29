@@ -18,8 +18,9 @@ import java.util.Date;
 public class MedicalTreatmentManagement {
     
     //list to store medical treatment details
-    private static final MyList<MedicalTreatment> treatmentList = new DynamicList<>();
+    private static MyList<MedicalTreatment> treatmentList = new DynamicList<>();
     private static final MyList<MedicalTreatmentItem> medicineList = new DynamicList<>();
+    private static MyList<MedicalTreatment> backupList = null; // store backup before deletion
 
     // initialize the medical treatment list
     public static void initMedicalTreatmentList() {
@@ -130,7 +131,7 @@ public class MedicalTreatmentManagement {
 
     // display treatment history by patient ID
     public static MyList<MedicalTreatment> getTreatmentHistoryByPatientIdList(String patientId) {
-        return treatmentList.findAll(th -> th.getPatientId().equals(patientId));
+        return treatmentList.filter(th -> th.getPatientId().equals(patientId));
     }
 
     // get the treatment history by ID
@@ -463,4 +464,19 @@ public class MedicalTreatmentManagement {
     public static void setTreatmentNote(MedicalTreatment treatment, String note) {
         treatment.setNotes(note);
     }
+
+    // clone the treatment list
+    public static void cloneTreatmentList() {
+        backupList = treatmentList.clone();
+    }
+
+    // restore the treatment list
+    public static void restoreTreatmentList() {
+        if (backupList != null) {
+            treatmentList = backupList.clone(); // restore
+            System.out.println(">> Treatment history has been restored from backup.");
+        } else {
+            System.out.println(">> No backup available to restore.");
+        }
+    }   
 }
