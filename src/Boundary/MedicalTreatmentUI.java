@@ -92,8 +92,6 @@ public class MedicalTreatmentUI {
                         System.out.println("Exiting to Main Menu...");
                         medicalTreatmentMainMenu(); // Exit to main menu
                     }
-                    case 7 -> 
-                        createTreatment();
                     default -> {
                         System.out.println("Invalid Choice. Please enter again from 1 to 5.");
                     }
