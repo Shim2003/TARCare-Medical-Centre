@@ -26,20 +26,26 @@ import java.time.format.DateTimeFormatter;
  * @author leekeezhan
  */
 public class AppointmentManagement {
-    private static DynamicList<Appointment> scheduledAppointments = new DynamicList<>();
+    // List of all scheduled appointments
+    private static MyList<Appointment> scheduledAppointments = new DynamicList<>();
     
     // Counter
     private static int appointmentCounter = 1001; // A1001
 
+    // Set the list of scheduled appointments (used for data initialization)
+    public static void setScheduledAppointments(MyList<Appointment> list) {
+        scheduledAppointments = list;
+    }
+    
+    // Generate the next unique appointment ID
     public static String generateNextAppointmentId() {
         String id = "A" + appointmentCounter;
         while (appointmentIdExists(id)) {
-            id = "A" + (++appointmentCounter);
+            appointmentCounter++; // appointmentCounter++
+            id = "A" + appointmentCounter;
         }
-        appointmentCounter++; // appointmentCounter++
         return id;
     }
-
 
     // Check if the appointment ID exists
     private static boolean appointmentIdExists(String id) {
@@ -51,80 +57,82 @@ public class AppointmentManagement {
         return false;
     }
     
+    // Add a new appointment to the scheduled list
     public static void addScheduledAppointment(Appointment a) {
-        scheduledAppointments.add(a);
+        scheduledAppointments.add(scheduledAppointments.size(), a);
     }
     
+    // Peek the next available appointment ID without incrementing the counter
     public static String peekNextAppointmentId() {
         int tempCounter = appointmentCounter; 
         String id = "A" + tempCounter;
         while (appointmentIdExists(id)) {
-            id = "A" + (++appointmentCounter);
+            id = "A" + (++tempCounter);
         }
         return id; // Do not modify appointmentCounter
     }
 
-
-    public static void scheduleNextAppointment(String patientId, String doctorId, String dateTimeStr, String reason) {
+    // Schedule a new appointment.
+    public static MyList<String> scheduleNextAppointment(String patientId, String doctorId, String dateTimeStr, String reason) {
+        MyList<String> errors = new DynamicList<>();
+        LocalDateTime appointmentTime = null;
+        
         // Check if the patient exists
         Patient patient = PatientManagement.findPatientById(patientId);
         if (patient == null) {
-            System.out.println("Patient not found. Cannot schedule appointment.");
-            return;
+            errors.add("Patient ID '" + patientId + "' not found.");
         }
 
         // Check if the doctor exists
         Doctor doctor = DoctorManagement.findDoctorById(doctorId);
         if (doctor == null) {
-            System.out.println("Doctor not found. Cannot schedule appointment.");
-            return;
+            errors.add("Doctor ID '" + doctorId + "' not found.");
         }
 
+        // Parse date/time only if patient and doctor exist (optional: you can parse anyway)
+        if (errors.isEmpty()) {
         try {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
-            LocalDateTime appointmentTime = LocalDateTime.parse(dateTimeStr, formatter);
-
-            // Check that appointment time is in the future
-            if (appointmentTime.isBefore(LocalDateTime.now())) {
-                System.out.println("Invalid appointment time. The appointment must be in the future.");
-                return;
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+                appointmentTime = LocalDateTime.parse(dateTimeStr, formatter);
+                if (appointmentTime.isBefore(LocalDateTime.now())) {
+                    errors.add("Appointment must be in the future.");
+                }
+            } catch (Exception e) {
+                errors.add("Invalid date/time format.");
             }
+        }
 
-            // Check if doctor is scheduled on the appointment day
+        // Check doctor schedule and conflicting appointments **only if no previous errors**
+        if (errors.isEmpty()) {
             DayOfWeek dayOfWeek = appointmentTime.getDayOfWeek();
             MyList<Schedule> doctorSchedules = ScheduleManagement.findSchedulesByDoctorId(doctorId);
             boolean isAvailable = false;
             for (int i = 0; i < doctorSchedules.size(); i++) {
                 Schedule s = doctorSchedules.get(i);
-                if (s.getDayOfWeek() == dayOfWeek) {
-                    LocalTime start = s.getStartTime();
-                    LocalTime end = s.getEndTime();
-                    LocalTime appTime = appointmentTime.toLocalTime();
-                    if (!appTime.isBefore(start) && !appTime.isAfter(end)) {
-                        isAvailable = true;
-                        break;
-                    }
+                LocalTime start = s.getStartTime();
+                LocalTime end = s.getEndTime();
+                LocalTime appTime = appointmentTime.toLocalTime();
+                if (s.getDayOfWeek() == dayOfWeek && !appTime.isBefore(start) && !appTime.isAfter(end)) {
+                    isAvailable = true;
+                    break;
                 }
             }
-
             if (!isAvailable) {
-                System.out.println("Doctor " + doctorId + " is not available on " + dayOfWeek + " at " + appointmentTime.toLocalTime());
-                return;
+                errors.add("Doctor " + doctorId + " is not available on " + dayOfWeek + " at " + appointmentTime.toLocalTime());
             }
-            
-            // Check for conflicting appointments (same doctor at the same time)
             for (int i = 0; i < scheduledAppointments.size(); i++) {
                 Appointment existing = scheduledAppointments.get(i);
                 if (existing.getDoctorId().equals(doctorId) &&
                     existing.getAppointmentTime().equals(appointmentTime)) {
-                    System.out.println("Conflict detected: Doctor " + doctorId + 
-                                       " already has an appointment at " + appointmentTime.format(formatter));
-                    return;
+                    errors.add("Conflict: Doctor already has an appointment at this time.");
+                    break;
                 }
             }
+        }
 
+        // Schedule appointment if no errors
+        if (errors.isEmpty()) {
             String appointmentId = generateNextAppointmentId();
-
             Appointment newAppointment = new Appointment(
                     appointmentId,
                     patientId,
@@ -132,51 +140,12 @@ public class AppointmentManagement {
                     appointmentTime,
                     reason
             );
-
             scheduledAppointments.add(newAppointment);
-            System.out.println("   Appointment scheduled successfully!");
-            System.out.println("   Appointment ID: " + appointmentId);
-            System.out.println("   Patient: " + patient.getFullName() + " (" + patientId + ")");
-            System.out.println("   Doctor: " + doctor.getName() + " (" + doctorId + ")");
-            System.out.println("   Date/Time: " + dateTimeStr);
-            System.out.println("   Reason: " + reason);
-        } catch (Exception e) {
-            System.out.println("Invalid date/time format. Please use 'dd-MM-yyyy HH:mm'.");
         }
+        return errors;
     }
-
-    // View all appointments with Patient and Doctor names
-    public static void viewAppointmentsWithNames() {
-        if (scheduledAppointments.isEmpty()) {
-            System.out.println("No scheduled appointments.");
-            return;
-        }
-
-        System.out.println("\n--- Scheduled Appointments (With Names) ---");
-        for (int i = 0; i < scheduledAppointments.size(); i++) {
-            Appointment a = scheduledAppointments.get(i);
-
-            Patient patient = PatientManagement.findPatientById(a.getPatientId());
-            String patientName = (patient != null) ? patient.getFullName() : "Unknown Patient";
-
-            Doctor doctor = DoctorManagement.findDoctorById(a.getDoctorId());
-            String doctorName = (doctor != null) ? doctor.getName() : "Unknown Doctor";
-
-            System.out.printf("%d. Appointment ID: %s | Patient: %s (%s) | Doctor: %s (%s) | Date/Time: %s | Reason: %s\n",
-                    i + 1,
-                    a.getAppointmentId(),
-                    patientName,
-                    a.getPatientId(),
-                    doctorName,
-                    a.getDoctorId(),
-                    a.getAppointmentTime().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")),
-                    a.getReason()
-            );
-        }
-        System.out.println("-------------------------------------------\n");
-    }
-    
-    // General method: find Appointment by ID automatically
+ 
+    // find Appointment by ID automatically
     public static MyList<Appointment> findAppointmentsById(String id) {
         boolean isPatient = (PatientManagement.findPatientById(id) != null);
         boolean isDoctor = (DoctorManagement.findDoctorById(id) != null);
@@ -191,193 +160,16 @@ public class AppointmentManagement {
             Appointment a = scheduledAppointments.get(i);
             if ((isPatient && a.getPatientId().equals(id)) ||
                 (isDoctor && a.getDoctorId().equals(id))) {
-                result.add(a);
+                result.add(result.size(), a);
             }
         }
         return result;
     }
-    
-    // Prompt user and view appointments
-    public static void promptAndViewAppointments() {
-        Scanner sc = new Scanner(System.in);
-        System.out.print("Enter Appointment ID, Patient ID, or Doctor ID to view appointments: ");
-        String id = sc.nextLine().trim();
-        viewAppointmentsById(id);
-    }
-    
-    // Unified method to display Appointment details
-    private static void displayAppointment(Appointment a) {
-        Patient patient = PatientManagement.findPatientById(a.getPatientId());
-        String patientName = (patient != null) ? patient.getFullName() : "Unknown Patient";
 
-        Doctor doctor = DoctorManagement.findDoctorById(a.getDoctorId());
-        String doctorName = (doctor != null) ? doctor.getName() : "Unknown Doctor";
+    // Get a formatted appointment report
+    public static MyList<String> getAppointmentsReportByIdSingleLine(String id) {
+        MyList<String> report = new DynamicList<>();
 
-        System.out.printf("Appointment ID: %s | Patient: %s (%s) | Doctor: %s (%s) | Date/Time: %s | Reason: %s\n",
-                a.getAppointmentId(),
-                patientName,
-                a.getPatientId(),
-                doctorName,
-                a.getDoctorId(),
-                a.getAppointmentTime().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")),
-                a.getReason()
-        );
-    }
-    
-    // Automatically determine ID type (Appointment / Patient / Doctor) and display
-    public static void viewAppointmentsById(String id) {
-        // check if it is an Appointment ID
-        for (int i = 0; i < scheduledAppointments.size(); i++) {
-            Appointment a = scheduledAppointments.get(i);
-            if (a.getAppointmentId().equalsIgnoreCase(id)) {
-                // Display only future appointments
-                if (a.getAppointmentTime().isAfter(java.time.LocalDateTime.now())) {
-                    System.out.println("\n--- Appointment Detail for ID: " + id + " ---");
-                    displayAppointment(a);
-                    System.out.println("-------------------------------------------\n");
-                } else {
-                    System.out.println("Appointment ID " + id + " has already passed.");
-                }
-                return; 
-            }
-        }
-
-        boolean isPatient = (PatientManagement.findPatientById(id) != null);
-        boolean isDoctor = (DoctorManagement.findDoctorById(id) != null);
-
-        if (!isPatient && !isDoctor) {
-            System.out.println("ID not found in Patient or Doctor records: " + id);
-            return;
-        }
-
-        MyList<Appointment> appointments = findAppointmentsById(id);
-        boolean foundFuture = false;
-
-        if (appointments.isEmpty()) {
-            System.out.println("No appointments found for ID: " + id);
-            return;
-        }
-
-        System.out.printf("\n--- Appointments for %s ID: %s ---\n",
-                isPatient ? "Patient" : "Doctor", id);
-
-        for (int i = 0; i < appointments.size(); i++) {
-            Appointment a = appointments.get(i);
-            if (a.getAppointmentTime().isAfter(java.time.LocalDateTime.now())) {
-                foundFuture = true;
-                System.out.printf("%d. ", i + 1);
-                displayAppointment(a);
-            }
-        }
-
-        if (!foundFuture) {
-            System.out.println("No future appointments found for this ID.");
-        }
-
-        System.out.println("-------------------------------------------\n");
-    }
-
-
-    // Delete Appointment by Appointment ID
-    public static void deleteAppointmentById(String appointmentId) {
-        if (scheduledAppointments.isEmpty()) {
-            System.out.println("No appointments available to delete.");
-            return;
-        }
-
-        boolean deleted = false;
-        for (int i = 0; i < scheduledAppointments.size(); i++) {
-            Appointment a = scheduledAppointments.get(i);
-            if (a.getAppointmentId().equals(appointmentId)) {
-                scheduledAppointments.remove(i);
-                deleted = true;
-                System.out.println("Appointment " + appointmentId + " has been deleted.");
-                break;
-            }
-        }
-
-        if (!deleted) {
-            System.out.println("Appointment ID " + appointmentId + " not found.");
-        }
-    }
-
-    // Modify Appointment
-    public static void modifyAppointment(String appointmentId) {
-        Appointment appointment = null;
-        for (int i = 0; i < scheduledAppointments.size(); i++) {
-            if (scheduledAppointments.get(i).getAppointmentId().equals(appointmentId)) {
-                appointment = scheduledAppointments.get(i);
-                break;
-            }
-        }
-
-        if (appointment == null) {
-            System.out.println("Appointment ID " + appointmentId + " not found.");
-            return;
-        }
-
-        Scanner sc = new Scanner(System.in);
-        System.out.println("\n--- Modifying Appointment " + appointmentId + " ---");
-
-        System.out.print("Enter new Patient ID (or press Enter to keep " + appointment.getPatientId() + "): ");
-        String newPatientId = sc.nextLine().trim();
-        if (!newPatientId.isEmpty()) {
-            Patient patient = PatientManagement.findPatientById(newPatientId);
-            if (patient != null) {
-                appointment.setPatientId(newPatientId);
-                System.out.println("Patient updated to " + patient.getFullName());
-            } else {
-                System.out.println("Patient ID not found. Keeping original.");
-            }
-        }
-
-        System.out.print("Enter new Doctor ID (or press Enter to keep " + appointment.getDoctorId() + "): ");
-        String newDoctorId = sc.nextLine().trim();
-        if (!newDoctorId.isEmpty()) {
-            Doctor doctor = DoctorManagement.findDoctorById(newDoctorId);
-            if (doctor != null) {
-                appointment.setDoctorId(newDoctorId);
-                System.out.println("Doctor updated to " + doctor.getName());
-            } else {
-                System.out.println("Doctor ID not found. Keeping original.");
-            }
-        }
-
-        System.out.print("Enter new date and time (dd-MM-yyyy HH:mm) (or press Enter to keep " 
-                         + appointment.getAppointmentTime().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")) + "): ");
-        String newDateTimeStr = sc.nextLine().trim();
-        if (!newDateTimeStr.isEmpty()) {
-            try {
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
-                LocalDateTime newDateTime = LocalDateTime.parse(newDateTimeStr, formatter);
-                if (newDateTime.isAfter(LocalDateTime.now())) {
-                    appointment.setAppointmentTime(newDateTime);
-                    System.out.println("Appointment date/time updated.");
-                } else {
-                    System.out.println("Invalid date/time. Keeping original.");
-                }
-            } catch (Exception e) {
-                System.out.println("Invalid format. Keeping original.");
-            }
-        }
-
-        System.out.print("Enter new reason (or press Enter to keep \"" + appointment.getReason() + "\"): ");
-        String newReason = sc.nextLine().trim();
-        if (!newReason.isEmpty()) {
-            appointment.setReason(newReason);
-            System.out.println("Reason updated.");
-        }
-
-        System.out.println("Appointment modification complete.\n");
-    }
-
-    public static DynamicList<Appointment> getScheduledAppointments() {
-        return scheduledAppointments;
-    }
-    
-    // View Consultation Report by ID
-    public static void viewConsultationReportById(String id) {
-        // Check Appointment ID
         Appointment found = null;
         for (int i = 0; i < scheduledAppointments.size(); i++) {
             Appointment a = scheduledAppointments.get(i);
@@ -388,10 +180,201 @@ public class AppointmentManagement {
         }
 
         if (found != null) {
-            System.out.println("\n--- Consultation Report for Appointment ID: " + id + " ---\n");
-            displayAppointment1(found);
-            System.out.println("---------------------------------------\n");
-            return;
+            report.add("--- Appointment Detail for ID: " + found.getAppointmentId() + " ---");
+            report.add(formatAppointmentDisplaySingleLine(found));
+            report.add("-------------------------------------------");
+            return report;
+        }
+
+        // Patient / Doctor case
+        boolean isPatient = (PatientManagement.findPatientById(id) != null);
+        boolean isDoctor = (DoctorManagement.findDoctorById(id) != null);
+
+        if (!isPatient && !isDoctor) {
+            report.add("No appointments found for ID: " + id);
+            return report;
+        }
+
+        MyList<Appointment> appointments = findAppointmentsById(id);
+        if (appointments.isEmpty()) {
+            report.add("No appointments found for ID: " + id);
+            return report;
+        }
+
+        report.add("--- Appointment Detail for ID: " + id + " ---");
+        for (int i = 0; i < appointments.size(); i++) {
+            Appointment a = appointments.get(i);
+            report.add(formatAppointmentDisplaySingleLine(a));
+        }
+        report.add("-------------------------------------------");
+
+        return report;
+    }
+    
+    // Print a report (list of strings)
+    public static void printReport(MyList<String> report) {
+        for (String line : report) {
+            System.out.println(line);
+        }
+    }
+    
+    // Single-line display version
+    public static String formatAppointmentDisplaySingleLine(Appointment a) {
+        Patient patient = PatientManagement.findPatientById(a.getPatientId());
+        String patientName = (patient != null) ? patient.getFullName() : "Unknown Patient";
+
+        Doctor doctor = DoctorManagement.findDoctorById(a.getDoctorId());
+        String doctorName = (doctor != null) ? doctor.getName() : "Unknown Doctor";
+
+        return String.format(
+            "Appointment ID: %s | Patient: %s (%s) | Doctor: %s (%s) | Date/Time: %s | Reason: %s",
+            a.getAppointmentId(),
+            patientName,
+            a.getPatientId(),
+            doctorName,
+            a.getDoctorId(),
+            a.getAppointmentTime().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")),
+            a.getReason()
+        );
+    }
+
+    // Helper: add all lines from one list to another
+    private static void addAll(MyList<String> target, MyList<String> source) {
+        for (int i = 0; i < source.size(); i++) {
+            target.add(source.get(i));
+        }
+    }
+
+    // Delete Appointment by Appointment ID
+    public static boolean deleteAppointment(String appointmentId) {
+        for (int i = 0; i < scheduledAppointments.size(); i++) {
+            if (scheduledAppointments.get(i).getAppointmentId().equalsIgnoreCase(appointmentId)) {
+                scheduledAppointments.remove(i);
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    // Private: check if patient exists
+    private static Appointment findAppointmentOrReportError(String appointmentId, MyList<String> errors) {
+        for (int i = 0; i < scheduledAppointments.size(); i++) {
+            Appointment a = scheduledAppointments.get(i);
+            if (a.getAppointmentId().equalsIgnoreCase(appointmentId)) {
+                return a;
+            }
+        }
+        errors.add("Appointment ID " + appointmentId + " not found.");
+        return null;
+    }
+    
+    // Private: check if doctor exists
+    private static boolean checkPatientExists(String patientId, MyList<String> errors) {
+        if (PatientManagement.findPatientById(patientId) == null) {
+            errors.add("Patient ID " + patientId + " not found.");
+            return false;
+        }
+        return true;
+    }
+
+    // Modify an existing appointment
+    private static boolean checkDoctorExists(String doctorId, MyList<String> errors) {
+        if (DoctorManagement.findDoctorById(doctorId) == null) {
+            errors.add("Doctor ID " + doctorId + " not found.");
+            return false;
+        }
+        return true;
+    }
+
+    // Modify Appointment
+    public static MyList<String> modifyAppointment(String appointmentId, String newPatientId, String newDoctorId, LocalDateTime newDateTime, String newReason) {
+        
+        MyList<String> errors = new DynamicList<>();
+        Appointment appointment = findAppointmentOrReportError(appointmentId, errors);
+        if (appointment == null) return errors;
+
+        if (newPatientId != null && !newPatientId.isEmpty()) {
+            if (checkPatientExists(newPatientId, errors)) {
+                appointment.setPatientId(newPatientId);
+            }
+        }
+
+        if (newDoctorId != null && !newDoctorId.isEmpty()) {
+            if (checkDoctorExists(newDoctorId, errors)) {
+                appointment.setDoctorId(newDoctorId);
+            }
+        }
+        
+        if (newDateTime != null) {
+            if (newDateTime.isAfter(LocalDateTime.now())) {
+                
+                boolean available = false;
+                DayOfWeek dayOfWeek = newDateTime.getDayOfWeek();
+                MyList<Schedule> doctorSchedules = ScheduleManagement.findSchedulesByDoctorId(appointment.getDoctorId());
+                LocalTime appTime = newDateTime.toLocalTime();
+                for (int i = 0; i < doctorSchedules.size(); i++) {
+                    Schedule s = doctorSchedules.get(i);
+                    if (s.getDayOfWeek() == dayOfWeek &&
+                        !appTime.isBefore(s.getStartTime()) &&
+                        !appTime.isAfter(s.getEndTime())) {
+                        available = true;
+                        break;
+                    }
+                }
+                if (!available) {
+                    errors.add("Doctor not available at this new time. Keeping original.");
+                } else {
+                    // 检查是否与其他预约冲突
+                    boolean conflict = false;
+                    for (int i = 0; i < scheduledAppointments.size(); i++) {
+                        Appointment existing = scheduledAppointments.get(i);
+                        if (!existing.getAppointmentId().equalsIgnoreCase(appointmentId) &&
+                            existing.getDoctorId().equals(appointment.getDoctorId()) &&
+                            existing.getAppointmentTime().equals(newDateTime)) {
+                            conflict = true;
+                            break;
+                        }
+                    }
+                    if (conflict) {
+                        errors.add("Conflict with another appointment. Keeping original time.");
+                    } else {
+                        appointment.setAppointmentTime(newDateTime);
+                    }
+                }
+            } else {
+                errors.add("Invalid date/time (past). Keeping original.");
+            }
+        }
+        if (newReason != null && !newReason.isEmpty()) {
+            appointment.setReason(newReason);
+        }
+        return errors;
+    }
+
+    // Get list of all scheduled appointments
+    public static MyList<Appointment> getScheduledAppointments() {
+        return scheduledAppointments;
+    }
+    
+    // Get Consultation Report by ID
+    public static MyList<String> getConsultationReportById(String id) {
+        MyList<String> report = new DynamicList<>();
+        LocalDateTime now = LocalDateTime.now();
+
+        // Check Appointment ID
+        Appointment found = null;
+        for (Appointment a : scheduledAppointments) {
+            if (a.getAppointmentId().equalsIgnoreCase(id)) {
+                found = a;
+                break;
+            }
+        }
+
+        if (found != null) {
+            report.add("--- Consultation Report for Appointment ID: " + id + " ---");
+            addAll(report, formatAppointmentDisplay(found));
+            report.add("---------------------------------------");
+            return report;
         }
 
         // Determine whether it is a Patient or a Doctor
@@ -399,58 +382,62 @@ public class AppointmentManagement {
         boolean isDoctor = (DoctorManagement.findDoctorById(id) != null);
 
         if (!isPatient && !isDoctor) {
-            System.out.println("ID not found in Appointment, Patient, or Doctor records: " + id);
-            return;
+            report.add("ID not found in Appointment, Patient, or Doctor records: " + id);
+            return report;
         }
 
         MyList<Appointment> appointments = findAppointmentsById(id);
 
         if (appointments.isEmpty()) {
-            System.out.println("No appointments found for ID: " + id);
-            return;
+            report.add("No appointments found for ID: " + id);
+            return report;
         }
 
-        System.out.printf("\n--- Consultation Report for %s ID: %s ---\n\n",
-                isPatient ? "Patient" : "Doctor", id);
+        report.add("--- Consultation Report for " + (isPatient ? "Patient" : "Doctor") + " ID: " + id + " ---");
 
-        for (int i = 0; i < appointments.size(); i++) {
-            Appointment a = appointments.get(i);
-            displayAppointment1(a);
-            System.out.println("---------------------------------------");
+        for (Appointment a : appointments) {
+            addAll(report, formatAppointmentDisplay(a));
+            report.add("---------------------------------------");
         }
-    }
+
+        return report;
+    }  
     
-    public static void displayAppointment1(Appointment a) {
+    // Format a multi-line appointment display
+    public static MyList<String> formatAppointmentDisplay(Appointment a) {
+        MyList<String> lines = new DynamicList<>();
+
         Patient patient = PatientManagement.findPatientById(a.getPatientId());
         String patientName = (patient != null) ? patient.getFullName() : "Unknown Patient";
 
         Doctor doctor = DoctorManagement.findDoctorById(a.getDoctorId());
         String doctorName = (doctor != null) ? doctor.getName() : "Unknown Doctor";
 
-        System.out.println("Appointment ID : " + a.getAppointmentId());
-        System.out.println("Patient        : " + patientName + " (" + a.getPatientId() + ")");
-        System.out.println("Doctor         : " + doctorName + " (" + a.getDoctorId() + ")");
-        System.out.println("Date/Time      : " + a.getAppointmentTime().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")));
-        System.out.println("Reason         : " + a.getReason());
+        lines.add("Appointment ID : " + a.getAppointmentId());
+        lines.add("Patient        : " + patientName + " (" + a.getPatientId() + ")");
+        lines.add("Doctor         : " + doctorName + " (" + a.getDoctorId() + ")");
+        lines.add("Date/Time      : " + a.getAppointmentTime().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")));
+        lines.add("Reason         : " + a.getReason());
+
+        return lines;
     }
 
-    public static void demoClone() {
-        MyList<Appointment> copyList = scheduledAppointments.clone();
-        System.out.println("Cloned appointment list, total size: " + copyList.size());
+    // Clone all appointments (for demo/testing)
+    public static MyList<Appointment> demoCloneInfo() {
+        return scheduledAppointments.clone();
     }
     
-    public static void doctorStatistics() {
-        Scanner sc = new Scanner(System.in);
-        System.out.print("Enter Doctor ID to check total appointments: ");
-        String doctorId = sc.nextLine().trim();
+    // Generate statistics for a specific doctor
+    public static MyList<String> getDoctorStatistics(String doctorId) {
+        MyList<String> report = new DynamicList<>();
 
-        // The total number of appointments for the user's doctor ID
+        // 1. Total appointments for the specific doctor
         int doctorTotal = (int) scheduledAppointments
                             .filter(a -> a.getDoctorId().equals(doctorId))
                             .getStatistics(a -> 1).sum;
-        System.out.println("Total appointments for Doctor " + doctorId + ": " + doctorTotal);
+        report.add("Total appointments for Doctor " + doctorId + ": " + doctorTotal);
 
-        // The doctor with the highest appointment volume
+        // 2. Find doctor(s) with most total appointments
         DynamicList<String> doctorIds = new DynamicList<>();
         for (int i = 0; i < scheduledAppointments.size(); i++) {
             String dId = scheduledAppointments.get(i).getDoctorId();
@@ -459,7 +446,6 @@ public class AppointmentManagement {
 
         int maxAppointments = 0;
         DynamicList<String> topDoctors = new DynamicList<>();
-
         for (int i = 0; i < doctorIds.size(); i++) {
             String dId = doctorIds.get(i);
             int count = (int) scheduledAppointments
@@ -474,27 +460,20 @@ public class AppointmentManagement {
             }
         }
 
-        if (topDoctors.size() == doctorIds.size()) {
-            // All same
-            System.out.println("All doctors have the same number of appointments: " + maxAppointments);
-        } else {
-            // Display the doctor with the most appointments
-            System.out.print("Doctor(s) with most appointments: ");
-            for (int i = 0; i < topDoctors.size(); i++) {
-                System.out.print(topDoctors.get(i));
-                if (i != topDoctors.size() - 1) System.out.print(", ");
-            }
-            System.out.println(" (" + maxAppointments + " appointments)");
+        // Append doctor(s) with most appointments
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < topDoctors.size(); i++) {
+            sb.append(topDoctors.get(i));
+            if (i != topDoctors.size() - 1) sb.append(", ");
         }
+        report.add("Doctor(s) with most appointments: " + sb.toString() + " (" + maxAppointments + " appointments)");
 
-
-        //  The doctor with the most appointments this week
+        // 3. Check appointments this week
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime startOfWeek = now.with(DayOfWeek.MONDAY).withHour(0).withMinute(0).withSecond(0).withNano(0);
         LocalDateTime endOfWeek = startOfWeek.plusDays(6).withHour(23).withMinute(59).withSecond(59);
 
-        String topThisWeek = null;
-        int maxThisWeek = 0;
+        boolean anyAppointmentsThisWeek = false;
         for (int i = 0; i < doctorIds.size(); i++) {
             String dId = doctorIds.get(i);
             int count = (int) scheduledAppointments
@@ -502,61 +481,36 @@ public class AppointmentManagement {
                                         && !a.getAppointmentTime().isBefore(startOfWeek)
                                         && !a.getAppointmentTime().isAfter(endOfWeek))
                                 .getStatistics(a -> 1).sum;
-            if (count > maxThisWeek) {
-                maxThisWeek = count;
-                topThisWeek = dId;
+            if (count > 0) {
+                anyAppointmentsThisWeek = true;
+                break;
             }
         }
-        System.out.println("Doctor with most appointments this week: " + topThisWeek + " (" + maxThisWeek + " appointments)");
+
+        if (!anyAppointmentsThisWeek) {
+            report.add("No appointments for any doctor this week.");
+        }
+
+        return report;
     }
     
-    public static void checkDoctorNextWeekAppointments() {
-        Scanner sc = new Scanner(System.in);
-        System.out.print("Enter Doctor ID to check appointments next week: ");
-        String doctorId = sc.nextLine().trim();
-
+    // Check if a doctor has appointments in the next week
+    public static boolean hasDoctorAppointmentsNextWeek(String doctorId) {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime startOfNextWeek = now.with(DayOfWeek.MONDAY).plusWeeks(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
         LocalDateTime endOfNextWeek = startOfNextWeek.plusDays(6).withHour(23).withMinute(59).withSecond(59).withNano(999_999_999);
 
-        boolean hasAppointment = scheduledAppointments.anyMatch(a ->
+        return scheduledAppointments.anyMatch(a ->
             a.getDoctorId().equals(doctorId) &&
             !a.getAppointmentTime().isBefore(startOfNextWeek) &&
             !a.getAppointmentTime().isAfter(endOfNextWeek)
         );
-
-        if (hasAppointment) {
-            System.out.println("Doctor " + doctorId + " has appointments next week.");
-        } else {
-            System.out.println("Doctor " + doctorId + " is free next week.");
-        }
     }
- 
 
-    public static void displayAppointmentsByTime() {
-        // Make a copy to prevent modifying the original data
+    // Get all appointments sorted by time
+    public static MyList<Appointment> getAppointmentsByTimeReport() {
         DynamicList<Appointment> sortedList = (DynamicList<Appointment>) scheduledAppointments.clone();
-
-        // Call the sorting method we used earlier
         UtilityClass.quickSort(sortedList, Comparator.comparing(Appointment::getAppointmentTime));
-
-        LocalDateTime now = LocalDateTime.now();
-
-        System.out.println("\n--- Future Appointments ---");
-        for (int i = 0; i < sortedList.size(); i++) {
-            Appointment a = sortedList.get(i);
-            if (a.getAppointmentTime().isAfter(now)) {
-                displayAppointment(a);
-            }
-        }
-
-        System.out.println("\n--- Past Appointments ---");
-        for (int i = 0; i < sortedList.size(); i++) {
-            Appointment a = sortedList.get(i);
-            if (!a.getAppointmentTime().isAfter(now)) {
-                displayAppointment(a);
-            }
-        }
+        return sortedList;
     }
-
 }

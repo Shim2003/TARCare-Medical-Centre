@@ -4,13 +4,20 @@
  */
 package Boundary;
 
+import ADT.MyList;
 import Control.AppointmentManagement;
 import Control.PatientManagement;
 import Control.DoctorManagement;
 import Control.ScheduleManagement;
 import Control.LeaveManagement;
 import DAO.ClinicData;
+import Entity.*;
+import Utility.UtilityClass;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
+import java.util.Comparator;
+
 /**
  *
  * @author leekeezhan
@@ -71,22 +78,9 @@ public class AppointmentUI {
             sc.nextLine();
 
             switch (choice) {
-                case 1 -> {
-                    String nextAppointmentId = AppointmentManagement.generateNextAppointmentId();
-                    System.out.println("Next available Appointment ID: " + nextAppointmentId);
-                    System.out.print("Enter Patient ID: ");
-                    String patientId = sc.nextLine();
-                    System.out.print("Enter Doctor ID: ");
-                    String doctorId = sc.nextLine();
-                    System.out.print("Enter appointment date and time (dd-MM-yyyy HH:mm): ");
-                    String dateTimeStr = sc.nextLine();
-                    System.out.print("Enter reason: ");
-                    String reason = sc.nextLine();
-
-                    AppointmentManagement.scheduleNextAppointment(patientId, doctorId, dateTimeStr, reason);
-                }
-                case 2 -> AppointmentManagement.promptAndViewAppointments();
-                case 3 -> AppointmentManagement.displayAppointmentsByTime();
+                case 1 -> scheduleAppointmentUI();
+                case 2 -> viewAppointmentsByIdUI();
+                case 3 -> displayAppointmentsByTimeUI();
                 case 0 -> System.out.println("Returning...");
                 default -> System.out.println("Invalid choice.");
             }
@@ -113,17 +107,9 @@ public class AppointmentUI {
             sc.nextLine();
 
             switch (choice) {
-                case 1 -> {
-                    System.out.print("Enter Appointment ID to delete: ");
-                    String appointmentId = sc.nextLine();
-                    AppointmentManagement.deleteAppointmentById(appointmentId);
-                }
-                case 2 -> {
-                    System.out.print("Enter Appointment ID to modify: ");
-                    String appointmentId = sc.nextLine();
-                    AppointmentManagement.modifyAppointment(appointmentId);
-                }
-                case 3 -> AppointmentManagement.demoClone();
+                case 1 -> deleteAppointmentUI();
+                case 2 -> modifyAppointmentUI();
+                case 3 -> demoCloneUI();
                 case 0 -> System.out.println("Returning...");
                 default -> System.out.println("Invalid choice.");
             }
@@ -150,17 +136,235 @@ public class AppointmentUI {
             sc.nextLine();
 
             switch (choice) {
-                case 1 -> {
-                    System.out.print("Enter Appointment or Patient or Doctor ID: ");
-                    String id = sc.nextLine().trim();
-                    AppointmentManagement.viewConsultationReportById(id);
-                }
-                case 2 -> AppointmentManagement.checkDoctorNextWeekAppointments();
-                case 3 -> AppointmentManagement.doctorStatistics();
+                case 1 -> viewAppointmentsByIdUI2();
+                case 2 -> checkDoctorNextWeekUI();
+                case 3 -> doctorStatisticsUI();
                 case 0 -> System.out.println("Returning...");
                 default -> System.out.println("Invalid choice.");
             }
         } while (choice != 0);
+    }
+    
+    private static void scheduleAppointmentUI() {
+        ScheduleUI.DisplayAllTimetable();
+        String nextAppointmentId = AppointmentManagement.generateNextAppointmentId();
+        System.out.println("Next available Appointment ID: " + AppointmentManagement.peekNextAppointmentId());
+
+        System.out.print("Enter Patient ID: ");
+        String patientId = sc.nextLine();
+        System.out.print("Enter Doctor ID: ");
+        String doctorId = sc.nextLine();
+        System.out.print("Enter appointment date and time (dd-MM-yyyy HH:mm): ");
+        String dateTimeStr = sc.nextLine();
+        System.out.print("Enter reason: ");
+        String reason = sc.nextLine();
+
+        MyList<String> errors = AppointmentManagement.scheduleNextAppointment(patientId, doctorId, dateTimeStr, reason);
+
+        boolean hasError = false;
+        for (String error : errors) {
+            if (!hasError) {
+                System.out.println("Failed to schedule appointment:");
+                hasError = true;
+            }
+            System.out.println("- " + error);
+        }
+
+        if (!hasError) {
+            System.out.println("Appointment scheduled successfully!");
+        }
+    }
+    
+    private static void viewAppointmentsByIdUI() {
+        System.out.print("Enter Appointment / Patient / Doctor ID: ");
+        String id = sc.nextLine().trim();
+
+        MyList<String> report = AppointmentManagement.getAppointmentsReportByIdSingleLine(id);
+
+        AppointmentManagement.printReport(report);
+    }
+
+    private static void viewAppointmentsByIdUI2() {
+        System.out.print("Enter Appointment, Patient, or Doctor ID: ");
+        String id = sc.nextLine().trim();
+
+        MyList<String> report = AppointmentManagement.getConsultationReportById(id);
+
+        for (String line : report) {
+            System.out.println(line);
+        }
+    }
+    
+    private static void displayAppointmentsByTimeUI() {
+        MyList<Appointment> sortedList = AppointmentManagement.getAppointmentsByTimeReport();
+        LocalDateTime now = LocalDateTime.now();
+        String format = "%-15s %-20s %-20s %-10s %-10s %-20s %-20s%n";
+
+        System.out.println("\n--- Future Appointments ---");
+        System.out.printf(format, "Appointment ID", "Patient", "Doctor", "Patient ID", "Doctor ID", "Date/Time", "Reason");
+        boolean hasFuture = false;
+
+        for (Appointment a : sortedList) {
+            if (a.getAppointmentTime().isAfter(now)) {
+                hasFuture = true;
+                Patient patient = PatientManagement.findPatientById(a.getPatientId());
+                String patientName = (patient != null) ? patient.getFullName() : "Unknown Patient";
+                Doctor doctor = DoctorManagement.findDoctorById(a.getDoctorId());
+                String doctorName = (doctor != null) ? doctor.getName() : "Unknown Doctor";
+
+                System.out.printf(format,
+                        a.getAppointmentId(),
+                        patientName,
+                        doctorName,
+                        a.getPatientId(),
+                        a.getDoctorId(),
+                        a.getAppointmentTime().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")),
+                        a.getReason()
+                );
+            }
+        }
+        if (!hasFuture) System.out.println("No future appointments.");
+
+        System.out.println("\n--- Past Appointments ---");
+        System.out.printf(format, "Appointment ID", "Patient", "Doctor", "Patient ID", "Doctor ID", "Date/Time", "Reason");
+        boolean hasPast = false;
+
+        for (Appointment a : sortedList) {
+            if (!a.getAppointmentTime().isAfter(now)) {
+                hasPast = true;
+                Patient patient = PatientManagement.findPatientById(a.getPatientId());
+                String patientName = (patient != null) ? patient.getFullName() : "Unknown Patient";
+                Doctor doctor = DoctorManagement.findDoctorById(a.getDoctorId());
+                String doctorName = (doctor != null) ? doctor.getName() : "Unknown Doctor";
+
+                System.out.printf(format,
+                        a.getAppointmentId(),
+                        patientName,
+                        doctorName,
+                        a.getPatientId(),
+                        a.getDoctorId(),
+                        a.getAppointmentTime().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")),
+                        a.getReason()
+                );
+            }
+        }
+        if (!hasPast) System.out.println("No past appointments.");
+    }
+
+    private static void deleteAppointmentUI() {
+        System.out.print("Enter Appointment ID to delete: ");
+        String appointmentId = sc.nextLine();
+        boolean success = AppointmentManagement.deleteAppointment(appointmentId);
+        if (success) {
+            System.out.println("Appointment deleted successfully.");
+        } else {
+            System.out.println("Appointment ID not found.");
+        }
+    }
+    
+    private static void modifyAppointmentUI() {
+        System.out.print("Enter Appointment ID to modify: ");
+        String appointmentId = sc.nextLine().trim();
+
+        MyList<String> report = AppointmentManagement.getConsultationReportById(appointmentId);
+
+        boolean hasError = false;
+        for (String line : report) {
+            if (!hasError && line.startsWith("ID not found")) {
+                hasError = true;
+            }
+            System.out.println(line);
+        }
+        if (hasError) return;
+
+        System.out.println("\n--- Modifying Appointment " + appointmentId + " ---");
+
+        System.out.print("Enter new Patient ID (or press Enter to keep current): ");
+        String newPatientId = sc.nextLine().trim();
+
+        System.out.print("Enter new Doctor ID (or press Enter to keep current): ");
+        String newDoctorId = sc.nextLine().trim();
+
+        System.out.print("Enter new date/time (dd-MM-yyyy HH:mm) (or press Enter to keep current): ");
+        String dateTimeStr = sc.nextLine().trim();
+        LocalDateTime newDateTime = null;
+        if (!dateTimeStr.isEmpty()) {
+            try {
+                newDateTime = LocalDateTime.parse(dateTimeStr, DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm"));
+            } catch (Exception e) {
+                System.out.println("Invalid date/time format. Keeping original.");
+            }
+        }
+
+        System.out.print("Enter new reason (or press Enter to keep current): ");
+        String newReason = sc.nextLine().trim();
+
+        MyList<String> errors = AppointmentManagement.modifyAppointment(
+            appointmentId,
+            newPatientId.isEmpty() ? null : newPatientId,
+            newDoctorId.isEmpty() ? null : newDoctorId,
+            newDateTime,
+            newReason.isEmpty() ? null : newReason
+        );
+
+        boolean hasErrors = false;
+        for (String err : errors) {
+            if (!hasErrors) {
+                System.out.println("Modification completed with issues:");
+                hasErrors = true;
+            }
+            System.out.println("- " + err);
+        }
+
+        if (!hasErrors) {
+            System.out.println("Appointment modified successfully.");
+        }
+    }
+
+
+    
+    private static void demoCloneUI() {
+        MyList<Appointment> report = AppointmentManagement.demoCloneInfo();
+
+        int count = 0;
+        for (Appointment ignored : report) count++;
+        System.out.println("Cloned appointment list, total size: " + count);
+
+        System.out.println("=== Demo Clone Content ===");
+
+        for (Appointment a : report) {
+            System.out.printf("%s | %s | %s | %s | %s%n",
+                a.getAppointmentId(),
+                a.getPatientId(),
+                a.getDoctorId(),
+                a.getAppointmentTime().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")),
+                a.getReason()
+            );
+        }
+
+        System.out.println("==========================");
+    }
+
+    private static void checkDoctorNextWeekUI() {
+        System.out.print("Enter Doctor ID: ");
+        String doctorId = sc.nextLine();
+        boolean hasAppointments = AppointmentManagement.hasDoctorAppointmentsNextWeek(doctorId);
+        if (hasAppointments) {
+            System.out.println("Doctor " + doctorId + " has appointments next week.");
+        } else {
+            System.out.println("Doctor " + doctorId + " has no appointments next week.");
+        }
+    }
+
+    private static void doctorStatisticsUI() {
+        System.out.print("Enter Doctor ID: ");
+        String doctorId = sc.nextLine();
+
+        MyList<String> stats = AppointmentManagement.getDoctorStatistics(doctorId);
+
+        for (String line : stats) {
+            System.out.println(line);
+        }
     }
 
 }
