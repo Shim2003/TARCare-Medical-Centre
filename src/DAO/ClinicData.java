@@ -177,7 +177,7 @@ public class ClinicData {
             samples[9].setEndTime(LocalDateTime.of(2025, 8, 24, 14, 55));
 
             // Added to ConsultationManagement's completedConsultations
-            DynamicList<Consultation> completedList = ConsultationManagement.getCompletedConsultations();
+            MyList<Consultation> completedList = ConsultationManagement.getCompletedConsultations();
             for (Consultation c : samples) {
                 completedList.add(c);
             }

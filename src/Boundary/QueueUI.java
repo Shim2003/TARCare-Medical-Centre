@@ -217,8 +217,9 @@ public class QueueUI {
         System.out.println("\n\n=== Display Queue By Status ===");
         System.out.println("Select Status : ");
         System.out.println("1. " + Utility.UtilityClass.statusWaiting);
-        System.out.println("2. " + Utility.UtilityClass.statusConsulting);
-        System.out.println("3. " + Utility.UtilityClass.statusCompleted);
+        System.out.println("2. " + Utility.UtilityClass.statusReadyToConsult);
+        System.out.println("3. " + Utility.UtilityClass.statusConsulting);
+        System.out.println("4. " + Utility.UtilityClass.statusCompleted);
         System.out.print("Enter your choice (1-3): ");
 
         String choice = scanner.nextLine();
@@ -229,9 +230,12 @@ public class QueueUI {
                 selectedStatus = Utility.UtilityClass.statusWaiting;
                 break;
             case "2":
-                selectedStatus = Utility.UtilityClass.statusConsulting;
+                selectedStatus = Utility.UtilityClass.statusReadyToConsult;
                 break;
             case "3":
+                selectedStatus = Utility.UtilityClass.statusConsulting;
+                break;
+            case "4":
                 selectedStatus = Utility.UtilityClass.statusCompleted;
                 break;
             default:
@@ -455,7 +459,7 @@ public class QueueUI {
         System.out.printf("|- Waiting: %d (%.1f%%)\n", todayStats.waitingPatients,
                 (double) todayStats.waitingPatients / todayStats.totalPatients * 100);
         System.out.printf("|- Ready To Consult: %d (%.1f%%)\n", todayStats.readyToConsultingPatients,
-                (double) todayStats.consultingPatients / todayStats.totalPatients * 100);
+                (double) todayStats.readyToConsultingPatients / todayStats.totalPatients * 100);
         System.out.printf("|- Consulting: %d (%.1f%%)\n", todayStats.consultingPatients,
                 (double) todayStats.consultingPatients / todayStats.totalPatients * 100);
         System.out.printf("|- Completed: %d (%.1f%%)\n", todayStats.completedPatients,

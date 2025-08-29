@@ -205,6 +205,7 @@ public class PatientUI {
 
         if (patient == null) {
             System.out.println("Patient not found.");
+            UtilityClass.pressEnterToContinue();
             return;
         }
 
