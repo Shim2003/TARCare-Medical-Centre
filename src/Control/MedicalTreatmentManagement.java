@@ -413,4 +413,34 @@ public class MedicalTreatmentManagement {
         return failedList;
     }
 
+    public static MyList<MedicalTreatment> getTreatmentHistoryByYearAndMonth(int year, int month) {
+        MyList<MedicalTreatment> allTreatments = getMedicalTreatmentList();
+        MyList<MedicalTreatment> filteredList = new DynamicList<>();
+
+        if (allTreatments != null) {
+            for (int i = 0; i < allTreatments.size(); i++) {
+                MedicalTreatment t = allTreatments.get(i);
+                if (t.getTreatmentDate() != null) {
+                    int treatmentYear = t.getTreatmentDate().getYear() + 1900;
+                    int treatmentMonth = t.getTreatmentDate().getMonth() + 1;
+                    if (treatmentYear == year && treatmentMonth == month) {
+                        filteredList.add(t);
+                    }
+                }
+            }
+        }
+
+        // Sort by day of the month ascending
+        for (int i = 0; i < filteredList.size() - 1; i++) {
+            for (int j = i + 1; j < filteredList.size(); j++) {
+                if (filteredList.get(i).getTreatmentDate().getDate() > filteredList.get(j).getTreatmentDate().getDate()) {
+                    MedicalTreatment temp = filteredList.get(i);
+                    filteredList.replace(i, filteredList.get(j));
+                    filteredList.replace(j, temp);
+                }
+            }
+        }
+
+        return filteredList; // empty list if none found
+    }
 }

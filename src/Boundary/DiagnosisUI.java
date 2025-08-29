@@ -505,8 +505,5 @@ public class DiagnosisUI {
         }
         System.out.println("===========================================");
 
-        System.out.println("DEBUG: topSymptoms = " + topSymptoms);
-        System.out.println("DEBUG: size = " + size);
-
     }
 }

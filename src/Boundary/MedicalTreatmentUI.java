@@ -111,9 +111,10 @@ public class MedicalTreatmentUI {
             System.out.println("\n=== View Medical Treatment ===");
             System.out.println("1. View Treatment History By Patient ID");
             System.out.println("2. View Treatment History By Treatment ID");
-            System.out.println("3. Exit to Previous Menu");
+            System.out.println("3. View Overall Treatment History");
+            System.out.println("4. Exit to Previous Menu");
 
-            System.out.print("Enter your choice (1-3): ");
+            System.out.print("Enter your choice (1-4): ");
 
             try {
                 int choice = scanner.nextInt();
@@ -124,7 +125,9 @@ public class MedicalTreatmentUI {
                         viewPatientTreatmentHistoryByPatientId();
                     case 2 ->
                         viewSpecificTreatmentHistoryByTreatmentId();
-                    case 3 -> {
+                    case 3 ->
+                        viewTreatmentHistoryByYearAndMonth();
+                    case 4 -> {
                         System.out.println("Exiting to Main Menu...");
                         medicalTreatmentMenu(); // Exit to main menu
                     }
@@ -358,6 +361,71 @@ public class MedicalTreatmentUI {
         System.out.println("TREATMENT HISTORY DETAILS");
         System.out.println("=".repeat(68));
         treatmentHistoryDisplayForm(treatmentId);
+    }
+
+    // view the treatment history details based on the year and month enter by user
+    public static void viewTreatmentHistoryByYearAndMonth() {
+        System.out.print("\n\nEnter the year: ");
+        String yearInput = scanner.nextLine();
+
+        int year;
+        try {
+            year = Integer.parseInt(yearInput);
+            if(year<2020 || year>Year.now().getValue() + 1) {
+                System.out.println("Please enter a valid year from 2020 until now.");
+                return;
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input. Please enter a year.");
+            return;
+        }
+
+        // get the month input
+        System.out.print("Enter the month (01-12): ");
+        String monthInput = scanner.nextLine().trim();
+
+        //ensure the format match the history
+        if(monthInput.length() == 1) {
+            monthInput = "0" + monthInput;
+        }
+
+        int month;
+        try {
+            month = Integer.parseInt(monthInput);
+            if(month < 1 || month > 12) {
+                System.out.println("Invalid input. Please enter a month between 01-12.");
+                return;
+            }
+        } catch (Exception e) {
+            System.out.println("Invalid input. Please enter a month between 01-12.");
+            return;
+        }
+        MyList<MedicalTreatment> filteredList = MedicalTreatmentManagement.getTreatmentHistoryByYearAndMonth(year, month);
+
+        if (filteredList.isEmpty()) {
+            System.out.println("No treatment history found for " + year + "-" + String.format("%02d", month));
+            return;
+        }
+
+        // Table header
+        System.out.println("\n=== Treatment History for " + year + "-" + String.format("%02d", month) + " ===\n");
+        System.out.printf("%-15s | %-12s | %-15s | %-15s\n", "Treatment ID", "Date", "Status", "Outcome");
+        System.out.println("---------------------------------------------------------------");
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy"); // full date format
+
+        // Table content
+        for (int i = 0; i < filteredList.size(); i++) {
+            MedicalTreatment t = filteredList.get(i);
+            String dateStr = t.getTreatmentDate() != null ? sdf.format(t.getTreatmentDate()) : "N/A";
+            String status = t.getTreatmentStatus() != null ? t.getTreatmentStatus() : "N/A";
+            String outcome = t.getTreatmentOutcome() != null ? t.getTreatmentOutcome() : "N/A";
+
+            System.out.printf("%-15s | %-12s | %-15s | %-15s\n",
+                    t.getTreatmentId(), dateStr, status, outcome);
+        }
+
+        System.out.println("---------------------------------------------------------------\n");
     }
 
     // updateTreatmentStatus method
@@ -639,7 +707,7 @@ public class MedicalTreatmentUI {
         // fetch the treatment list using the getSuccessfulTreatmentHistory method in the medical treatment management
         for(int i = 0 ; i < MedicalTreatmentManagement.getTreatmentSize(success); i++) {
             MedicalTreatment t = MedicalTreatmentManagement.getTreatment(success, i);
-            System.out.printf("%-12s | %-10s | %-15s | %-16s | %-15s\n",
+            System.out.printf("%-12s | %-10s | %-14s | %-16s | %-15s\n",
                     t.getTreatmentId(), t.getPatientId(), sdf.format(t.getTreatmentDate()), t.getTreatmentStatus(), t.getTreatmentOutcome());
         }
         System.out.println("==========================================================================");
@@ -659,7 +727,7 @@ public class MedicalTreatmentUI {
         // fetch the treatment list using the getSuccessfulTreatmentHistory method in the medical treatment management
         for(int i = 0 ; i < MedicalTreatmentManagement.getTreatmentSize(followUp); i++) {
             MedicalTreatment t = MedicalTreatmentManagement.getTreatment(followUp, i);
-            System.out.printf("%-12s | %-10s | %-15s | %-16s | %-15s\n",
+            System.out.printf("%-12s | %-10s | %-14s | %-16s | %-15s\n",
                     t.getTreatmentId(), t.getPatientId(), sdf.format(t.getTreatmentDate()), t.getTreatmentStatus(), t.getTreatmentOutcome());
         }
         System.out.println("==========================================================================");
@@ -679,7 +747,7 @@ public class MedicalTreatmentUI {
         // fetch the treatment list using the getSuccessfulTreatmentHistory method in the medical treatment management
         for(int i = 0 ; i < MedicalTreatmentManagement.getTreatmentSize(failed); i++) {
             MedicalTreatment t = MedicalTreatmentManagement.getTreatment(failed, i);
-            System.out.printf("%-12s | %-10s | %-15s | %-16s | %-15s\n",
+            System.out.printf("%-12s | %-10s | %-14s | %-16s | %-15s\n",
                     t.getTreatmentId(), t.getPatientId(), sdf.format(t.getTreatmentDate()), t.getTreatmentStatus(), t.getTreatmentOutcome());
         }
         System.out.println("==========================================================================");
@@ -699,7 +767,7 @@ public class MedicalTreatmentUI {
         // fetch the treatment list using the getSuccessfulTreatmentHistory method in the medical treatment management
         for(int i = 0 ; i < MedicalTreatmentManagement.getTreatmentSize(ongoing); i++) {
             MedicalTreatment t = MedicalTreatmentManagement.getTreatment(ongoing, i);
-            System.out.printf("%-12s | %-10s | %-15s | %-16s | %-15s\n",
+            System.out.printf("%-12s | %-10s | %-14s | %-16s | %-15s\n",
                     t.getTreatmentId(), t.getPatientId(), sdf.format(t.getTreatmentDate()), t.getTreatmentStatus(), t.getTreatmentOutcome());
         }
         System.out.println("==========================================================================");
