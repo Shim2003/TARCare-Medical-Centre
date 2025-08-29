@@ -134,8 +134,7 @@ public class QueueUI {
         System.out.println("========================================");
 
         if ((QueueControl.getReadyToConsultCount() + QueueControl.getCurrentServingPatientCount()) >= 3) {
-            System.out.println("STATUS: Doctor is currently busy with other patients");
-            System.out.println("        Please wait and try again later");
+            System.out.println("STATUS: Full Consultation");
             UtilityClass.pressEnterToContinue();
             return;
         }
