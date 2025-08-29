@@ -267,11 +267,6 @@ public class DynamicList<T> implements MyList<T>, Iterable<T> {
     }
 
     @Override
-    public T getLast() {
-        return isEmpty() ? null : get(size - 1);
-    }
-
-    @Override
     public T findFirst(Predicate<T> predicate) {
         for (int i = 0; i < size; i++) {
             T item = get(i);

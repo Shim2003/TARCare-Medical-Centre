@@ -35,8 +35,6 @@ public interface MyList<T> extends Iterable<T>{
 
     T getFirst();
 
-    T getLast();
-
     T findFirst(Predicate<T> predicate);
 
     boolean anyMatch(Predicate<T> predicate);
