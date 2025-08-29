@@ -324,7 +324,7 @@ public class AppointmentManagement {
                 if (!available) {
                     errors.add("Doctor not available at this new time. Keeping original.");
                 } else {
-                    // 检查是否与其他预约冲突
+                    
                     boolean conflict = false;
                     for (int i = 0; i < scheduledAppointments.size(); i++) {
                         Appointment existing = scheduledAppointments.get(i);
