@@ -8,15 +8,13 @@ import ADT.MyList;
 import Control.AppointmentManagement;
 import Control.PatientManagement;
 import Control.DoctorManagement;
-import Control.ScheduleManagement;
-import Control.LeaveManagement;
-import DAO.ClinicData;
+import DAO.AppointmentReportResult;
+import DAO.ModifyAppointmentResult;
+import DAO.ScheduleAppointmentResult;
 import Entity.*;
-import Utility.UtilityClass;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
-import java.util.Comparator;
 
 /**
  *

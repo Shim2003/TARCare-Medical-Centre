@@ -6,14 +6,14 @@ package Control;
 
 import ADT.DynamicList;
 import ADT.MyList;
+import DAO.AppointmentReportResult;
+import DAO.ModifyAppointmentResult;
+import DAO.ScheduleAppointmentResult;
 import java.util.Comparator;
 import Entity.Appointment;
 import Entity.Patient;
 import Entity.Doctor;
-import Entity.AppointmentReportResult;
-import Entity.ModifyAppointmentResult;
 import Entity.Schedule;
-import Entity.ScheduleAppointmentResult;
 import Utility.UtilityClass;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
