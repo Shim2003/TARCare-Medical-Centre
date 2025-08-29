@@ -59,51 +59,51 @@ public class DiagnosisManagement {
         }
     }
 
-    public static MyList<SymptomCount> getTopSymptoms(int topN) {
-        MyList<SymptomCount> topSymptoms = new DynamicList<>();
-        int[] counts = new int[symptoms.size()];
+            public static MyList<SymptomCount> getTopSymptoms(int topN) {
+            MyList<SymptomCount> topSymptoms = new DynamicList<>();
+            int[] counts = new int[symptoms.size()];
 
-        // Count each symptom
-        DynamicList<String> uniqueSymptoms = new DynamicList<>();
-        for (int i = 0; i < symptoms.size(); i++) {
-            String s = symptoms.get(i);
-            boolean found = false;
-            for (int j = 0; j < uniqueSymptoms.size(); j++) {
-                if (uniqueSymptoms.get(j).equalsIgnoreCase(s)) {
-                    counts[j]++;
-                    found = true;
-                    break;
+            // Count each symptom
+            DynamicList<String> uniqueSymptoms = new DynamicList<>();
+            for (int i = 0; i < symptoms.size(); i++) {
+                String s = symptoms.get(i);
+                boolean found = false;
+                for (int j = 0; j < uniqueSymptoms.size(); j++) {
+                    if (uniqueSymptoms.get(j).equalsIgnoreCase(s)) {
+                        counts[j]++;
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    uniqueSymptoms.add(s);
+                    counts[uniqueSymptoms.size() - 1] = 1;
                 }
             }
-            if (!found) {
-                uniqueSymptoms.add(s);
-                counts[uniqueSymptoms.size() - 1] = 1;
-            }
-        }
 
-        // Sort by count descending
-        for (int i = 0; i < uniqueSymptoms.size() - 1; i++) {
-            for (int j = i + 1; j < uniqueSymptoms.size(); j++) {
-                if (counts[j] > counts[i]) {
-                    int tempCount = counts[i];
-                    counts[i] = counts[j];
-                    counts[j] = tempCount;
+            // Sort by count descending
+            for (int i = 0; i < uniqueSymptoms.size() - 1; i++) {
+                for (int j = i + 1; j < uniqueSymptoms.size(); j++) {
+                    if (counts[j] > counts[i]) {
+                        int tempCount = counts[i];
+                        counts[i] = counts[j];
+                        counts[j] = tempCount;
 
-                    String tempSymptom = uniqueSymptoms.get(i);
-                    uniqueSymptoms.replace(i, uniqueSymptoms.get(j));
-                    uniqueSymptoms.replace(j, tempSymptom);
+                        String tempSymptom = uniqueSymptoms.get(i);
+                        uniqueSymptoms.replace(i, uniqueSymptoms.get(j));
+                        uniqueSymptoms.replace(j, tempSymptom);
+                    }
                 }
             }
-        }
 
-        // Add top N to result
-        int limit = Math.min(topN, uniqueSymptoms.size());
-        for (int i = 0; i < limit; i++) {
-            topSymptoms.add(new SymptomCount(uniqueSymptoms.get(i), counts[i]));
-        }
+            // Populate topSymptoms
+            int limit = Math.min(topN, uniqueSymptoms.size());
+            for (int i = 0; i < limit; i++) {
+                topSymptoms.add(new SymptomCount(uniqueSymptoms.get(i), counts[i]));
+            }
 
-        return topSymptoms;
-    }
+            return topSymptoms;
+        }
 
     // Return the number of top symptoms calculated
     public static int getTopSymptomSize(MyList<SymptomCount> topSymptoms) {
@@ -129,17 +129,17 @@ public class DiagnosisManagement {
         return null;
     }
 
-    // Return a formatted string for the recommended medicine for top symptoms
-    public static MyList<String> getRecommendedMedicineList(MyList<SymptomCount> topSymptoms) {
-        MyList<String> recommendations = new DynamicList<>();
-        if (topSymptoms != null) {
-            for (int i = 0; i < topSymptoms.size(); i++) {
-                SymptomCount sc = topSymptoms.get(i);
-                String medicine = getMedicineForSymptom(sc.symptom); // control method
-                recommendations.add(String.format("%d. %s -> %s", i + 1, sc.symptom, medicine));
-            }
+    // Return how many recommended medicines exist
+    public static int getRecommendSize(MyList<SymptomCount> topSymptoms) {
+        return (topSymptoms != null) ? topSymptoms.size() : 0;
+    }
+
+    // Return a single SymptomCount object by index
+    public static SymptomCount getRecommendListItem(MyList<SymptomCount> topSymptoms, int index) {
+        if (topSymptoms == null || index < 0 || index >= topSymptoms.size()) {
+            return null;
         }
-        return recommendations;
+        return topSymptoms.get(index);
     }
 
     // return the collected list when done
@@ -187,8 +187,8 @@ public class DiagnosisManagement {
         return null;
     }
     public static String getSymptomByIndex(MyList<String> symptom, int index) {
-        if (index >= 0 && index < symptoms.size()) {
-            return symptoms.get(index);
+        if (index >= 0 && index < symptom.size()) {
+            return symptom.get(index);
         }
         return null;
     }

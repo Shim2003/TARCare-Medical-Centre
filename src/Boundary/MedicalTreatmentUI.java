@@ -4,7 +4,6 @@
  */
 package Boundary;
 
-import ADT.DynamicList;
 import ADT.MyList;
 import Control.DiagnosisManagement;
 import Control.MedicalTreatmentManagement;
@@ -26,10 +25,6 @@ public class MedicalTreatmentUI {
 
     // Date format for displaying dates
     private static final SimpleDateFormat sdf = new SimpleDateFormat(UtilityClass.DATE_FORMAT);
-
-    public static void main(String[] args) {
-        medicalTreatmentMainMenu();
-    }
 
     public static void medicalTreatmentMainMenu() {
         while (true) {
@@ -182,69 +177,12 @@ public class MedicalTreatmentUI {
         }
     }
 
-    // Method to create a new medical treatment with dummy data
-    // This method is for testing purposes and can be removed later
-    public static void createTreatmentTest() {
-        System.out.println("\n=== Create Medical Treatment ===");
-
-        // Create dummy medicine list with multiple items
-        DynamicList<MedicalTreatmentItem> medicineList = new DynamicList<>();
-
-        // Add multiple dummy medicines for testing
-        MedicalTreatmentItem medicine1 = new MedicalTreatmentItem(
-                "Paracetamol", "500mg", "Twice a day", "5 days", "Oral");
-        MedicalTreatmentItem medicine2 = new MedicalTreatmentItem(
-                "Amoxicillin", "250mg", "Three times a day", "7 days", "Oral");
-        MedicalTreatmentItem medicine3 = new MedicalTreatmentItem(
-                "Ibuprofen", "200mg", "As needed", "3 days", "Oral");
-
-        medicineList.add(medicine1);
-        medicineList.add(medicine2);
-        medicineList.add(medicine3);
-
-        // Dummy data for other fields
-        Date treatmentDate = new Date();
-        String treatmentAdvice = "Follow the prescribed dosage and frequency. Take medicines after meals. Drink plenty of water and get adequate rest.";
-
-        // Dummy consultation data
-        String diagnosisId = "DIAG001";
-        String consultationId = "C1001";
-        String patientId = "P1001";
-        String doctorId = "D1001";
-        String notes = "Patient responded well to initial consultation. No allergic reactions reported.";
-
-        // Create a new MedicalTreatment object
-        MedicalTreatment treatment = new MedicalTreatment(diagnosisId, patientId, doctorId,
-                treatmentDate, treatmentDate, "Active", "Ongoing", treatmentAdvice, notes, medicineList);
-
-        // Add the new MedicalTreatment object to the treatmentList
-        MedicalTreatmentManagement.addMedicalTreatment(treatment);
-
-        // Display creation summary
-        System.out.println("Treatment Date: " + sdf.format(treatmentDate));
-        System.out.println("Treatment Advice: " + treatmentAdvice);
-        System.out.println("\nDummy Medicines Added:");
-        for (int i = 0; i < medicineList.size(); i++) {
-            MedicalTreatmentItem item = medicineList.get(i);
-            System.out.println("  " + (i + 1) + ". " + item.getMedicineName() + " - " + item.getDosage());
-        }
-
-        System.out.println("\n" + "=".repeat(50));
-        System.out.println(">> Medical Treatment created successfully!");
-        System.out.println("Patient ID: " + patientId);
-        System.out.println("Treatment ID: " + treatment.getTreatmentId());
-        System.out.println("Total medicines prescribed: " + medicineList.size());
-        System.out.println("=".repeat(50));
-    }
-
     
     // Method to create a new medical treatment
     // This method will prompt the user for input and create a new treatment record
     public static void createTreatment() {
 
         System.out.println("\n=== Create Medical Treatment ===");
-
-        MyList<MedicalTreatmentItem> medicineList = new DynamicList<>();
 
         //print the diagnosis id
         String diagnosisId = DiagnosisManagement.getCurrentDiagnosisId();
@@ -257,6 +195,8 @@ public class MedicalTreatmentUI {
         // Get the current serving doctor ID from the queue list
         String doctorId = DiagnosisManagement.getCurrentServingDoctor();
         System.out.println("Doctor ID: " + doctorId);
+
+        MedicalTreatmentManagement.initMedicalTreatmentList();
 
         int i = 1;
         // if it is medication, ask for the medicine name and for many day(s)
@@ -298,16 +238,16 @@ public class MedicalTreatmentUI {
 
             //put the medicine details into the medicineList
             MedicalTreatmentItem item = new MedicalTreatmentItem(medicineName, dosage, frequency, duration, method);
-            medicineList.add(item);
+            MedicalTreatmentManagement.addMedicine(item);
             System.out.println("Medicine added: " + medicineName);
             i++;
         }
 
         // Show summary of added medicines
-        if (medicineList.isEmpty()) {
+        if (MedicalTreatmentManagement.isMedicineListEmpty()) {
             System.out.println("No medicines added to the treatment.");
         } else {
-            System.out.println("\nTotal medicines added: " + medicineList.size());
+            System.out.println("\nTotal medicines added: " + MedicalTreatmentManagement.getMedicineListSize());
         }
 
         // Get the treatment date automatically(use the format in the utility class)
@@ -320,15 +260,16 @@ public class MedicalTreatmentUI {
         System.out.print("Enter Additional Notes: ");
         String notes = scanner.nextLine();
 
-        // pass the medicineList to prescription by constructor
+        
         
         // Create a new MedicalTreatment object
         MedicalTreatment treatment = new MedicalTreatment(diagnosisId, patientId, doctorId,
-                treatmentDate, treatmentDate, "Active", "Ongoing", treatmentAdvice, notes, medicineList);
+                treatmentDate, treatmentDate, "Active", "Ongoing", treatmentAdvice, notes,
+                MedicalTreatmentManagement.getMedicineList());
 
-
+        // pass the medicineList to prescription by constructor
         Prescription prescription = new Prescription(PharmacyManagement.generateNewPrescriptionId(), patientId,
-        doctorId, medicineList, "PENDING");
+        doctorId, MedicalTreatmentManagement.getMedicineList(), "PENDING");
 
         PharmacyManagement.addToQueue(prescription);
 
@@ -345,7 +286,7 @@ public class MedicalTreatmentUI {
         System.out.print("Enter Patient ID: ");
         String patientId = scanner.nextLine().trim();
 
-        if (patientId.isEmpty()) {
+        if (DiagnosisManagement.isIdEmpty(patientId)) {
             System.out.println("Patient ID cannot be empty.");
             return;
         }
@@ -355,7 +296,7 @@ public class MedicalTreatmentUI {
                 = MedicalTreatmentManagement.getTreatmentHistoryByPatientIdList(patientId);
 
         //print out the treatment history list of checking whether it is empty or not
-        if (treatmentHistoryList.isEmpty()) {
+        if (MedicalTreatmentManagement.isTreatmentListEmpty(treatmentHistoryList)) {
             System.out.println("No treatment history found for Patient ID: " + patientId);
             return;
         }
@@ -365,8 +306,8 @@ public class MedicalTreatmentUI {
         System.out.println("Total Records Found: " + MedicalTreatmentManagement.getTreatmentListSize());
         System.out.println("=".repeat(68) + "\n");
 
-        for (int i = 0; i < treatmentHistoryList.size(); i++) {
-            MedicalTreatment history = treatmentHistoryList.get(i);
+        for (int i = 0; i < MedicalTreatmentManagement.getTreatmentListSize(); i++) {
+            MedicalTreatment history = MedicalTreatmentManagement.getTreatmentByIndex(treatmentHistoryList, i);
             // display the treatment history list "Treatment history found for ID TRMT1011"
             System.out.println("Treatment history found for ID " + history.getTreatmentId());
         }
@@ -380,7 +321,7 @@ public class MedicalTreatmentUI {
             System.out.print("Enter the Treatment ID to view the details or 'x' to quit: ");
             String treatmentId = scanner.nextLine().trim();
 
-            if (treatmentId.isEmpty()) {
+            if (DiagnosisManagement.isIdEmpty(treatmentId)) {
                 System.out.println("Treatment ID cannot be empty.");
                 return;
             } else if (treatmentId.equals("x")) {
@@ -401,7 +342,7 @@ public class MedicalTreatmentUI {
         System.out.print("Enter Treatment ID: ");
         String treatmentId = scanner.nextLine().trim();
 
-        if (treatmentId.isEmpty()) {
+        if (DiagnosisManagement.isIdEmpty(treatmentId)) {
             System.out.println("Treatment ID cannot be empty.");
             return;
         }
@@ -425,7 +366,7 @@ public class MedicalTreatmentUI {
         System.out.print("Enter Treatment ID: ");
         String treatmentId = scanner.nextLine().trim();
 
-        if (treatmentId.isEmpty()) {
+        if (DiagnosisManagement.isIdEmpty(treatmentId)) {
             System.out.println("Treatment ID cannot be empty.");
             return;
         }
@@ -555,7 +496,7 @@ public class MedicalTreatmentUI {
         System.out.print("Enter Treatment ID to delete: ");
         String treatmentId = scanner.nextLine().trim();
 
-        if (treatmentId.isEmpty()) {
+        if (DiagnosisManagement.isIdEmpty(treatmentId)) {
             System.out.println("Treatment ID cannot be empty.");
             return;
         }
@@ -581,7 +522,7 @@ public class MedicalTreatmentUI {
         System.out.print("Enter Patient ID to delete all treatments: ");
         String patientId = scanner.nextLine().trim();
 
-        if (patientId.isEmpty()) {
+        if (DiagnosisManagement.isIdEmpty(patientId)) {
             System.out.println("Patient ID cannot be empty.");
             return;
         }
@@ -622,8 +563,7 @@ public class MedicalTreatmentUI {
         System.out.println("\n\n=== Generate Monthly Treatment Report ===");
 
         // show the available year first
-        MyList<Integer> availableYears = MedicalTreatmentManagement.getAvailableYears();
-        if(availableYears.isEmpty()) {
+        if (!MedicalTreatmentManagement.hasTreatmentHistory()) {
             System.out.println("No treatment history found.");
             return;
         }
@@ -681,12 +621,12 @@ public class MedicalTreatmentUI {
 
         MyList<MedicalTreatment> monthlyTreatments = MedicalTreatmentManagement.getMonthlyTreatments(year, month);
 
-        if (monthlyTreatments.isEmpty()) {
+        if (MedicalTreatmentManagement.isTreatmentListEmpty(monthlyTreatments)) {
             System.out.println("No treatments found for " + monthYearStr + ".");
             return;
         }
 
-        System.out.printf("Total Treatments in %s: %d\n", monthYearStr, monthlyTreatments.size());
+        System.out.printf("Total Treatments in %s: %d\n", monthYearStr, MedicalTreatmentManagement.getTreatmentSize(monthlyTreatments));
         System.out.println("==========================================================================");
 
         MyList<MedicalTreatment> success = MedicalTreatmentManagement.getSuccessfulTreatmentHistory(year, month);
@@ -697,15 +637,15 @@ public class MedicalTreatmentUI {
         System.out.println("Treatment ID | Patient ID | Treatment Date | Treatment Status | Outcome ");
         System.out.println("==========================================================================");
         // fetch the treatment list using the getSuccessfulTreatmentHistory method in the medical treatment management
-        for(int i = 0 ; i < success.size(); i++) {
-            MedicalTreatment t = success.get(i);
+        for(int i = 0 ; i < MedicalTreatmentManagement.getTreatmentSize(success); i++) {
+            MedicalTreatment t = MedicalTreatmentManagement.getTreatment(success, i);
             System.out.printf("%-12s | %-10s | %-15s | %-16s | %-15s\n",
                     t.getTreatmentId(), t.getPatientId(), sdf.format(t.getTreatmentDate()), t.getTreatmentStatus(), t.getTreatmentOutcome());
         }
         System.out.println("==========================================================================");
         // print the total amount
         System.out.print("Total Successful Treatments: ");
-        System.out.println(success.size());
+        System.out.println(MedicalTreatmentManagement.getTreatmentSize(success));
         System.out.println("==========================================================================");
 
         MyList<MedicalTreatment> followUp = MedicalTreatmentManagement.getFollowUpTreatmentHistory(year, month);
@@ -717,15 +657,15 @@ public class MedicalTreatmentUI {
         System.out.println("Treatment ID | Patient ID | Treatment Date | Treatment Status | Outcome");
         System.out.println("==========================================================================");
         // fetch the treatment list using the getSuccessfulTreatmentHistory method in the medical treatment management
-        for(int i = 0 ; i < followUp.size(); i++) {
-            MedicalTreatment t = followUp.get(i);
+        for(int i = 0 ; i < MedicalTreatmentManagement.getTreatmentSize(followUp); i++) {
+            MedicalTreatment t = MedicalTreatmentManagement.getTreatment(followUp, i);
             System.out.printf("%-12s | %-10s | %-15s | %-16s | %-15s\n",
                     t.getTreatmentId(), t.getPatientId(), sdf.format(t.getTreatmentDate()), t.getTreatmentStatus(), t.getTreatmentOutcome());
         }
         System.out.println("==========================================================================");
         // print the total amount
         System.out.print("Total Needs Follow Up Treatments: ");
-        System.out.println(followUp.size());
+        System.out.println(MedicalTreatmentManagement.getTreatmentSize(followUp));
         System.out.println("==========================================================================");
 
         MyList<MedicalTreatment> failed = MedicalTreatmentManagement.getFailedTreatmentHistory(year, month);
@@ -737,15 +677,15 @@ public class MedicalTreatmentUI {
         System.out.println("Treatment ID | Patient ID | Treatment Date | Treatment Status | Outcome");
         System.out.println("==========================================================================");
         // fetch the treatment list using the getSuccessfulTreatmentHistory method in the medical treatment management
-        for(int i = 0 ; i < failed.size(); i++) {
-            MedicalTreatment t = failed.get(i);
+        for(int i = 0 ; i < MedicalTreatmentManagement.getTreatmentSize(failed); i++) {
+            MedicalTreatment t = MedicalTreatmentManagement.getTreatment(failed, i);
             System.out.printf("%-12s | %-10s | %-15s | %-16s | %-15s\n",
                     t.getTreatmentId(), t.getPatientId(), sdf.format(t.getTreatmentDate()), t.getTreatmentStatus(), t.getTreatmentOutcome());
         }
         System.out.println("==========================================================================");
         // print the total amount 
         System.out.print("Total Failed Treatments: ");
-        System.out.println(failed.size());
+        System.out.println(MedicalTreatmentManagement.getTreatmentSize(failed));
         System.out.println("==========================================================================");
 
         MyList<MedicalTreatment> ongoing = MedicalTreatmentManagement.getOngoingTreatmentHistory(year, month);
@@ -757,15 +697,15 @@ public class MedicalTreatmentUI {
         System.out.println("Treatment ID | Patient ID | Treatment Date | Treatment Status | Outcome");
         System.out.println("==========================================================================");
         // fetch the treatment list using the getSuccessfulTreatmentHistory method in the medical treatment management
-        for(int i = 0 ; i < ongoing.size(); i++) {
-            MedicalTreatment t = ongoing.get(i);
+        for(int i = 0 ; i < MedicalTreatmentManagement.getTreatmentSize(ongoing); i++) {
+            MedicalTreatment t = MedicalTreatmentManagement.getTreatment(ongoing, i);
             System.out.printf("%-12s | %-10s | %-15s | %-16s | %-15s\n",
                     t.getTreatmentId(), t.getPatientId(), sdf.format(t.getTreatmentDate()), t.getTreatmentStatus(), t.getTreatmentOutcome());
         }
         System.out.println("==========================================================================");
         // print the total amount 
         System.out.print("Total Ongoing Treatments: ");
-        System.out.println(ongoing.size());
+        System.out.println(MedicalTreatmentManagement.getTreatmentSize(ongoing));
         System.out.println("==========================================================================");
 
         // state the percentage for overall treatment outcome
@@ -832,28 +772,34 @@ public class MedicalTreatmentUI {
             displayTreatmentList(outcomeLabel, treatmentList);
 
             // allow viewing details
-            System.out.print("\nEnter a Treatment ID to view details (or 'x' to return): ");
-            String treatmentId = scanner.nextLine().trim();
-            if (!treatmentId.equalsIgnoreCase("x")) {
-                treatmentHistoryDisplayForm(treatmentId);
+
+            if(MedicalTreatmentManagement.isTreatmentListEmpty(treatmentList) == false) {
+                System.out.print("\nEnter a Treatment ID to view details (or 'x' to return): ");
+                String treatmentId = scanner.nextLine().trim();
+                if (!treatmentId.equalsIgnoreCase("x")) {
+                    treatmentHistoryDisplayForm(treatmentId);
+                }
+            } else {
+                System.out.println("No records found.");
             }
+            
         }
     }
 
     private static void displayTreatmentList(String label, MyList<MedicalTreatment> list) {
         System.out.println("\n" + label + ":");
         System.out.println("=======================================================================");
-        if (list == null || list.size() == 0) {
+        if (list == null || MedicalTreatmentManagement.isTreatmentListEmpty(list) == true) {
             System.out.println("No records found.");
         } else {
-            for (int i = 0; i < list.size(); i++) {
-                MedicalTreatment treatment = list.get(i);
+            for (int i = 0; i < MedicalTreatmentManagement.getTreatmentSize(list); i++) {
+                MedicalTreatment treatment = MedicalTreatmentManagement.getTreatmentByIndex(list, i);
                 System.out.println("Treatment ID: " + treatment.getTreatmentId()
                         + "\tPatient ID: " + treatment.getPatientId());
             }
         }
         System.out.println("=======================================================================");
-        System.out.println("Total " + label + ": " + (list == null ? 0 : list.size()));
+        System.out.println("Total " + label + ": " + (list == null ? 0 : MedicalTreatmentManagement.getTreatmentSize(list)));
     }
 
     public static void treatmentHistoryDisplayForm(String treatmentId) {
@@ -904,15 +850,15 @@ public class MedicalTreatmentUI {
         sb.append("> PRESCRIBED MEDICATIONS:                                        <\n");
         sb.append("==================================================================\n");
         
-        if (treatment.getMedicineList() != null && !treatment.getMedicineList().isEmpty()) {
-            for (int i = 0; i < treatment.getMedicineList().size(); i++) {
-                MedicalTreatmentItem medicine = treatment.getMedicineList().get(i);
+        if (treatment.getMedicineList() != null && MedicalTreatmentManagement.hasMedicines(treatment)) {
+            for (int i = 0; i < MedicalTreatmentManagement.getMedicineCount(treatment); i++) {
+                MedicalTreatmentItem medicine = MedicalTreatmentManagement.getMedicineByIndex(treatment, i);
                 sb.append(String.format("> %d. %-59s <\n", (i + 1), medicine.getMedicineName()));
                 sb.append(String.format(">    Dosage    : %-48s <\n", medicine.getDosage()));
                 sb.append(String.format(">    Frequency : %-48s <\n", medicine.getFrequency()));
                 sb.append(String.format(">    Duration  : %-48s <\n", medicine.getDuration()));
                 sb.append(String.format(">    Method    : %-48s <\n", medicine.getMethod()));
-                if (i < treatment.getMedicineList().size() - 1) {
+                if (i < MedicalTreatmentManagement.getMedicineCount(treatment) - 1) {
                     sb.append(">                                                                <\n");
                 }
             }

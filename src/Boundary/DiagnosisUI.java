@@ -406,6 +406,8 @@ public class DiagnosisUI {
     public static void severityAndSymptomCheck() {
         System.out.println("\n\n=== Filter Diagnosis by Severity Level ===");
 
+        DiagnosisManagement.startSymptomCollection();
+
         // Get Year
         System.out.print("Enter the Year: ");
         String yearInput = scanner.nextLine().trim();
@@ -463,7 +465,8 @@ public class DiagnosisUI {
             // Add all symptoms to control
             MyList<String> symptoms = diagnosis.getSymptoms();
             for (int j = 0; j < DiagnosisManagement.getSymptomSize(symptoms); j++) {
-                DiagnosisManagement.addSymptom(DiagnosisManagement.getSymptomByIndex(symptoms, j));
+                String symptom = DiagnosisManagement.getSymptomByIndex(symptoms, j); // Fixed method call
+                DiagnosisManagement.addSymptom(symptom);
             }
         }
 
@@ -484,7 +487,7 @@ public class DiagnosisUI {
         // Display top 3 symptoms
         System.out.println("Top 3 Symptoms:");
         System.out.println("===========================================");
-        for (int i = 0; i < topSymptoms.size(); i++) {
+        for (int i = 0; i < size; i++) {
             String symptomName = DiagnosisManagement.getTopSymptomName(topSymptoms, i);
             int symptomCount = DiagnosisManagement.getTopSymptomCount(topSymptoms, i);
             System.out.printf("%d. %s - %d occurrences\n", i + 1, symptomName, symptomCount);
@@ -493,10 +496,17 @@ public class DiagnosisUI {
         // Display recommended medicine
         System.out.println("\nRecommend Medicine:");
         System.out.println("===========================================");
-        MyList<String> recommendedList = DiagnosisManagement.getRecommendedMedicineList(topSymptoms);
-        for (int i = 0; i < recommendedList.size(); i++) {
-            System.out.println(recommendedList.get(i));
+        for (int i = 0; i < DiagnosisManagement.getRecommendSize(topSymptoms); i++) {
+            DiagnosisManagement.SymptomCount sc = DiagnosisManagement.getRecommendListItem(topSymptoms, i);
+            if (sc != null) {
+                String medicine = DiagnosisManagement.getMedicineForSymptom(sc.symptom);
+                System.out.printf("%d. %s -> %s\n", i + 1, sc.symptom, medicine);
+            }
         }
         System.out.println("===========================================");
+
+        System.out.println("DEBUG: topSymptoms = " + topSymptoms);
+        System.out.println("DEBUG: size = " + size);
+
     }
 }
