@@ -19,7 +19,7 @@ import java.util.Scanner;
 
 /**
  *
- * @author User
+ * @author Lee Wei Hao
  */
 public class QueueUI {
 
