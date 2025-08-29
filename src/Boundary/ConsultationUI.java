@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package Boundary;
+import ADT.MyList;
 import Control.DoctorManagement;
 import Control.PatientManagement;
 import Control.ConsultationManagement;
@@ -224,7 +225,7 @@ public class ConsultationUI {
     }
 
     
-    private static void viewCurrentConsultingUI() {
+    private static void viewCurrentConsultingUI() { 
         if (!ConsultationManagement.hasCurrentConsulting()) {
             System.out.println("No current consultations.");
             return;
@@ -232,10 +233,12 @@ public class ConsultationUI {
 
         System.out.println("=== Current Consulting Patients ===");
         var list = ConsultationManagement.getCurrentConsultingInfo();
-        for (int i = 0; i < list.size(); i++) {
-            System.out.println(list.get(i));
+
+        for (var line : list) {
+            System.out.println(line);
         }
     }
+
     
     private static void viewCurrentConsultingUI2() {
         String[] displayArr = ConsultationManagement.getOngoingConsultationsForDisplayArray();
@@ -264,42 +267,50 @@ public class ConsultationUI {
             System.out.println(line);
         }
     }
-
     
     private static void viewConsultationReportUI() {
         System.out.print("Enter Patient ID or Consultation ID to view report: ");
         String id = sc.nextLine();
-        Consultation[] arr = ConsultationManagement.getConsultationReportArray(id);
 
-        if (arr.length == 0) {
-            System.out.println("No consultation report found.");
-        } else {
-            System.out.println("======================================");
-            System.out.println("        CONSULTATION REPORT");
-            System.out.println("          Search ID: " + id);
-            System.out.println("======================================");
+        var consultations = ConsultationManagement.getConsultationReportList(id);
 
-            int count = 1;
-            for (Consultation c : arr) {
-                String startTime = (c.getStartTime() != null ? UtilityClass.formatLocalDateTime(c.getStartTime()) : "-");
-                String endTime = (c.getEndTime() != null ? UtilityClass.formatLocalDateTime(c.getEndTime()) : "-");
-                String symptoms = (c.getSymptoms() != null && !c.getSymptoms().isEmpty()) ? c.getSymptoms() : "-";
-                String duration = (c.getEndTime() != null ? ConsultationManagement.formatDuration(c.getDurationSeconds()) : "-");
+        System.out.println("======================================");
+        System.out.println("        CONSULTATION REPORT");
+        System.out.println("          Search ID: " + id);
+        System.out.println("======================================");
 
-                System.out.println("Consultation #" + count);
-                System.out.println("-------------------------------------");
-                System.out.println("Consultation ID  :" + c.getConsultationId());
-                System.out.println("Doctor ID        :" + c.getDoctorId());
-                System.out.println("Patient ID       :" + c.getPatientId());
-                System.out.println("Start Time       :" + startTime);
-                System.out.println("End Time         :" + endTime);
-                System.out.println("Symptoms         :" + symptoms);
-                System.out.println("-------------------------------------");
-                count++;
-            }
+        int count = 1;
+        boolean printedAny = false;
 
-            System.out.println("======================================");
+        for (var c : consultations) {
+            printedAny = true;
+
+            String startTime = (c.getStartTime() != null ? UtilityClass.formatLocalDateTime(c.getStartTime()) : "-");
+            String endTime = (c.getEndTime() != null ? UtilityClass.formatLocalDateTime(c.getEndTime()) : "-");
+            String symptoms = (c.getSymptoms() != null && c.getSymptoms().length() > 0) 
+                  ? c.getSymptoms() 
+                  : "-";
+            String duration = (c.getEndTime() != null ? ConsultationManagement.formatDuration(c.getDurationSeconds()) : "-");
+
+            System.out.println("Consultation #" + count);
+            System.out.println("-------------------------------------");
+            System.out.println("Consultation ID  :" + c.getConsultationId());
+            System.out.println("Doctor ID        :" + c.getDoctorId());
+            System.out.println("Patient ID       :" + c.getPatientId());
+            System.out.println("Start Time       :" + startTime);
+            System.out.println("End Time         :" + endTime);
+            System.out.println("Symptoms         :" + symptoms);
+            System.out.println("-------------------------------------");
+
+            count++;
         }
+
+        // 如果没有任何数据
+        if (!printedAny) {
+            System.out.println("No consultation report found.");
+        }
+
+        System.out.println("======================================");
     }
     
     // ======== MANAGEMENT ========
@@ -312,12 +323,16 @@ public class ConsultationUI {
 
     private static void printDoctorsStatus(String header) {
         System.out.println();
-        var list = ConsultationManagement.getAllDoctorsStatus(header);
-        for (int i = 0; i < list.size(); i++) {
-            System.out.println(list.get(i));
+        MyList<Doctor> list = ConsultationManagement.getAllDoctorsStatus();
+        System.out.println(header + ":");
+        for (Doctor d : list) {  
+            System.out.println(
+                d.getDoctorID() + " - " + d.getName() + " : " + d.getWorkingStatus()
+            );
         }
         System.out.println();
     }
+
     
     // ======== ANALYTICS ========
     private static void showConsultationDurationStatsUI() {
@@ -352,7 +367,7 @@ public class ConsultationUI {
             String duration = (c.getStartTime() != null && c.getEndTime() != null)
                     ? ConsultationManagement.formatDuration(Duration.between(c.getStartTime(), c.getEndTime()).getSeconds())
                     : "-";
-            String symptoms = (c.getSymptoms() != null && !c.getSymptoms().isEmpty()) ? c.getSymptoms() : "-";
+            String symptoms = (c.getSymptoms() != null && c.getSymptoms().length() > 0) ? c.getSymptoms() : "-";
             String status = (c.getEndTime() != null) ? "Completed" : "Ongoing";
 
             System.out.println("Consultation ID: " + c.getConsultationId()

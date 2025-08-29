@@ -99,17 +99,15 @@ public class ConsultationManagement {
         return displayArr;
     }
 
-    // Convert consultation report for a given ID into an array of Consultation objects
-    public static Consultation[] getConsultationReportArray(String id) {
+    public static DynamicList<Consultation> getConsultationReportList(String id) {
         MyList<Consultation> list = getConsultationReport(id);
 
-        if (list.isEmpty()) return new Consultation[0];
-
-        Consultation[] arr = new Consultation[list.size()];
-        for (int i = 0; i < list.size(); i++) {
-            arr[i] = list.get(i);
+        DynamicList<Consultation> result = new DynamicList<>();
+        for (Consultation c : list) {
+            result.add(c);
         }
-        return arr;
+
+        return result;
     }
 
     // Get a list of all doctors
