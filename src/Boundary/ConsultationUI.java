@@ -191,8 +191,8 @@ public class ConsultationUI {
             System.out.println("Patient: " + patient.getFullName() + " (ID: " + patient.getPatientID() + ")");
             System.out.println("Start Time: " + UtilityClass.formatLocalDateTime(consultation.getStartTime()));
             System.out.println("Symptoms: " + (consultation.getSymptoms() != null && consultation.getSymptoms().length() > 0
-                                   ? consultation.getSymptoms()
-                                   : "-"));
+                               ? consultation.getSymptoms()
+                               : "-"));
             System.out.println("Doctor Status: " + assignedDoctor.getWorkingStatus());
             System.out.println("======================================================\n");
 

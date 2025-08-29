@@ -193,7 +193,7 @@ public class ConsultationManagement {
             consultationId,
             patient.getPatientID(),
             assignedDoctor.getDoctorID(),
-            "" // symptoms left empty, doctor will input
+            symptoms // symptoms left empty, doctor will input
         );
         
         consultation.setStartTime(LocalDateTime.now());
