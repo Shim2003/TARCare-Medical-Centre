@@ -402,7 +402,7 @@ public class MedicalTreatmentUI {
         }
         MyList<MedicalTreatment> filteredList = MedicalTreatmentManagement.getTreatmentHistoryByYearAndMonth(year, month);
 
-        if (filteredList.isEmpty()) {
+        if (MedicalTreatmentManagement.isTreatmentListEmpty(filteredList)) {
             System.out.println("No treatment history found for " + year + "-" + String.format("%02d", month));
             return;
         }
@@ -415,8 +415,8 @@ public class MedicalTreatmentUI {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy"); // full date format
 
         // Table content
-        for (int i = 0; i < filteredList.size(); i++) {
-            MedicalTreatment t = filteredList.get(i);
+        for (int i = 0; i < MedicalTreatmentManagement.getTreatmentSize(filteredList); i++) {
+            MedicalTreatment t = MedicalTreatmentManagement.getTreatmentByIndex(filteredList, i);
             String dateStr = t.getTreatmentDate() != null ? sdf.format(t.getTreatmentDate()) : "N/A";
             String status = t.getTreatmentStatus() != null ? t.getTreatmentStatus() : "N/A";
             String outcome = t.getTreatmentOutcome() != null ? t.getTreatmentOutcome() : "N/A";
