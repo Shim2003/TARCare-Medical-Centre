@@ -8,7 +8,7 @@ import java.util.Iterator;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public class DynamicList<T> implements MyList<T>, Iterable<T> {
+public class DynamicList<T> implements MyList<T> {
 
     private static final int BLOCK_SIZE = 128; // Block size for better memory management
     private static final int INITIAL_BLOCKS = 4;
