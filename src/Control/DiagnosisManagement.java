@@ -59,51 +59,52 @@ public class DiagnosisManagement {
         }
     }
 
-            public static MyList<SymptomCount> getTopSymptoms(int topN) {
-            MyList<SymptomCount> topSymptoms = new DynamicList<>();
-            int[] counts = new int[symptoms.size()];
+    public static MyList<SymptomCount> getTopSymptoms(int topN) {
+        MyList<SymptomCount> topSymptoms = new DynamicList<>();
+        int[] counts = new int[symptoms.size()];
 
-            // Count each symptom
-            DynamicList<String> uniqueSymptoms = new DynamicList<>();
-            for (int i = 0; i < symptoms.size(); i++) {
-                String s = symptoms.get(i);
-                boolean found = false;
-                for (int j = 0; j < uniqueSymptoms.size(); j++) {
-                    if (uniqueSymptoms.get(j).equalsIgnoreCase(s)) {
-                        counts[j]++;
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    uniqueSymptoms.add(s);
-                    counts[uniqueSymptoms.size() - 1] = 1;
+        // Count each symptom
+        DynamicList<String> uniqueSymptoms = new DynamicList<>();
+        for (int i = 0; i < symptoms.size(); i++) {
+            String s = symptoms.get(i);
+            boolean found = false;
+            for (int j = 0; j < uniqueSymptoms.size(); j++) {
+                if (uniqueSymptoms.get(j).equalsIgnoreCase(s)) {
+                    counts[j]++;
+                    found = true;
+                    break;
                 }
             }
-
-            // Sort by count descending
-            for (int i = 0; i < uniqueSymptoms.size() - 1; i++) {
-                for (int j = i + 1; j < uniqueSymptoms.size(); j++) {
-                    if (counts[j] > counts[i]) {
-                        int tempCount = counts[i];
-                        counts[i] = counts[j];
-                        counts[j] = tempCount;
-
-                        String tempSymptom = uniqueSymptoms.get(i);
-                        uniqueSymptoms.replace(i, uniqueSymptoms.get(j));
-                        uniqueSymptoms.replace(j, tempSymptom);
-                    }
-                }
+            if (!found) {
+                uniqueSymptoms.add(s);
+                counts[uniqueSymptoms.size() - 1] = 1;
             }
-
-            // Populate topSymptoms
-            int limit = Math.min(topN, uniqueSymptoms.size());
-            for (int i = 0; i < limit; i++) {
-                topSymptoms.add(new SymptomCount(uniqueSymptoms.get(i), counts[i]));
-            }
-
-            return topSymptoms;
         }
+
+        // Sort by count descending
+        for (int i = 0; i < uniqueSymptoms.size() - 1; i++) {
+            for (int j = i + 1; j < uniqueSymptoms.size(); j++) {
+                if (counts[j] > counts[i]) {
+                    int tempCount = counts[i];
+                    counts[i] = counts[j];
+                    counts[j] = tempCount;
+
+                    String tempSymptom = uniqueSymptoms.get(i);
+                    uniqueSymptoms.replace(i, uniqueSymptoms.get(j));
+                    uniqueSymptoms.replace(j, tempSymptom);
+                }
+            }
+        }
+
+        // Populate topSymptoms
+        int limit = Math.min(topN, uniqueSymptoms.size());
+        for (int i = 0; i < limit; i++) {
+            topSymptoms.add(new SymptomCount(uniqueSymptoms.get(i), counts[i]));
+        }
+
+
+        return topSymptoms;
+    }
 
     // Return the number of top symptoms calculated
     public static int getTopSymptomSize(MyList<SymptomCount> topSymptoms) {
@@ -171,9 +172,9 @@ public class DiagnosisManagement {
     public static String getSymptomById(String diagnosisId, int index) {
         Diagnosis diagnosis = findDiagnosisById(diagnosisId);
         if (diagnosis != null) {
-            MyList<String> symptoms = diagnosis.getSymptoms();
-            if (index >= 0 && index < symptoms.size()) {
-                return symptoms.get(index);
+            MyList<String> symptom = diagnosis.getSymptoms();
+            if (index >= 0 && index < symptom.size()) {
+                return symptom.get(index);
             }
         }
         return null;
@@ -265,8 +266,13 @@ public class DiagnosisManagement {
     }
 
     //remove a diagnosis by ID
-    public static boolean removeDiagnosisById(String diagnosisId) {
-        return diagnosisList.removeIf(d -> d.getDiagnosisId().equals(diagnosisId));
+    public static boolean removeDiagnosis(Diagnosis diagnosis) {
+        int index = diagnosisList.indexOf(diagnosis);
+        if (index != -1) {
+            diagnosisList.remove(index);
+            return true;
+        }
+        return false;
     }
 
     // display the all diagnosis list based on diagnosis ID
@@ -443,5 +449,145 @@ public class DiagnosisManagement {
             default:
                 return "General Checkup Needed";
         }
+    }
+
+    // set the treatment status for a treatment
+    public static void setPatientId(Diagnosis diagnosis, String id) {
+        diagnosis.setPatientId(id);
+    }
+
+    // set the treatment status for a treatment
+    public static void setDoctorId(Diagnosis diagnosis, String id) {
+        diagnosis.setDoctorId(id);
+    }
+    
+    // set the diagnosis date for a treatment
+    public static void setDiagnosisDate(Diagnosis diagnosis, Date date) {
+        diagnosis.setDiagnosisDate(date);
+    }
+
+    // set the symptoms for a treatment
+    public static void setSymptoms(Diagnosis diagnosis, MyList symptoms) {
+        diagnosis.setSymptoms(symptoms);
+    }
+
+    // Control method to get statistics for all collected symptoms
+    public static DynamicList.ListStatistics<SymptomCount> getAllSymptomStatistics() {
+        MyList<SymptomCount> allSymptoms = new DynamicList<>();
+        MyList<String> collectedSymptoms = getAllCollectedSymptoms(); // your existing collected symptoms
+
+        // Count occurrences
+        DynamicList<String> uniqueSymptoms = new DynamicList<>();
+        int[] counts = new int[collectedSymptoms.size()];
+
+        for (int i = 0; i < collectedSymptoms.size(); i++) {
+            String s = collectedSymptoms.get(i);
+            boolean found = false;
+            for (int j = 0; j < uniqueSymptoms.size(); j++) {
+                if (uniqueSymptoms.get(j).equalsIgnoreCase(s)) {
+                    counts[j]++;
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                uniqueSymptoms.add(s);
+                counts[uniqueSymptoms.size() - 1] = 1;
+            }
+        }
+
+        // Convert to SymptomCount objects
+        for (int i = 0; i < uniqueSymptoms.size(); i++) {
+            allSymptoms.add(new SymptomCount(uniqueSymptoms.get(i), counts[i]));
+        }
+
+        // Calculate statistics using the ADT internally
+        return allSymptoms.getStatistics(sc -> sc.count);
+    }
+
+    // get the max symptom name and min symptom name
+    public static String getMaxSymptom() {
+        DynamicList.ListStatistics<SymptomCount> statistics = getAllSymptomStatistics();
+        MyList<SymptomCount> allSymptoms = new DynamicList<>();
+
+        // reconstruct the symptoms list
+        MyList<String> collectedSymptoms = getAllCollectedSymptoms();
+        DynamicList<String> uniqueSymptoms = new DynamicList<>();
+        int[] counts = new int[collectedSymptoms.size()];
+        
+        for (int i = 0; i < collectedSymptoms.size(); i++) {
+            String s = collectedSymptoms.get(i);
+            boolean found = false;
+            for (int j = 0; j < uniqueSymptoms.size(); j++) {
+                if (uniqueSymptoms.get(j).equalsIgnoreCase(s)) {
+                    counts[j]++;
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                uniqueSymptoms.add(s);
+                counts[uniqueSymptoms.size() - 1] = 1;
+            }
+        }
+        
+        // convert to SymptomCount objects
+        for (int i = 0; i < uniqueSymptoms.size(); i++) {
+            allSymptoms.add(new SymptomCount(uniqueSymptoms.get(i), counts[i]));
+        }
+        
+        // find the symptom with the highest count
+        if (!allSymptoms.isEmpty()) {
+            SymptomCount maxSymptom = allSymptoms.get(0);
+            for (int i = 1; i < allSymptoms.size(); i++) {
+                if (allSymptoms.get(i).count > maxSymptom.count) {
+                    maxSymptom = allSymptoms.get(i);
+                }
+            }
+            return maxSymptom.symptom;
+        }
+        return null;
+    }
+
+    public static String getMinSymptom() {
+        MyList<SymptomCount> allSymptoms = new DynamicList<>();
+        
+        // rebuild the symptoms list
+        MyList<String> collectedSymptoms = getAllCollectedSymptoms();
+        DynamicList<String> uniqueSymptoms = new DynamicList<>();
+        int[] counts = new int[collectedSymptoms.size()];
+        
+        for (int i = 0; i < collectedSymptoms.size(); i++) {
+            String s = collectedSymptoms.get(i);
+            boolean found = false;
+            for (int j = 0; j < uniqueSymptoms.size(); j++) {
+                if (uniqueSymptoms.get(j).equalsIgnoreCase(s)) {
+                    counts[j]++;
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                uniqueSymptoms.add(s);
+                counts[uniqueSymptoms.size() - 1] = 1;
+            }
+        }
+        
+        // convert to SymptomCount object
+        for (int i = 0; i < uniqueSymptoms.size(); i++) {
+            allSymptoms.add(new SymptomCount(uniqueSymptoms.get(i), counts[i]));
+        }
+        
+        // look for the symptom with the lowest count
+        if (!allSymptoms.isEmpty()) {
+            SymptomCount minSymptom = allSymptoms.get(0);
+            for (int i = 1; i < allSymptoms.size(); i++) {
+                if (allSymptoms.get(i).count < minSymptom.count) {
+                    minSymptom = allSymptoms.get(i);
+                }
+            }
+            return minSymptom.symptom;
+        }
+        return null;
     }
 }

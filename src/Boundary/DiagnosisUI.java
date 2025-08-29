@@ -4,6 +4,7 @@
  */
 package Boundary;
 
+import ADT.DynamicList;
 import ADT.MyList;
 import Control.DiagnosisManagement;
 import Entity.*;
@@ -290,10 +291,10 @@ public class DiagnosisUI {
         //update the input to the certain diagnosis
         Diagnosis updatedDiagnosis = new Diagnosis(diagnosisId, newDiagnosisDescription, newSeverityLevel, newRecommendations, newAdditionalNotes);
         
-        updatedDiagnosis.setPatientId(diagnosis.getPatientId());
-        updatedDiagnosis.setDoctorId(diagnosis.getDoctorId());
-        updatedDiagnosis.setDiagnosisDate(diagnosis.getDiagnosisDate());
-        updatedDiagnosis.setSymptoms(diagnosis.getSymptoms());
+        DiagnosisManagement.setPatientId(diagnosis, diagnosis.getPatientId());
+        DiagnosisManagement.setDoctorId(diagnosis, diagnosis.getDoctorId());
+        DiagnosisManagement.setDiagnosisDate(diagnosis, diagnosis.getDiagnosisDate());
+        DiagnosisManagement.setSymptoms(diagnosis, diagnosis.getSymptoms());
 
         // Update the diagnosis details
         DiagnosisManagement.updateDiagnosisDetails(diagnosisId, updatedDiagnosis);
@@ -301,19 +302,29 @@ public class DiagnosisUI {
     }
 
     public static void deleteDiagnosis() {
-        System.out.println("\n=== Delete Diagnosis ===");
-        System.out.print("Enter Diagnosis ID to delete: ");
-        String diagnosisId = scanner.nextLine();
+        System.out.print("\n\nEnter Diagnosis ID to remove: ");
+        String diagId = scanner.nextLine().trim();
 
-        if (DiagnosisManagement.removeDiagnosisById(diagnosisId)) {
-            System.out.print("Enter 'Y' to confirm deletion: ");
-            String confirmation = scanner.nextLine();
-            while (confirmation.equalsIgnoreCase("Y")) {
-                System.out.println("Diagnosis with ID " + diagnosisId + " has been deleted successfully.");
-                break;
+        // Find the Diagnosis object by ID
+        Diagnosis diagnosis = DiagnosisManagement.findDiagnosisById(diagId);
+
+        if (diagnosis == null) {
+            System.out.println("Diagnosis with ID " + diagId + " not found.");
+            return;
+        }
+
+        // Confirm deletion
+        System.out.print("Are you sure you want to remove this diagnosis? (Y/N): ");
+        String confirm = scanner.nextLine().trim();
+        if (confirm.equalsIgnoreCase("Y")) {
+            boolean removed = DiagnosisManagement.removeDiagnosis(diagnosis);
+            if (removed) {
+                System.out.println("Diagnosis removed successfully!");
+            } else {
+                System.out.println("Failed to remove the diagnosis.");
             }
         } else {
-            System.out.println("No diagnosis found with ID: " + diagnosisId);
+            System.out.println("Removal canceled.");
         }
     }
 
@@ -439,6 +450,9 @@ public class DiagnosisUI {
             return;
         }
 
+        String monthName = UtilityClass.getMonthName(month);
+        String monthYearStr = monthName + " " + year;
+
         // Get filtered diagnoses from control
         MyList<Diagnosis> filteredList = DiagnosisManagement.getDiagnosesByYearAndMonth(year, month);
         if (DiagnosisManagement.isDiagnosisEmpty(filteredList)) {
@@ -471,7 +485,7 @@ public class DiagnosisUI {
         }
 
         // Display diagnosis count by severity
-        System.out.println("\nDiagnoses by Severity Level (" + year + "):");
+        System.out.println("\n>> Diagnoses by Severity Level (" + monthYearStr + "):");
         System.out.println("===========================================");
         System.out.println("Severity Level | Count");
         System.out.println("===========================================");
@@ -480,29 +494,42 @@ public class DiagnosisUI {
         System.out.printf("High           | %d\n", highCount);
         System.out.printf("Critical       | %d\n\n", criticalCount);
 
-        // Get top 3 symptoms from control
-        MyList<DiagnosisManagement.SymptomCount> topSymptoms = DiagnosisManagement.getTopSymptoms(3);
-        int size = DiagnosisManagement.getTopSymptomSize(topSymptoms);
+        // get top 3 symptoms
+        MyList<DiagnosisManagement.SymptomCount> top3 = DiagnosisManagement.getTopSymptoms(3);
 
-        // Display top 3 symptoms
-        System.out.println("Top 3 Symptoms:");
+        // Display Top 3 Symptoms
+        System.out.println(">> Top 3 Symptoms:");
         System.out.println("===========================================");
-        for (int i = 0; i < size; i++) {
-            String symptomName = DiagnosisManagement.getTopSymptomName(topSymptoms, i);
-            int symptomCount = DiagnosisManagement.getTopSymptomCount(topSymptoms, i);
-            System.out.printf("%d. %s - %d occurrences\n", i + 1, symptomName, symptomCount);
+        for (int i = 0; i < top3.size(); i++) {
+            DiagnosisManagement.SymptomCount sc = top3.get(i);
+            System.out.printf("%d. %s - %d occurrences\n", i + 1, sc.symptom, sc.count);
         }
 
-        // Display recommended medicine
-        System.out.println("\nRecommend Medicine:");
+        // get overall symptom statistics
+        DynamicList.ListStatistics<DiagnosisManagement.SymptomCount> allStats = DiagnosisManagement.getAllSymptomStatistics();
+
+        // Display overall statistics
+        System.out.println("\n>> Overall Symptom Statistics:");
         System.out.println("===========================================");
-        for (int i = 0; i < DiagnosisManagement.getRecommendSize(topSymptoms); i++) {
-            DiagnosisManagement.SymptomCount sc = DiagnosisManagement.getRecommendListItem(topSymptoms, i);
-            if (sc != null) {
-                String medicine = DiagnosisManagement.getMedicineForSymptom(sc.symptom);
-                System.out.printf("%d. %s -> %s\n", i + 1, sc.symptom, medicine);
-            }
+        // if the average is high, it possibly means health issue or seasonal illness
+        System.out.printf("Average occurrences: %.2f\n", allStats.average);
+        System.out.printf("Minimum occurrences: %.0f -> %s\n", allStats.min, DiagnosisManagement.getMinSymptom());
+        System.out.printf("Maximum occurrences: %.0f -> %s\n", allStats.max, DiagnosisManagement.getMaxSymptom());
+        // high sd means some symptoms are much more common than others
+        // low sd means symptoms are more evenly distributed across patient
+        // This is can help to understand one or two symptoms dominate or whether cases are balanced
+        System.out.printf("Standard deviation: %.2f\n", allStats.standardDeviation);
+        System.out.println("===========================================\n");
+
+        // Optional: show recommended medicine for top 3 symptoms
+        System.out.println(">> Recommended Medicines for Top 3 Symptoms:");
+        System.out.println("===========================================");
+        for (int i = 0; i < top3.size(); i++) {
+            DiagnosisManagement.SymptomCount sc = top3.get(i);
+            String medicine = DiagnosisManagement.getMedicineForSymptom(sc.symptom);
+            System.out.printf("%d. %s -> %s\n", i + 1, sc.symptom, medicine);
         }
         System.out.println("===========================================");
+
     }
 }
