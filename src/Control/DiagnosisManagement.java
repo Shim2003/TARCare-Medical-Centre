@@ -590,4 +590,29 @@ public class DiagnosisManagement {
         }
         return null;
     }
+
+    //get top 3 size by passing the value into parameter
+    public static int getTop3Size(MyList<SymptomCount> top3List) {
+        return top3List != null ? top3List.size() : 0;
+    }
+
+    // Get a SymptomCount object from top 3 list by index
+    public static SymptomCount getTop3Item(MyList<SymptomCount> top3List, int index) {
+        if (top3List != null && index >= 0 && index < top3List.size()) {
+            return top3List.get(index);
+        }
+        return null;
+    }
+
+    // Get symptom name from top 3 list by index
+    public static String getTop3SymptomName(MyList<SymptomCount> top3List, int index) {
+        SymptomCount sc = getTop3Item(top3List, index);
+        return sc != null ? sc.symptom : "";
+    }
+
+    // Get symptom count from top 3 list by index
+    public static int getTop3SymptomCount(MyList<SymptomCount> top3List, int index) {
+        SymptomCount sc = getTop3Item(top3List, index);
+        return sc != null ? sc.count : 0;
+    }
 }

@@ -291,10 +291,10 @@ public class DiagnosisUI {
         //update the input to the certain diagnosis
         Diagnosis updatedDiagnosis = new Diagnosis(diagnosisId, newDiagnosisDescription, newSeverityLevel, newRecommendations, newAdditionalNotes);
         
-        DiagnosisManagement.setPatientId(diagnosis, diagnosis.getPatientId());
-        DiagnosisManagement.setDoctorId(diagnosis, diagnosis.getDoctorId());
-        DiagnosisManagement.setDiagnosisDate(diagnosis, diagnosis.getDiagnosisDate());
-        DiagnosisManagement.setSymptoms(diagnosis, diagnosis.getSymptoms());
+        DiagnosisManagement.setPatientId(updatedDiagnosis, diagnosis.getPatientId());
+        DiagnosisManagement.setDoctorId(updatedDiagnosis, diagnosis.getDoctorId());
+        DiagnosisManagement.setDiagnosisDate(updatedDiagnosis, diagnosis.getDiagnosisDate());
+        DiagnosisManagement.setSymptoms(updatedDiagnosis, diagnosis.getSymptoms());
 
         // Update the diagnosis details
         DiagnosisManagement.updateDiagnosisDetails(diagnosisId, updatedDiagnosis);
@@ -500,9 +500,10 @@ public class DiagnosisUI {
         // Display Top 3 Symptoms
         System.out.println(">> Top 3 Symptoms:");
         System.out.println("===========================================");
-        for (int i = 0; i < top3.size(); i++) {
-            DiagnosisManagement.SymptomCount sc = top3.get(i);
-            System.out.printf("%d. %s - %d occurrences\n", i + 1, sc.symptom, sc.count);
+        for (int i = 0; i < DiagnosisManagement.getTop3Size(top3); i++) {
+            String symptomName = DiagnosisManagement.getTop3SymptomName(top3, i);
+            int symptomCount = DiagnosisManagement.getTop3SymptomCount(top3, i);
+            System.out.printf("%d. %s - %d occurrences\n", i + 1, symptomName, symptomCount);
         }
 
         // get overall symptom statistics
@@ -524,10 +525,10 @@ public class DiagnosisUI {
         // Optional: show recommended medicine for top 3 symptoms
         System.out.println(">> Recommended Medicines for Top 3 Symptoms:");
         System.out.println("===========================================");
-        for (int i = 0; i < top3.size(); i++) {
-            DiagnosisManagement.SymptomCount sc = top3.get(i);
-            String medicine = DiagnosisManagement.getMedicineForSymptom(sc.symptom);
-            System.out.printf("%d. %s -> %s\n", i + 1, sc.symptom, medicine);
+        for (int i = 0; i < DiagnosisManagement.getTop3Size(top3); i++) {
+            String symptomName = DiagnosisManagement.getTop3SymptomName(top3, i);
+            String medicine = DiagnosisManagement.getMedicineForSymptom(symptomName);
+            System.out.printf("%d. %s -> %s\n", i + 1, symptomName, medicine);
         }
         System.out.println("===========================================");
 
