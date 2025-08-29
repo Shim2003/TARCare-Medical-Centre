@@ -108,7 +108,7 @@ public class PharmacyUI {
         // Show new medicine info for confirmation
         System.out.println("\n--- New Medicine Details ---");
         printMedicineHeader();
-        System.out.println(formatMedicineDisplay(m));
+        System.out.println(service.formatMedicineDisplay(m));
 
         System.out.print("\nConfirm add this medicine? (y/n): ");
         String confirm = sc.nextLine().trim().toLowerCase();
@@ -135,7 +135,7 @@ public class PharmacyUI {
         
         System.out.println("Current details: ");
         printMedicineHeader();
-        System.out.println(formatMedicineDisplay(existing));
+        System.out.println(service.formatMedicineDisplay(existing));
 
         Medicine updated = readMedicineData(existing);
         
@@ -158,7 +158,7 @@ public class PharmacyUI {
         // Show medicine details
         System.out.println("\n--- Medicine to be deleted ---");
         printMedicineHeader();
-        System.out.println(formatMedicineDisplay(existing));
+        System.out.println(service.formatMedicineDisplay(existing));
 
         // Get user confirmations
         if (!getDeleteConfirmation()) {
@@ -458,21 +458,6 @@ public class PharmacyUI {
     private static void printMedicineHeader() {
         System.out.println("ID   | Name                           | Quantity(Form)   | Category             | Price (RM)     | Manufacturer           | Expiry");
         System.out.println("=".repeat(135));
-    }
-
-    // Helper function to format medicine display
-    private static String formatMedicineDisplay(Medicine medicine) {
-        String quantityForm = medicine.getQuantity() + "(" + medicine.getDosageForm() + ")";
-        SimpleDateFormat sdf = new SimpleDateFormat(UtilityClass.DATE_FORMAT);
-        return String.format("%-4s | %-30s | %-16s | %-20s | %-14.2f | %-22s | %s",
-            medicine.getMedicineID(),
-            medicine.getMedicineName(),
-            quantityForm,
-            medicine.getCategory(),
-            medicine.getPrice(),
-            medicine.getManufacturer(),
-            sdf.format(medicine.getExpiryDate())
-        );
     }
     
     // Create stock request manually

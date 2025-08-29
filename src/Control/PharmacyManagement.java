@@ -55,10 +55,6 @@ public class PharmacyManagement {
         return medicines.findFirst(m -> m.getMedicineName().equalsIgnoreCase(name));
     }
     
-    public MyList<Medicine> getAll() {
-        return medicines;
-    }
-    
     // ===== UI-SPECIFIC BUSINESS LOGIC METHODS =====
     
     /**
@@ -110,7 +106,6 @@ public class PharmacyManagement {
         }
 
         StringBuilder display = new StringBuilder();
-        SimpleDateFormat sdf = new SimpleDateFormat(UtilityClass.DATE_FORMAT);
         
         // Add header
         display.append("ID   | Name                           | Quantity(Form)   | Category             | Price (RM)     | Manufacturer           | Expiry\n");
@@ -119,7 +114,7 @@ public class PharmacyManagement {
         // Add medicine data
         for (int i = 0; i < medicines.size(); i++) {
             Medicine medicine = medicines.get(i);
-            display.append(formatMedicineDisplay(medicine, sdf)).append("\n");
+            display.append(formatMedicineDisplay(medicine)).append("\n");
         }
         
         return display.toString();
@@ -438,13 +433,11 @@ public class PharmacyManagement {
         StringBuilder outOfStockDisplay = new StringBuilder();
         StringBuilder lowStockDisplay = new StringBuilder();
         
-        SimpleDateFormat sdf = new SimpleDateFormat(UtilityClass.DATE_FORMAT);
-        
         // Process out of stock medicines
         for (int i = 0; i < outOfStockMedicines.size(); i++) {
             Medicine medicine = outOfStockMedicines.get(i);
             String statusLabel = getStockStatusLabel(medicine);
-            String formattedMedicine = formatMedicineDisplay(medicine, sdf);
+            String formattedMedicine = formatMedicineDisplay(medicine);
             outOfStockDisplay.append(formattedMedicine).append(" ").append(statusLabel).append("\n");
         }
 
@@ -452,7 +445,7 @@ public class PharmacyManagement {
         for (int i = 0; i < lowStockMedicines.size(); i++) {
             Medicine medicine = lowStockMedicines.get(i);
             String statusLabel = getStockStatusLabel(medicine);
-            String formattedMedicine = formatMedicineDisplay(medicine, sdf);
+            String formattedMedicine = formatMedicineDisplay(medicine);
             lowStockDisplay.append(formattedMedicine).append(" ").append(statusLabel).append("\n");
         }
 
@@ -501,7 +494,8 @@ public class PharmacyManagement {
         }
     }
     
-    private String formatMedicineDisplay(Medicine medicine, SimpleDateFormat sdf) {
+    public String formatMedicineDisplay(Medicine medicine) {
+        SimpleDateFormat sdf = new SimpleDateFormat(UtilityClass.DATE_FORMAT);
         String quantityForm = medicine.getQuantity() + "(" + medicine.getDosageForm() + ")";
         return String.format("%-4s | %-30s | %-16s | %-20s | %-14.2f | %-22s | %s",
             medicine.getMedicineID(),
@@ -576,7 +570,6 @@ public class PharmacyManagement {
         }
 
         StringBuilder display = new StringBuilder();
-        SimpleDateFormat sdf = new SimpleDateFormat(UtilityClass.DATE_FORMAT);
         
         display.append("Available medicines:\n");
         display.append("ID   | Name                           | Quantity(Form)   | Category             | Price (RM)     | Manufacturer           | Expiry\n");
@@ -584,7 +577,7 @@ public class PharmacyManagement {
         
         for (int i = 0; i < medicines.size(); i++) {
             Medicine medicine = medicines.get(i);
-            display.append(formatMedicineDisplay(medicine, sdf)).append("\n");
+            display.append(formatMedicineDisplay(medicine)).append("\n");
         }
 
         return new StockRequestCreationInfo(medicines, display.toString());
@@ -908,11 +901,10 @@ public class PharmacyManagement {
         if (results.size() == 0) {
             display.append("No medicines found matching the criteria.\n");
         } else {
-            SimpleDateFormat sdf = new SimpleDateFormat(UtilityClass.DATE_FORMAT);
             display.append("ID   | Name                           | Quantity(Form)   | Category             | Price (RM)     | Manufacturer           | Expiry\n");
             display.append("=".repeat(135)).append("\n");
             for (int i = 0; i < results.size(); i++) {
-                display.append(formatMedicineDisplay(results.get(i), sdf)).append("\n");
+                display.append(formatMedicineDisplay(results.get(i))).append("\n");
             }
         }
 
@@ -1237,12 +1229,11 @@ public class PharmacyManagement {
         summaryDisplay.append(String.format("Average stock per medicine: %.2f units%n", averageStock));
 
         StringBuilder fullDisplay = new StringBuilder();
-        SimpleDateFormat sdf = new SimpleDateFormat(UtilityClass.DATE_FORMAT);
         fullDisplay.append("ID   | Name                           | Quantity(Form)   | Category             | Price (RM)     | Manufacturer           | Expiry\n");
         fullDisplay.append("=".repeat(135)).append("\n");
         for (int i = 0; i < snapshot.size(); i++) {
             Medicine medicine = snapshot.get(i);
-            fullDisplay.append(formatMedicineDisplay(medicine, sdf)).append("\n");
+            fullDisplay.append(formatMedicineDisplay(medicine)).append("\n");
         }
 
         return new SnapshotInfo(snapshot, summaryDisplay.toString(), fullDisplay.toString());
@@ -1277,11 +1268,10 @@ public class PharmacyManagement {
 
         StringBuilder displayInfo = new StringBuilder();
         displayInfo.append("Found ").append(expired.size()).append(" expired medicines:\n");
-        SimpleDateFormat sdf = new SimpleDateFormat(UtilityClass.DATE_FORMAT);
         displayInfo.append("ID   | Name                           | Quantity(Form)   | Category             | Price (RM)     | Manufacturer           | Expiry\n");
         displayInfo.append("=".repeat(135)).append("\n");
         for (int i = 0; i < expired.size(); i++) {
-            displayInfo.append(formatMedicineDisplay(expired.get(i), sdf)).append(" [EXPIRED]\n");
+            displayInfo.append(formatMedicineDisplay(expired.get(i))).append(" [EXPIRED]\n");
         }
 
         return new ExpiredMedicinesInfo(expired, displayInfo.toString());
