@@ -15,13 +15,13 @@ import java.util.Date;
 import java.text.SimpleDateFormat;
 
 /**
- * Enhanced PharmacyManagement following ECB pattern
- * Business logic layer that provides structured information to UI
+ *
+ *
  * @author Shim
  */
 public class PharmacyManagement {
     private static MyList<Medicine> medicines = new DynamicList<>();
-    public static MyList<Prescription> prescriptionQueue = new DynamicList<>();
+    private static MyList<Prescription> prescriptionQueue = new DynamicList<>();
     private static MyList<StockRequest> stockRequests = new DynamicList<>();
     private int requestCounter = 1;
     
@@ -676,7 +676,22 @@ public class PharmacyManagement {
     }
     
     private String generateRequestID() {
-        return "REQ" + String.format("%03d", requestCounter++);
+        String candidateId;
+        boolean isUnique;
+
+        do {
+            candidateId = "REQ" + String.format("%03d", requestCounter++);
+            isUnique = true;
+
+            for (int i = 0; i < stockRequests.size(); i++) {
+                if (stockRequests.get(i).getRequestID().equals(candidateId)) {
+                    isUnique = false;
+                    break;
+                }
+            }
+        } while (!isUnique);
+
+        return candidateId;
     }
     
     public static MyList<StockRequest> getAllStockRequests() {
@@ -1325,8 +1340,6 @@ public class PharmacyManagement {
         var stats = medicineList.getStatistics(Medicine::getQuantity);
         return stats.average;
     }
-    
-    // ===== UTILITY METHODS =====
     
     public static String generateNewPrescriptionId() {
         if (prescriptionQueue.isEmpty()) {

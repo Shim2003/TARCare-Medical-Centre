@@ -32,7 +32,7 @@ public class UtilityClass {
     //Status
     public static final String statusFree = "Free";
     public static final String statusWaiting = "Waiting";
-        public static final String statusReadyToConsult = "ReadyToConsult";
+    public static final String statusReadyToConsult = "ReadyToConsult";
     public static final String statusConsulting = "Consulting";
     public static final String statusCompleted = "Completed";
     public static final String workingStatusOff = "Off";

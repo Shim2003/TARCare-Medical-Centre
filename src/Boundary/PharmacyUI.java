@@ -5,17 +5,15 @@
 package Boundary;
 
 import ADT.DynamicList;
+import ADT.MyList;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Scanner;
+import java.text.SimpleDateFormat;
 import Control.PharmacyManagement;
 import Entity.Medicine;
-import Entity.MedicalTreatmentItem;
-import Entity.Prescription;
-import Entity.StockRequest;
-import ADT.MyList;
 import Utility.UtilityClass;
-import java.text.SimpleDateFormat;
+
 
 public class PharmacyUI {
 
