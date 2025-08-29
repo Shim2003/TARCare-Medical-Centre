@@ -219,7 +219,7 @@ public class QueueUI {
         System.out.println("2. " + Utility.UtilityClass.statusReadyToConsult);
         System.out.println("3. " + Utility.UtilityClass.statusConsulting);
         System.out.println("4. " + Utility.UtilityClass.statusCompleted);
-        System.out.print("Enter your choice (1-3): ");
+        System.out.print("Enter your choice (1-4): ");
 
         String choice = scanner.nextLine();
         String selectedStatus = null;
@@ -337,9 +337,10 @@ public class QueueUI {
         System.out.println("\n--- Remove Queue Records by Status ---");
         System.out.println("Select Status to Remove:");
         System.out.println("1. " + Utility.UtilityClass.statusWaiting);
-        System.out.println("2. " + Utility.UtilityClass.statusConsulting);
-        System.out.println("3. " + Utility.UtilityClass.statusCompleted);
-        System.out.print("Enter your choice (1-3): ");
+        System.out.println("2. " + Utility.UtilityClass.statusReadyToConsult);
+        System.out.println("3. " + Utility.UtilityClass.statusConsulting);
+        System.out.println("4. " + Utility.UtilityClass.statusCompleted);
+        System.out.print("Enter your choice (1-4): ");
 
         String choice = scanner.nextLine();
         String selectedStatus = null;
@@ -349,9 +350,12 @@ public class QueueUI {
                 selectedStatus = Utility.UtilityClass.statusWaiting;
                 break;
             case "2":
-                selectedStatus = Utility.UtilityClass.statusConsulting;
+                selectedStatus = Utility.UtilityClass.statusReadyToConsult;
                 break;
             case "3":
+                selectedStatus = Utility.UtilityClass.statusConsulting;
+                break;
+            case "4":
                 selectedStatus = Utility.UtilityClass.statusCompleted;
                 break;
             default:
@@ -490,14 +494,14 @@ public class QueueUI {
     }
 
     public static void generateHistoricalQueueData() {
-        System.out.println("\n" + "=".repeat(80));
+        System.out.println("\n" + "=".repeat(90));
         System.out.println("                    HISTORICAL QUEUE DATA");
-        System.out.println("=".repeat(80));
+        System.out.println("=".repeat(90));
 
         System.out.println("LAST 7 DAYS SUMMARY:");
-        System.out.printf("%-12s | %-6s | %-7s | %-10s | %-9s  | %-10s\n",
-                "Date", "Total", "Waiting", "Consulting", "Completed", "Rate");
-        System.out.println("-".repeat(80));
+        System.out.printf("%-12s | %-6s | %-7s | %-12s | %-10s | %-9s  | %-10s\n",
+                "Date", "Total", "Waiting", "Ready", "Consulting", "Completed", "Rate");
+        System.out.println("-".repeat(90));
 
         Calendar cal = Calendar.getInstance();
 
@@ -509,30 +513,34 @@ public class QueueUI {
             DAO.DailyQueueStats dayStats = QueueControl.getDailyQueueStats(targetDate);
 
             if (dayStats.totalPatients > 0) {
-                System.out.printf("%-12s | %-6d | %-7d | %-10d | %-10d | %-9.1f%%\n",
+                System.out.printf("%-12s | %-6d | %-7d | %-12d | %-10d | %-10d | %-9.1f%%\n",
                         UtilityClass.formatDate(targetDate),
                         dayStats.totalPatients,
                         dayStats.waitingPatients,
+                        dayStats.readyToConsultingPatients,
                         dayStats.consultingPatients,
                         dayStats.completedPatients,
                         dayStats.completionRate);
             } else {
-                System.out.printf("%-12s | %-6s | %-7s | %-10s | %-8s | %-12s\n",
+                System.out.printf("%-12s | %-6s | %-7s | %-12s | %-10s | %-8s | %-12s\n",
                         UtilityClass.formatDate(targetDate),
-                        "0", "0", "0", "0", "N/A");
+                        "0", "0", "0", "0", "0", "N/A");
             }
         }
 
         // Weekly summary
-        System.out.println("-".repeat(80));
+        System.out.println("-".repeat(90));
 
         // Calculate weekly totals
-        int weeklyTotal = 0, weeklyCompleted = 0;
+        int weeklyTotal = 0, weeklyWaiting = 0, weeklyReady = 0, weeklyConsulting = 0, weeklyCompleted = 0;
         for (int i = 6; i >= 0; i--) {
             cal.setTime(new Date());
             cal.add(Calendar.DAY_OF_MONTH, -i);
             DAO.DailyQueueStats dayStats = QueueControl.getDailyQueueStats(cal.getTime());
             weeklyTotal += dayStats.totalPatients;
+            weeklyWaiting += dayStats.waitingPatients;
+            weeklyReady += dayStats.readyToConsultingPatients;
+            weeklyConsulting += dayStats.consultingPatients;
             weeklyCompleted += dayStats.completedPatients;
         }
 
@@ -540,10 +548,13 @@ public class QueueUI {
 
         System.out.println("WEEKLY SUMMARY:");
         System.out.printf("Total Patients (7 days): %d\n", weeklyTotal);
-        System.out.printf("Completed Patients: %d\n", weeklyCompleted);
+        System.out.printf("|- Waiting: %d\n", weeklyWaiting);
+        System.out.printf("|- Ready To Consult: %d\n", weeklyReady);
+        System.out.printf("|- Consulting: %d\n", weeklyConsulting);
+        System.out.printf("|- Completed: %d\n", weeklyCompleted);
         System.out.printf("Weekly Completion Rate: %.1f%%\n", weeklyRate);
 
-        System.out.println("=".repeat(80));
+        System.out.println("=".repeat(90));
         UtilityClass.pressEnterToContinue();
     }
 
