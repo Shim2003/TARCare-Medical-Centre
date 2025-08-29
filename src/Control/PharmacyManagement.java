@@ -28,12 +28,42 @@ public class PharmacyManagement {
     public PharmacyManagement() { }
     
     // ===== BASIC MEDICINE MANAGEMENT METHODS =====
+    public Medicine createMedicineFromInput(String id, String name, Integer quantity,
+            String category, Double price, String manufacturer,
+            Date expiryDate, String dosageForm) {
+        Medicine medicine = new Medicine();
+        medicine.setMedicineID(id);
+        medicine.setMedicineName(name);
+        medicine.setQuantity(quantity);
+        medicine.setCategory(category);
+        medicine.setPrice(price);
+        medicine.setManufacturer(manufacturer);
+        medicine.setDosageForm(dosageForm);
+        medicine.setExpiryDate(expiryDate);
+        return medicine;
+    }
+    
     public static boolean addMedicine(Medicine m) {
         if (findById(m.getMedicineID()) != null) {
             return false; // duplicate id
         }
         medicines.add(m);
         return true;
+    }
+    
+    public Medicine updateMedicineFromInput(Medicine base, String id, String name,
+            String category, Double price, String manufacturer,
+            Date expiryDate, String dosageForm) {
+        Medicine updated = new Medicine();
+        updated.setMedicineID(id);
+        updated.setMedicineName(name);
+        updated.setQuantity(base.getQuantity()); // Keep existing quantity
+        updated.setCategory(category);
+        updated.setPrice(price);
+        updated.setManufacturer(manufacturer);
+        updated.setDosageForm(dosageForm);
+        updated.setExpiryDate(expiryDate);
+        return updated;
     }
     
     public boolean updateMedicine(String id, Medicine newData) {

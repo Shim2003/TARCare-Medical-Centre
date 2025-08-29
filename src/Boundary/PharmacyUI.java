@@ -317,32 +317,36 @@ public class PharmacyUI {
     }
 
     private static Medicine readMedicineData(Medicine base) {
-        SimpleDateFormat sdf = new SimpleDateFormat(UtilityClass.DATE_FORMAT);
-        Medicine m = new Medicine();
-
-        m.setMedicineID(readLineWithDefault("ID", base == null ? null : base.getMedicineID()));
-        m.setMedicineName(readLineWithDefault("Name", base == null ? null : base.getMedicineName()));
+        // Collect raw input data
+        String id = readLineWithDefault("ID", base == null ? null : base.getMedicineID());
+        String name = readLineWithDefault("Name", base == null ? null : base.getMedicineName());
 
         // Only allow quantity input for new medicines (base == null)
+        Integer quantity = null;
         if (base == null) {
-            m.setQuantity(readInt("Quantity: "));
-        } else {
-            m.setQuantity(base.getQuantity()); // Keep existing quantity - no message displayed
+            quantity = readInt("Quantity: ");
         }
 
-        m.setCategory(readLineWithDefault("Category", base == null ? null : base.getCategory()));
-        m.setPrice(readDoubleWithDefault("Price", base == null ? null : base.getPrice()));
-        m.setManufacturer(readLineWithDefault("Manufacturer", base == null ? null : base.getManufacturer()));
+        String category = readLineWithDefault("Category", base == null ? null : base.getCategory());
+        Double price = readDoubleWithDefault("Price", base == null ? null : base.getPrice());
+        String manufacturer = readLineWithDefault("Manufacturer", base == null ? null : base.getManufacturer());
 
         // Dosage form selection
         String selectedDosageForm = selectDosageForm(base == null ? null : base.getDosageForm());
-        m.setDosageForm(selectedDosageForm);
 
         // Expiry date
         Date expiryDate = readExpiryDate(base == null || base.getExpiryDate() == null ? null : base.getExpiryDate());
-        m.setExpiryDate(expiryDate);
 
-        return m;
+        // Delegate medicine creation/update to control layer
+        if (base == null) {
+            // Creating new medicine
+            return service.createMedicineFromInput(id, name, quantity, category, price,
+                    manufacturer, expiryDate, selectedDosageForm);
+        } else {
+            // Updating existing medicine
+            return service.updateMedicineFromInput(base, id, name, category, price,
+                    manufacturer, expiryDate, selectedDosageForm);
+        }
     }
 
     private static String selectDosageForm(String currentForm) {
