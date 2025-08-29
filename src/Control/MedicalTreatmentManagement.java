@@ -443,4 +443,24 @@ public class MedicalTreatmentManagement {
 
         return filteredList; // empty list if none found
     }
+
+    // set the follow up date for a treatment
+    public static void setFollowUpDate(MedicalTreatment treatment, Date followUpDate) {
+        treatment.setFollowUpDate(followUpDate);
+    }
+    
+    // set the treatment outcome for a treatment
+    public static void setTreatmentOutcome(MedicalTreatment treatment, String outcome) {
+        treatment.setTreatmentOutcome(outcome);
+    }
+
+    // set the treatment status for a treatment
+    public static void setTreatmentStatus(MedicalTreatment treatment, String status) {
+        treatment.setTreatmentStatus(status);
+    }
+
+    // set the treatment status for a treatment
+    public static void setTreatmentNote(MedicalTreatment treatment, String note) {
+        treatment.setNotes(note);
+    }
 }

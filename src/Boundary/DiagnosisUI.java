@@ -290,10 +290,10 @@ public class DiagnosisUI {
         //update the input to the certain diagnosis
         Diagnosis updatedDiagnosis = new Diagnosis(diagnosisId, newDiagnosisDescription, newSeverityLevel, newRecommendations, newAdditionalNotes);
         
-        updatedDiagnosis.setPatientId(diagnosis.getPatientId());
-        updatedDiagnosis.setDoctorId(diagnosis.getDoctorId());
-        updatedDiagnosis.setDiagnosisDate(diagnosis.getDiagnosisDate());
-        updatedDiagnosis.setSymptoms(diagnosis.getSymptoms());
+        DiagnosisManagement.setPatientId(diagnosis, diagnosis.getPatientId());
+        DiagnosisManagement.setDoctorId(diagnosis, diagnosis.getDoctorId());
+        DiagnosisManagement.setDiagnosisDate(diagnosis, diagnosis.getDiagnosisDate());
+        DiagnosisManagement.setSymptoms(diagnosis, diagnosis.getSymptoms());
 
         // Update the diagnosis details
         DiagnosisManagement.updateDiagnosisDetails(diagnosisId, updatedDiagnosis);
@@ -301,19 +301,29 @@ public class DiagnosisUI {
     }
 
     public static void deleteDiagnosis() {
-        System.out.println("\n=== Delete Diagnosis ===");
-        System.out.print("Enter Diagnosis ID to delete: ");
-        String diagnosisId = scanner.nextLine();
+        System.out.print("\n\nEnter Diagnosis ID to remove: ");
+        String diagId = scanner.nextLine().trim();
 
-        if (DiagnosisManagement.removeDiagnosisById(diagnosisId)) {
-            System.out.print("Enter 'Y' to confirm deletion: ");
-            String confirmation = scanner.nextLine();
-            while (confirmation.equalsIgnoreCase("Y")) {
-                System.out.println("Diagnosis with ID " + diagnosisId + " has been deleted successfully.");
-                break;
+        // Find the Diagnosis object by ID
+        Diagnosis diagnosis = DiagnosisManagement.findDiagnosisById(diagId);
+
+        if (diagnosis == null) {
+            System.out.println("Diagnosis with ID " + diagId + " not found.");
+            return;
+        }
+
+        // Confirm deletion
+        System.out.print("Are you sure you want to remove this diagnosis? (Y/N): ");
+        String confirm = scanner.nextLine().trim();
+        if (confirm.equalsIgnoreCase("Y")) {
+            boolean removed = DiagnosisManagement.removeDiagnosis(diagnosis);
+            if (removed) {
+                System.out.println("Diagnosis removed successfully!");
+            } else {
+                System.out.println("Failed to remove the diagnosis.");
             }
         } else {
-            System.out.println("No diagnosis found with ID: " + diagnosisId);
+            System.out.println("Removal canceled.");
         }
     }
 

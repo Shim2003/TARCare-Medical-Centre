@@ -483,7 +483,7 @@ public class MedicalTreatmentUI {
                     return;
                 }
             }
-            treatment.setTreatmentStatus(newStatus);
+            MedicalTreatmentManagement.setTreatmentStatus(treatment, newStatus);
             System.out.println(">> Treatment status updated to: " + newStatus);
 
         } catch (Exception e) {
@@ -519,7 +519,7 @@ public class MedicalTreatmentUI {
                     return;
                 }
             }
-            treatment.setTreatmentOutcome(newOutcome);
+            MedicalTreatmentManagement.setTreatmentOutcome(treatment, newOutcome);
             System.out.println(">> Treatment outcome updated to: " + newOutcome);
 
         } catch (Exception e) {
@@ -537,7 +537,7 @@ public class MedicalTreatmentUI {
             if (followUpDate == null) {
                 System.out.println("Invalid date format. Follow-up date not updated.");
             } else {
-                treatment.setFollowUpDate(followUpDate);
+                MedicalTreatmentManagement.setFollowUpDate(treatment, followUpDate);
                 System.out.println(">> Follow-Up Date updated to: " + sdf.format(followUpDate));
             }
         }
@@ -546,7 +546,7 @@ public class MedicalTreatmentUI {
         System.out.print("Enter Additional Notes (or press Enter to skip): ");
         String notes = scanner.nextLine();
         if (!notes.trim().isEmpty()) {
-            treatment.setNotes(notes);
+            MedicalTreatmentManagement.setTreatmentNote(treatment, notes);
             System.out.println(">> Notes updated successfully.");
         }
 

@@ -37,12 +37,6 @@ public class UtilityClass {
     public static final String statusCompleted = "Completed";
     public static final String workingStatusOff = "Off";
     public static final String statusOnLeave = "On Leave";
-
-    //Diagnosis Status
-    private static final String lowLevel = "Low";
-    private static final String mediumLevel = "Medium";
-    private static final String highLevel = "High";
-    private static final String criticalLevel = "Critical";
     
     public static final int DEFAULT_RESTOCK_QUANTITY = 30;
 

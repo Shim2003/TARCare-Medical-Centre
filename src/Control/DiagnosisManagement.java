@@ -59,51 +59,52 @@ public class DiagnosisManagement {
         }
     }
 
-            public static MyList<SymptomCount> getTopSymptoms(int topN) {
-            MyList<SymptomCount> topSymptoms = new DynamicList<>();
-            int[] counts = new int[symptoms.size()];
+    public static MyList<SymptomCount> getTopSymptoms(int topN) {
+        MyList<SymptomCount> topSymptoms = new DynamicList<>();
+        int[] counts = new int[symptoms.size()];
 
-            // Count each symptom
-            DynamicList<String> uniqueSymptoms = new DynamicList<>();
-            for (int i = 0; i < symptoms.size(); i++) {
-                String s = symptoms.get(i);
-                boolean found = false;
-                for (int j = 0; j < uniqueSymptoms.size(); j++) {
-                    if (uniqueSymptoms.get(j).equalsIgnoreCase(s)) {
-                        counts[j]++;
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    uniqueSymptoms.add(s);
-                    counts[uniqueSymptoms.size() - 1] = 1;
+        // Count each symptom
+        DynamicList<String> uniqueSymptoms = new DynamicList<>();
+        for (int i = 0; i < symptoms.size(); i++) {
+            String s = symptoms.get(i);
+            boolean found = false;
+            for (int j = 0; j < uniqueSymptoms.size(); j++) {
+                if (uniqueSymptoms.get(j).equalsIgnoreCase(s)) {
+                    counts[j]++;
+                    found = true;
+                    break;
                 }
             }
-
-            // Sort by count descending
-            for (int i = 0; i < uniqueSymptoms.size() - 1; i++) {
-                for (int j = i + 1; j < uniqueSymptoms.size(); j++) {
-                    if (counts[j] > counts[i]) {
-                        int tempCount = counts[i];
-                        counts[i] = counts[j];
-                        counts[j] = tempCount;
-
-                        String tempSymptom = uniqueSymptoms.get(i);
-                        uniqueSymptoms.replace(i, uniqueSymptoms.get(j));
-                        uniqueSymptoms.replace(j, tempSymptom);
-                    }
-                }
+            if (!found) {
+                uniqueSymptoms.add(s);
+                counts[uniqueSymptoms.size() - 1] = 1;
             }
-
-            // Populate topSymptoms
-            int limit = Math.min(topN, uniqueSymptoms.size());
-            for (int i = 0; i < limit; i++) {
-                topSymptoms.add(new SymptomCount(uniqueSymptoms.get(i), counts[i]));
-            }
-
-            return topSymptoms;
         }
+
+        // Sort by count descending
+        for (int i = 0; i < uniqueSymptoms.size() - 1; i++) {
+            for (int j = i + 1; j < uniqueSymptoms.size(); j++) {
+                if (counts[j] > counts[i]) {
+                    int tempCount = counts[i];
+                    counts[i] = counts[j];
+                    counts[j] = tempCount;
+
+                    String tempSymptom = uniqueSymptoms.get(i);
+                    uniqueSymptoms.replace(i, uniqueSymptoms.get(j));
+                    uniqueSymptoms.replace(j, tempSymptom);
+                }
+            }
+        }
+
+        // Populate topSymptoms
+        int limit = Math.min(topN, uniqueSymptoms.size());
+        for (int i = 0; i < limit; i++) {
+            topSymptoms.add(new SymptomCount(uniqueSymptoms.get(i), counts[i]));
+        }
+
+
+        return topSymptoms;
+    }
 
     // Return the number of top symptoms calculated
     public static int getTopSymptomSize(MyList<SymptomCount> topSymptoms) {
@@ -265,8 +266,13 @@ public class DiagnosisManagement {
     }
 
     //remove a diagnosis by ID
-    public static boolean removeDiagnosisById(String diagnosisId) {
-        return diagnosisList.removeIf(d -> d.getDiagnosisId().equals(diagnosisId));
+    public static boolean removeDiagnosis(Diagnosis diagnosis) {
+        int index = diagnosisList.indexOf(diagnosis);
+        if (index != -1) {
+            diagnosisList.remove(index);
+            return true;
+        }
+        return false;
     }
 
     // display the all diagnosis list based on diagnosis ID
@@ -443,5 +449,25 @@ public class DiagnosisManagement {
             default:
                 return "General Checkup Needed";
         }
+    }
+
+    // set the treatment status for a treatment
+    public static void setPatientId(Diagnosis diagnosis, String id) {
+        diagnosis.setPatientId(id);
+    }
+
+    // set the treatment status for a treatment
+    public static void setDoctorId(Diagnosis diagnosis, String id) {
+        diagnosis.setDoctorId(id);
+    }
+    
+    // set the diagnosis date for a treatment
+    public static void setDiagnosisDate(Diagnosis diagnosis, Date date) {
+        diagnosis.setDiagnosisDate(date);
+    }
+
+    // set the symptoms for a treatment
+    public static void setSymptoms(Diagnosis diagnosis, MyList symptoms) {
+        diagnosis.setSymptoms(symptoms);
     }
 }
