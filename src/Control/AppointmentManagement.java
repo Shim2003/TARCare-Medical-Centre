@@ -13,6 +13,7 @@ import Entity.Doctor;
 import Control.PatientManagement;
 import Control.DoctorManagement;
 import Entity.Schedule;
+import Entity.ScheduleAppointmentResult;
 import Utility.UtilityClass;
 import java.time.DayOfWeek;
 import java.util.Scanner;
@@ -73,36 +74,31 @@ public class AppointmentManagement {
     }
 
     // Schedule a new appointment.
-    public static MyList<String> scheduleNextAppointment(String patientId, String doctorId, String dateTimeStr, String reason) {
+    public static ScheduleAppointmentResult scheduleNextAppointment(String patientId, String doctorId, String dateTimeStr, String reason) {
         MyList<String> errors = new DynamicList<>();
         LocalDateTime appointmentTime = null;
-        
-        // Check if the patient exists
+        Appointment newAppointment = null;
+
+        // Check patient
         Patient patient = PatientManagement.findPatientById(patientId);
-        if (patient == null) {
-            errors.add("Patient ID '" + patientId + "' not found.");
-        }
+        if (patient == null) errors.add("Patient ID '" + patientId + "' not found.");
 
-        // Check if the doctor exists
+        // Check doctor
         Doctor doctor = DoctorManagement.findDoctorById(doctorId);
-        if (doctor == null) {
-            errors.add("Doctor ID '" + doctorId + "' not found.");
-        }
+        if (doctor == null) errors.add("Doctor ID '" + doctorId + "' not found.");
 
-        // Parse date/time only if patient and doctor exist (optional: you can parse anyway)
+        // Parse date/time
         if (errors.isEmpty()) {
-        try {
+            try {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
                 appointmentTime = LocalDateTime.parse(dateTimeStr, formatter);
-                if (appointmentTime.isBefore(LocalDateTime.now())) {
-                    errors.add("Appointment must be in the future.");
-                }
+                if (appointmentTime.isBefore(LocalDateTime.now())) errors.add("Appointment must be in the future.");
             } catch (Exception e) {
                 errors.add("Invalid date/time format.");
             }
         }
 
-        // Check doctor schedule and conflicting appointments **only if no previous errors**
+        // Check schedule/conflicts
         if (errors.isEmpty()) {
             DayOfWeek dayOfWeek = appointmentTime.getDayOfWeek();
             MyList<Schedule> doctorSchedules = ScheduleManagement.findSchedulesByDoctorId(doctorId);
@@ -117,9 +113,8 @@ public class AppointmentManagement {
                     break;
                 }
             }
-            if (!isAvailable) {
-                errors.add("Doctor " + doctorId + " is not available on " + dayOfWeek + " at " + appointmentTime.toLocalTime());
-            }
+            if (!isAvailable) errors.add("Doctor " + doctorId + " is not available on " + dayOfWeek + " at " + appointmentTime.toLocalTime());
+
             for (int i = 0; i < scheduledAppointments.size(); i++) {
                 Appointment existing = scheduledAppointments.get(i);
                 if (existing.getDoctorId().equals(doctorId) &&
@@ -130,19 +125,14 @@ public class AppointmentManagement {
             }
         }
 
-        // Schedule appointment if no errors
+        // Schedule appointment
         if (errors.isEmpty()) {
             String appointmentId = generateNextAppointmentId();
-            Appointment newAppointment = new Appointment(
-                    appointmentId,
-                    patientId,
-                    doctorId,
-                    appointmentTime,
-                    reason
-            );
+            newAppointment = new Appointment(appointmentId, patientId, doctorId, appointmentTime, reason);
             scheduledAppointments.add(newAppointment);
         }
-        return errors;
+
+        return new ScheduleAppointmentResult(errors, newAppointment);
     }
  
     // find Appointment by ID automatically

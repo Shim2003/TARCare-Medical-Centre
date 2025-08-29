@@ -71,7 +71,6 @@ public class ConsultationManagement {
     
     // Convert ongoing consultations into a display-friendly string array
     public static String[] getOngoingConsultationsForDisplayArray() {
-        
         MyList<Consultation> ongoingList = getOngoingConsultationsList();
 
         if (ongoingList.isEmpty()) return new String[0];
@@ -88,14 +87,13 @@ public class ConsultationManagement {
                     : "-";
             String symptoms = (c.getSymptoms() != null && !c.getSymptoms().isEmpty()) ? c.getSymptoms() : "-";
 
-            displayArr[i] = "Consultation ID: " + c.getConsultationId()
-                    + ", Patient: " + c.getPatientId()
-                    + ", Doctor: " + c.getDoctorId()
-                    + ", Start Time: " + startTime
-                    + ", End Time: " + endTime
-                    + ", Duration: " + duration
-                    + ", Symptoms: " + symptoms
-                    + ", Status: Ongoing";
+            displayArr[i] = "Index " + i + " -> Consultation ID: " + c.getConsultationId() + "\n"
+                    + "Patient ID: " + c.getPatientId() + "\n"
+                    + "Doctor ID: " + c.getDoctorId() + "\n"
+                    + "Start Time: " + startTime + "\n"
+                    + "End Time: " + endTime + "\n"
+                    + "Duration: " + duration + "\n"
+                    + "Symptoms: " + symptoms;
         }
 
         return displayArr;

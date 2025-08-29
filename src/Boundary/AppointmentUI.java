@@ -147,9 +147,6 @@ public class AppointmentUI {
     
     private static void scheduleAppointmentUI() {
         ScheduleUI.DisplayAllTimetable();
-        String nextAppointmentId = AppointmentManagement.generateNextAppointmentId();
-        System.out.println("Next available Appointment ID: " + AppointmentManagement.peekNextAppointmentId());
-
         System.out.print("Enter Patient ID: ");
         String patientId = sc.nextLine();
         System.out.print("Enter Doctor ID: ");
@@ -159,19 +156,24 @@ public class AppointmentUI {
         System.out.print("Enter reason: ");
         String reason = sc.nextLine();
 
-        MyList<String> errors = AppointmentManagement.scheduleNextAppointment(patientId, doctorId, dateTimeStr, reason);
+        ScheduleAppointmentResult result = AppointmentManagement.scheduleNextAppointment(patientId, doctorId, dateTimeStr, reason);
+        MyList<String> errors = result.getErrors();
+        Appointment appt = result.getAppointment();
 
-        boolean hasError = false;
-        for (String error : errors) {
-            if (!hasError) {
-                System.out.println("Failed to schedule appointment:");
-                hasError = true;
-            }
-            System.out.println("- " + error);
-        }
-
-        if (!hasError) {
+        if (!errors.isEmpty()) {
+            System.out.println("Failed to schedule appointment:");
+            for (String error : errors) System.out.println("- " + error);
+        } else if (appt != null) {
             System.out.println("Appointment scheduled successfully!");
+            System.out.println("Appointment ID: " + appt.getAppointmentId());
+            Patient patient = PatientManagement.findPatientById(appt.getPatientId());
+            Doctor doctor = DoctorManagement.findDoctorById(appt.getDoctorId());
+            System.out.println("Patient: " + (patient != null ? patient.getFullName() : appt.getPatientId()) 
+                               + " (" + appt.getPatientId() + ")");
+            System.out.println("Doctor: " + (doctor != null ? doctor.getName() : appt.getDoctorId()) 
+                               + " (" + appt.getDoctorId() + ")");
+            System.out.println("Date/Time: " + appt.getAppointmentTime().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")));
+            System.out.println("Reason: " + appt.getReason());
         }
     }
     
