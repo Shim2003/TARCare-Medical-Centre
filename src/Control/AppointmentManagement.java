@@ -10,13 +10,12 @@ import java.util.Comparator;
 import Entity.Appointment;
 import Entity.Patient;
 import Entity.Doctor;
-import Control.PatientManagement;
-import Control.DoctorManagement;
+import Entity.AppointmentReportResult;
+import Entity.ModifyAppointmentResult;
 import Entity.Schedule;
 import Entity.ScheduleAppointmentResult;
 import Utility.UtilityClass;
 import java.time.DayOfWeek;
-import java.util.Scanner;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -277,11 +276,16 @@ public class AppointmentManagement {
     }
 
     // Modify Appointment
-    public static MyList<String> modifyAppointment(String appointmentId, String newPatientId, String newDoctorId, LocalDateTime newDateTime, String newReason) {
-        
+    public static ModifyAppointmentResult modifyAppointment(
+            String appointmentId,
+            String newPatientId,
+            String newDoctorId,
+            LocalDateTime newDateTime,
+            String newReason) {
+
         MyList<String> errors = new DynamicList<>();
         Appointment appointment = findAppointmentOrReportError(appointmentId, errors);
-        if (appointment == null) return errors;
+        if (appointment == null) return new ModifyAppointmentResult(errors);
 
         if (newPatientId != null && !newPatientId.isEmpty()) {
             if (checkPatientExists(newPatientId, errors)) {
@@ -294,10 +298,9 @@ public class AppointmentManagement {
                 appointment.setDoctorId(newDoctorId);
             }
         }
-        
+
         if (newDateTime != null) {
             if (newDateTime.isAfter(LocalDateTime.now())) {
-                
                 boolean available = false;
                 DayOfWeek dayOfWeek = newDateTime.getDayOfWeek();
                 MyList<Schedule> doctorSchedules = ScheduleManagement.findSchedulesByDoctorId(appointment.getDoctorId());
@@ -314,7 +317,6 @@ public class AppointmentManagement {
                 if (!available) {
                     errors.add("Doctor not available at this new time. Keeping original.");
                 } else {
-                    
                     boolean conflict = false;
                     for (int i = 0; i < scheduledAppointments.size(); i++) {
                         Appointment existing = scheduledAppointments.get(i);
@@ -335,10 +337,12 @@ public class AppointmentManagement {
                 errors.add("Invalid date/time (past). Keeping original.");
             }
         }
+
         if (newReason != null && !newReason.isEmpty()) {
             appointment.setReason(newReason);
         }
-        return errors;
+
+        return new ModifyAppointmentResult(errors);
     }
 
     // Get list of all scheduled appointments
@@ -347,11 +351,10 @@ public class AppointmentManagement {
     }
     
     // Get Consultation Report by ID
-    public static MyList<String> getConsultationReportById(String id) {
+    public static AppointmentReportResult getConsultationReportById(String id) {
+        MyList<String> errors = new DynamicList<>();
         MyList<String> report = new DynamicList<>();
-        LocalDateTime now = LocalDateTime.now();
 
-        // Check Appointment ID
         Appointment found = null;
         for (Appointment a : scheduledAppointments) {
             if (a.getAppointmentId().equalsIgnoreCase(id)) {
@@ -364,23 +367,22 @@ public class AppointmentManagement {
             report.add("--- Consultation Report for Appointment ID: " + id + " ---");
             addAll(report, formatAppointmentDisplay(found));
             report.add("---------------------------------------");
-            return report;
+            return new AppointmentReportResult(errors, report);
         }
 
-        // Determine whether it is a Patient or a Doctor
         boolean isPatient = (PatientManagement.findPatientById(id) != null);
         boolean isDoctor = (DoctorManagement.findDoctorById(id) != null);
 
         if (!isPatient && !isDoctor) {
-            report.add("ID not found in Appointment, Patient, or Doctor records: " + id);
-            return report;
+            errors.add("ID not found in Appointment, Patient, or Doctor records: " + id);
+            return new AppointmentReportResult(errors, report);
         }
 
         MyList<Appointment> appointments = findAppointmentsById(id);
 
         if (appointments.isEmpty()) {
-            report.add("No appointments found for ID: " + id);
-            return report;
+            errors.add("No appointments found for ID: " + id);
+            return new AppointmentReportResult(errors, report);
         }
 
         report.add("--- Consultation Report for " + (isPatient ? "Patient" : "Doctor") + " ID: " + id + " ---");
@@ -390,8 +392,8 @@ public class AppointmentManagement {
             report.add("---------------------------------------");
         }
 
-        return report;
-    }  
+        return new AppointmentReportResult(errors, report);
+    }
     
     // Format a multi-line appointment display
     public static MyList<String> formatAppointmentDisplay(Appointment a) {

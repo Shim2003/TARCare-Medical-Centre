@@ -8,26 +8,25 @@ package Entity;
  *
  * @author leekeezhan
  */
+import ADT.DynamicList;
 import ADT.MyList;
 
-public class ScheduleAppointmentResult {
+public class ModifyAppointmentResult {
     private MyList<String> errors;
-    private Appointment appointment;
 
-    public ScheduleAppointmentResult(MyList<String> errors, Appointment appointment) {
-        this.errors = errors;
-        this.appointment = appointment;
+    public ModifyAppointmentResult() {
+        this.errors = new DynamicList<>();
     }
-    
+
+    public ModifyAppointmentResult(MyList<String> errors) {
+        this.errors = errors;
+    }
+
     public boolean hasErrors() {
         return errors != null && !errors.isEmpty();
     }
-    
-    public Iterable<String> getErrorMessages() {
-        return errors;
-    }
 
-    public Appointment getAppointment() {
-        return appointment;
+    public MyList<String> getErrors() {
+        return errors;
     }
 }
