@@ -1,21 +1,19 @@
-    /*
+/*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package Boundary;
 
 import ADT.DynamicList;
+import ADT.MyList;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Scanner;
+import java.text.SimpleDateFormat;
 import Control.PharmacyManagement;
 import Entity.Medicine;
-import Entity.MedicalTreatmentItem;
-import Entity.Prescription;
-import Entity.StockRequest;
-import ADT.MyList;
 import Utility.UtilityClass;
-import java.text.SimpleDateFormat;
+
 
 public class PharmacyUI {
 
@@ -110,17 +108,15 @@ public class PharmacyUI {
         // Show new medicine info for confirmation
         System.out.println("\n--- New Medicine Details ---");
         printMedicineHeader();
-        System.out.println(formatMedicineDisplay(m));
+        System.out.println(service.formatMedicineDisplay(m));
 
         System.out.print("\nConfirm add this medicine? (y/n): ");
         String confirm = sc.nextLine().trim().toLowerCase();
 
         if (confirm.equals("y") || confirm.equals("yes")) {
-            if (service.addMedicine(m)) {
-                System.out.println("Medicine added successfully!");
-            } else {
-                System.out.println("Medicine ID already exists!");
-            }
+            // Delegate to control layer
+            String result = service.addMedicineWithValidation(m);
+            System.out.println(result);
         } else {
             System.out.println("Medicine addition cancelled.");
         }
@@ -129,26 +125,30 @@ public class PharmacyUI {
     private static void updateMedicine() {
         System.out.println("\n--- Update Medicine ---");
         String id = readLine("Enter medicine ID to update: ");
+        
+        // Delegate validation to control layer
         Medicine existing = service.findById(id);
         if (existing == null) {
             System.out.println("Medicine not found.");
             return;
         }
+        
         System.out.println("Current details: ");
         printMedicineHeader();
-        System.out.println(formatMedicineDisplay(existing));
+        System.out.println(service.formatMedicineDisplay(existing));
 
         Medicine updated = readMedicineData(existing);
-        if (service.updateMedicine(id, updated)) {
-            System.out.println("Updated successfully!");
-        } else {
-            System.out.println("Failed to update.");
-        }
+        
+        // Delegate to control layer
+        String result = service.updateMedicineWithValidation(id, updated);
+        System.out.println(result);
     }
 
     private static void deleteMedicine() {
         System.out.println("\n--- Delete Medicine ---");
         String id = readLine("Enter medicine ID to delete: ");
+        
+        // Get medicine details from control layer
         Medicine existing = service.findById(id);
         if (existing == null) {
             System.out.println("Medicine not found.");
@@ -158,148 +158,75 @@ public class PharmacyUI {
         // Show medicine details
         System.out.println("\n--- Medicine to be deleted ---");
         printMedicineHeader();
-        System.out.println(formatMedicineDisplay(existing));
+        System.out.println(service.formatMedicineDisplay(existing));
 
+        // Get user confirmations
+        if (!getDeleteConfirmation()) {
+            System.out.println("Delete operation cancelled.");
+            return;
+        }
+
+        // Delegate to control layer
+        String result = service.deleteMedicineWithValidation(id);
+        System.out.println(result);
+    }
+
+    private static boolean getDeleteConfirmation() {
         // First confirmation
         System.out.print("\nAre you sure you want to delete this medicine? (y/n): ");
         String firstConfirm = sc.nextLine().trim().toLowerCase();
 
         if (!firstConfirm.equals("y") && !firstConfirm.equals("yes")) {
-            System.out.println("Delete operation cancelled.");
-            return;
+            return false;
         }
 
         // Double confirmation
         System.out.print("This action cannot be undone. Type 'DELETE' to confirm: ");
         String secondConfirm = sc.nextLine().trim();
 
-        if (secondConfirm.equals("DELETE")) {
-            if (service.deleteMedicine(id)) {
-                System.out.println("Medicine deleted successfully.");
-            } else {
-                System.out.println("Failed to delete medicine.");
-            }
-        } else {
-            System.out.println("Delete operation cancelled. You must type 'DELETE' exactly to confirm.");
-        }
+        return secondConfirm.equals("DELETE");
     }
 
     private static void displayMedicines() {
         System.out.println("\n--- Medicine Inventory ---");
-        if (service.getAll().size() == 0) {
-            System.out.println("No medicines in inventory.");
-            return;
-        }
 
-        // Create a clone and sort alphabetically by default
-        MyList<Medicine> Medicines = service.getAll();
-
-        printMedicineHeader();
-        for (int i = 0; i < Medicines.size(); i++) {
-            Medicine medicine = Medicines.get(i);
-            System.out.println(formatMedicineDisplay(medicine));
-        }
+        // Get formatted display from control layer
+        String inventoryDisplay = service.getMedicineInventoryDisplay();
+        System.out.println(inventoryDisplay);
     }
 
     private static void displayPrescriptionQueue() {
         System.out.println("\n--- Prescription Queue ---");
-        if (service.getQueueSize() == 0) {
-            System.out.println("No prescriptions in queue.");
-            return;
-        }
-
-        for (int i = 0; i < service.getQueueSize(); i++) {
-            Prescription p = service.getQueueAt(i);
-            System.out.println("=== Queue Position " + (i + 1) + " ===");
-            System.out.println("Prescription ID: " + p.getPrescriptionID());
-            System.out.println("Patient ID: " + p.getPatientID()); // Changed from getPatient().getFullName()
-            System.out.println("Doctor ID: " + p.getDoctorId());
-            System.out.println("Status: " + p.getStatus());
-            System.out.println("Medicine Items:");
-            for (int j = 0; j < p.getMedicineItems().size(); j++) {
-                MedicalTreatmentItem item = p.getMedicineItems().get(j);
-
-                // Get medicine to access dosage form
-                Medicine medicine = service.findByName(item.getMedicineName());
-                String dosageForm = medicine != null ? medicine.getDosageForm() : "unit";
-
-                System.out.println("  - " + item.getMedicineName() + 
-                                 " | Dosage: " + UtilityClass.getCompleteDosageDescription(item, dosageForm) +
-                                 " | Frequency: " + item.getFrequency() +
-                                 " | Duration: " + item.getDuration() +
-                                 " | Method: " + item.getMethod() +
-                                 " | Calculated Quantity: " + UtilityClass.calculateQuantityNeeded(item));
-            }
-            System.out.println();
-        }
+        
+        // Get queue information from control layer
+        String queueDisplay = service.getPrescriptionQueueDisplay();
+        System.out.println(queueDisplay);
     }
 
     private static void processPrescription() {
         System.out.println("\n--- Process Prescription (Distribute Medicines) ---");
-        if (service.getQueueSize() == 0) {
+        
+        // Get prescription processing information from control layer
+        PharmacyManagement.PrescriptionProcessingInfo processingInfo = 
+            service.preparePrescriptionProcessing();
+        
+        if (processingInfo == null) {
             System.out.println("No prescriptions in queue.");
             return;
         }
 
-        // Show next prescription in queue
-        Prescription nextPrescription = service.getNextInQueue();
-        System.out.println("Processing prescription for Patient ID: " + nextPrescription.getPatientID()); // Changed
-        System.out.println("Prescription ID: " + nextPrescription.getPrescriptionID());
+        // Display processing information
+        System.out.println("Processing prescription for Patient ID: " + processingInfo.getPatientId());
+        System.out.println("Prescription ID: " + processingInfo.getPrescriptionId());
         System.out.println("\nRequired medicines:");
+        System.out.println(processingInfo.getMedicineAvailabilityDisplay());
+        System.out.println("\nTotal cost: $" + String.format("%.2f", processingInfo.getTotalCost()));
 
-        boolean canProcess = true;
-        double totalCost = 0.0;
-        MyList<String> insufficientMedicines = new DynamicList<>();
-
-        // Check stock availability using calculated quantities
-        for (int i = 0; i < nextPrescription.getMedicineItems().size(); i++) {
-            MedicalTreatmentItem item = nextPrescription.getMedicineItems().get(i);
-            Medicine medicine = service.findByName(item.getMedicineName());
-            int quantityNeeded = UtilityClass.calculateQuantityNeeded(item);
-
-            if (medicine == null) {
-                System.out.println("[X] " + item.getMedicineName() + " - MEDICINE NOT FOUND");
-                canProcess = false;
-            } else if (medicine.getQuantity() < quantityNeeded) {
-                System.out.println("[X] " + item.getMedicineName() + 
-                                 " - INSUFFICIENT STOCK (Available: " + medicine.getQuantity() + 
-                                 ", Calculated Need: " + quantityNeeded + ")");
-                insufficientMedicines.add(medicine.getMedicineID() + ":" + medicine.getMedicineName());
-                canProcess = false;
-            } else {
-                double itemCost = medicine.getPrice() * quantityNeeded;
-                totalCost += itemCost;
-                System.out.println("[OK] " + item.getMedicineName() + 
-                                 " - Available (Calculated Need: " + quantityNeeded + 
-                                 ", Cost: $" + String.format("%.2f", itemCost) + ")");
-                System.out.println("     Prescription: " + item.getDosage() + ", " + 
-                                 item.getFrequency() + " for " + item.getDuration());
-                System.out.println("     Medicine Form: " + medicine.getCompleteDosage());
-            }
-        }
-
-        System.out.println("\nTotal cost: $" + String.format("%.2f", totalCost));
-
-        if (!canProcess) {
+        if (!processingInfo.canProcess()) {
             System.out.println("\n[X] Cannot process prescription due to stock issues.");
 
-            if (insufficientMedicines.size() > 0) {
-                System.out.println("\nOptions:");
-                System.out.println("1. Create restock request for insufficient medicines");
-                System.out.println("2. Exit");
-
-                int choice = readInt("Choose option: ");
-
-                if (choice == 1) {
-                    for (int i = 0; i < insufficientMedicines.size(); i++) {
-                        String[] parts = insufficientMedicines.get(i).split(":");
-                        String medicineID = parts[0];
-                        String medicineName = parts[1];
-
-                        System.out.println("\nCreating restock request for: " + medicineName);
-                        createStockRequest(medicineID, medicineName);
-                    }
-                }
+            if (processingInfo.hasInsufficientMedicines()) {
+                handleInsufficientStock(processingInfo);
             }
 
             System.out.print("Press Enter to continue...");
@@ -311,17 +238,9 @@ public class PharmacyUI {
         String confirm = sc.nextLine().trim().toLowerCase();
 
         if (confirm.equals("y") || confirm.equals("yes")) {
-            // Distribute medicines and update stock
-            boolean success = service.processPrescription();
-
-            if (success) {
-                System.out.println("[SUCCESS] Prescription processed successfully!");
-                System.out.println("[$] Total amount charged: $" + String.format("%.2f", totalCost));
-                System.out.println("[INFO] Medicine stock has been updated based on calculated quantities.");
-                System.out.println("[PATIENT] Patient " + nextPrescription.getPatientID() + " can collect medicines."); // Changed
-            } else {
-                System.out.println("[ERROR] Failed to process prescription.");
-            }
+            // Delegate to control layer
+            String result = service.processPrescriptionWithFeedback();
+            System.out.println(result);
         } else {
             System.out.println("Prescription processing cancelled.");
         }
@@ -330,72 +249,46 @@ public class PharmacyUI {
         sc.nextLine();
     }
 
+    private static void handleInsufficientStock(PharmacyManagement.PrescriptionProcessingInfo processingInfo) {
+        System.out.println("\nOptions:");
+        System.out.println("1. Create restock request for insufficient medicines");
+        System.out.println("2. Exit");
+
+        int choice = readInt("Choose option: ");
+
+        if (choice == 1) {
+            // Delegate to control layer
+            String result = service.createRestockRequestsForInsufficientMedicines(processingInfo);
+            System.out.println(result);
+        }
+    }
+
     private static void displayLowStockAlert() {
         System.out.println("\n--- Low Stock Alert ---");
-        boolean hasAnyAlert = false;
-
-        MyList<Medicine> lowStockMedicines = service.getLowStockMedicines(UtilityClass.LOW_STOCK_THRESHOLD);
-        MyList<Medicine> outOfStockMedicines = service.getOutOfStockMedicines();
-
-        if (lowStockMedicines.size() == 0) {
+        
+        // Get low stock alert information from control layer
+        PharmacyManagement.LowStockAlertInfo alertInfo = service.getLowStockAlertInfo();
+        
+        if (alertInfo.hasNoAlerts()) {
             System.out.println("[OK] All medicines have sufficient stock.");
             return;
         }
-        
-        if (outOfStockMedicines.size() > 0) {
+
+        // Display alerts
+        if (alertInfo.hasOutOfStockMedicines()) {
             System.out.println("[CRITICAL] OUT OF STOCK MEDICINES:");
             printMedicineHeader();
-            for (int i = 0; i < outOfStockMedicines.size(); i++) {
-                Medicine medicine = outOfStockMedicines.get(i);
-
-                String statusLabel;
-                if (service.hasPendingRequestForMedicine(medicine.getMedicineID())) {
-                    int pendingQty = service.getTotalPendingQuantityForMedicine(medicine.getMedicineID());
-                    statusLabel = "[REQUESTED: " + pendingQty + " units]";
-                } else {
-                    statusLabel = "[OUT OF STOCK]";
-                }
-
-                System.out.println(formatMedicineDisplay(medicine) + " " + statusLabel);
-            }
-            hasAnyAlert = true;
+            System.out.println(alertInfo.getOutOfStockDisplay());
         }
 
-        if (lowStockMedicines.size() > 0) {
+        if (alertInfo.hasLowStockMedicines()) {
             System.out.println("\n[WARNING] LOW STOCK MEDICINES:");
             printMedicineHeader();
-            for (int i = 0; i < lowStockMedicines.size(); i++) {
-                Medicine medicine = lowStockMedicines.get(i);
-
-                String statusLabel;
-                if (service.hasPendingRequestForMedicine(medicine.getMedicineID())) {
-                    int pendingQty = service.getTotalPendingQuantityForMedicine(medicine.getMedicineID());
-                    statusLabel = "[REQUESTED: " + pendingQty + " units]";
-                } else {
-                    statusLabel = "[LOW STOCK]";
-                }
-
-                System.out.println(formatMedicineDisplay(medicine) + " " + statusLabel);
-            }
-            hasAnyAlert = true;
+            System.out.println(alertInfo.getLowStockDisplay());
         }
 
-        MyList<Medicine> availableForRequest = new DynamicList<>();
-        for (int i = 0; i < outOfStockMedicines.size(); i++) {
-            Medicine med = outOfStockMedicines.get(i);
-            if (!service.hasPendingRequestForMedicine(med.getMedicineID())) {
-                availableForRequest.add(med);
-            }
-        }
-        for (int i = 0; i < lowStockMedicines.size(); i++) {
-            Medicine med = lowStockMedicines.get(i);
-            if (!service.hasPendingRequestForMedicine(med.getMedicineID())) {
-                availableForRequest.add(med);
-            }
-        }
-
-        if (availableForRequest.size() == 0) {
-            System.out.println("\n[INFO] All low/out-of-stock medicines already have pending restock requests.");
+        if (alertInfo.hasRequestInfo()) {
+            System.out.println(alertInfo.getRequestInfo());
             return;
         }
 
@@ -403,49 +296,66 @@ public class PharmacyUI {
         String response = sc.nextLine().trim().toLowerCase();
 
         if (response.equals("y") || response.equals("yes")) {
-            System.out.println("\nSelect medicine to create restock request:");
-            for (int i = 0; i < availableForRequest.size(); i++) {
-                Medicine med = availableForRequest.get(i);
-                System.out.println((i + 1) + ". " + med.getMedicineName() + " (ID: " + med.getMedicineID() + ") - Current: " + med.getQuantity());
-            }
-            System.out.println("0. Exit");
+            handleRestockRequestCreation(alertInfo);
+        }
+    }
 
-            int choice = readInt("Select medicine (1-" + availableForRequest.size() + "): ");
-            if (choice >= 1 && choice <= availableForRequest.size()) {
-                Medicine selectedMedicine = availableForRequest.get(choice - 1);
-                createStockRequest(selectedMedicine.getMedicineID(), selectedMedicine.getMedicineName());
-            } else if (choice != 0) {
-                System.out.println("Invalid choice.");
-            }
+    private static void handleRestockRequestCreation(PharmacyManagement.LowStockAlertInfo alertInfo) {
+        System.out.println("\nSelect medicine to create restock request:");
+        System.out.println(alertInfo.getAvailableForRequestDisplay());
+        System.out.println("0. Exit");
+
+        int maxChoice = alertInfo.getAvailableForRequestCount();
+        int choice = readInt("Select medicine (1-" + maxChoice + "): ");
+        
+        if (choice >= 1 && choice <= maxChoice) {
+            String result = service.createRestockRequestByChoice(alertInfo, choice - 1);
+            System.out.println(result);
+        } else if (choice != 0) {
+            System.out.println("Invalid choice.");
         }
     }
 
     private static Medicine readMedicineData(Medicine base) {
-        SimpleDateFormat sdf = new SimpleDateFormat(UtilityClass.DATE_FORMAT);
-        Medicine m = new Medicine();
-
-        m.setMedicineID(readLineWithDefault("ID", base == null ? null : base.getMedicineID()));
-        m.setMedicineName(readLineWithDefault("Name", base == null ? null : base.getMedicineName()));
+        // Collect raw input data
+        String id = readLineWithDefault("ID", base == null ? null : base.getMedicineID());
+        String name = readLineWithDefault("Name", base == null ? null : base.getMedicineName());
 
         // Only allow quantity input for new medicines (base == null)
+        Integer quantity = null;
         if (base == null) {
-            m.setQuantity(readInt("Quantity: "));
-        } else {
-            m.setQuantity(base.getQuantity()); // Keep existing quantity - no message displayed
+            quantity = readInt("Quantity: ");
         }
 
-        m.setCategory(readLineWithDefault("Category", base == null ? null : base.getCategory()));
-        m.setPrice(readDoubleWithDefault("Price", base == null ? null : base.getPrice()));
-        m.setManufacturer(readLineWithDefault("Manufacturer", base == null ? null : base.getManufacturer()));
+        String category = readLineWithDefault("Category", base == null ? null : base.getCategory());
+        Double price = readDoubleWithDefault("Price", base == null ? null : base.getPrice());
+        String manufacturer = readLineWithDefault("Manufacturer", base == null ? null : base.getManufacturer());
 
-        // Dosage form selection (only field needed)
+        // Dosage form selection
+        String selectedDosageForm = selectDosageForm(base == null ? null : base.getDosageForm());
+
+        // Expiry date
+        Date expiryDate = readExpiryDate(base == null || base.getExpiryDate() == null ? null : base.getExpiryDate());
+
+        // Delegate medicine creation/update to control layer
+        if (base == null) {
+            // Creating new medicine
+            return service.createMedicineFromInput(id, name, quantity, category, price,
+                    manufacturer, expiryDate, selectedDosageForm);
+        } else {
+            // Updating existing medicine
+            return service.updateMedicineFromInput(base, id, name, category, price,
+                    manufacturer, expiryDate, selectedDosageForm);
+        }
+    }
+
+    private static String selectDosageForm(String currentForm) {
         System.out.println("\nSelect dosage form:");
         String[] dosageForms = UtilityClass.DOSAGE_FORMS;
         for (int i = 0; i < dosageForms.length; i++) {
             System.out.println((i + 1) + ". " + dosageForms[i]);
         }
 
-        String currentForm = base == null ? null : base.getDosageForm();
         if (currentForm != null) {
             System.out.println("Current: " + currentForm);
         }
@@ -453,26 +363,25 @@ public class PharmacyUI {
         int formChoice = readIntWithDefault("Select dosage form (1-" + dosageForms.length + ")", 
                                            currentForm == null ? 1 : findFormIndex(currentForm) + 1);
         if (formChoice >= 1 && formChoice <= dosageForms.length) {
-            m.setDosageForm(dosageForms[formChoice - 1]);
+            return dosageForms[formChoice - 1];
         } else {
-            m.setDosageForm("tablet"); // default
+            return "tablet"; // default
         }
+    }
 
-        // Expiry date
+    private static Date readExpiryDate(Date currentDate) {
+        SimpleDateFormat sdf = new SimpleDateFormat(UtilityClass.DATE_FORMAT);
+        
         while (true) {
             String prompt = "Expiry date (dd/MM/yyyy)";
-            String def = base == null || base.getExpiryDate() == null ? null : sdf.format(base.getExpiryDate());
+            String def = currentDate == null ? null : sdf.format(currentDate);
             String s = readLineWithDefault(prompt, def);
             try {
-                Date d = sdf.parse(s);
-                m.setExpiryDate(d);
-                break;
+                return sdf.parse(s);
             } catch (ParseException e) {
                 System.out.println("Invalid date format. Please use dd/MM/yyyy.");
             }
         }
-
-        return m;
     }
     
     private static int findFormIndex(String form) {
@@ -554,179 +463,93 @@ public class PharmacyUI {
         System.out.println("ID   | Name                           | Quantity(Form)   | Category             | Price (RM)     | Manufacturer           | Expiry");
         System.out.println("=".repeat(135));
     }
-
-    // Helper function to format medicine display
-    private static String formatMedicineDisplay(Medicine medicine) {
-        String quantityForm = medicine.getQuantity() + "(" + medicine.getDosageForm() + ")";
-        SimpleDateFormat sdf = new SimpleDateFormat(UtilityClass.DATE_FORMAT);
-        return String.format("%-4s | %-30s | %-16s | %-20s | %-14.2f | %-22s | %s",
-            medicine.getMedicineID(),
-            medicine.getMedicineName(),
-            quantityForm,
-            medicine.getCategory(),
-            medicine.getPrice(),
-            medicine.getManufacturer(),
-            sdf.format(medicine.getExpiryDate())
-        );
-    }
     
     // Create stock request manually
     private static void createStockRequestManually() {
         System.out.println("\n--- Create Stock Request ---");
 
-        // Display available medicines first
-        if (service.getAll().size() == 0) {
+        // Get stock request creation info from control layer
+        PharmacyManagement.StockRequestCreationInfo creationInfo
+                = service.getStockRequestCreationInfo();
+
+        if (creationInfo.hasNoMedicines()) {
             System.out.println("No medicines in inventory.");
             return;
         }
 
-        System.out.println("Available medicines:");
-        printMedicineHeader();
-        for (int i = 0; i < service.getAll().size(); i++) {
-            Medicine medicine = service.getAll().get(i);
-            System.out.println(formatMedicineDisplay(medicine));
-        }
+        System.out.println(creationInfo.getMedicineListDisplay());
 
         String medicineID = readLine("\nEnter medicine ID for restock request: ");
-        Medicine medicine = service.findById(medicineID);
 
-        if (medicine == null) {
+        // Get medicine info and validation from control layer
+        PharmacyManagement.StockRequestInfo requestInfo
+                = service.prepareStockRequestInfo(medicineID);
+
+        if (requestInfo == null) {
             System.out.println("Medicine not found.");
             return;
         }
 
-        System.out.println("\nSelected medicine: " + medicine.getMedicineName());
-        System.out.println("Current stock: " + medicine.getQuantity() + " " + medicine.getDosageForm());
-
-        // Check if there are pending requests
-        if (service.hasPendingRequestForMedicine(medicineID)) {
-            int pendingQty = service.getTotalPendingQuantityForMedicine(medicineID);
-            System.out.println("!!! Warning: There are pending requests for " + pendingQty + " units of this medicine.");
-        }
+        System.out.println(requestInfo.getDisplayInfo());
 
         int requestedQuantity = readInt("Enter quantity to request: ");
 
-        if (requestedQuantity <= 0) {
-            System.out.println("Invalid quantity. Must be greater than 0.");
-            return;
-        }
-
-        String requestID = service.createStockRequest(medicineID, requestedQuantity);
-        if (requestID != null) {
-            System.out.println("Stock request created successfully!");
-            System.out.println("Request ID: " + requestID);
-            System.out.println("Medicine: " + medicine.getMedicineName());
-            System.out.println("Requested quantity: " + requestedQuantity + " " + medicine.getDosageForm());
-            System.out.println("Status: PENDING");
-        } else {
-            System.out.println("Failed to create stock request.");
-        }
-    }
-
-    // Helper function to create stock request (called from other functions)
-    private static void createStockRequest(String medicineID, String medicineName) {
-        System.out.println("\n--- Create Stock Request ---");
-        System.out.println("Medicine: " + medicineName + " (ID: " + medicineID + ")");
-
-        Medicine medicine = service.findById(medicineID);
-        if (medicine != null) {
-            System.out.println("Current stock: " + medicine.getQuantity() + " " + medicine.getDosageForm());
-
-            // Check if there are pending requests
-            if (service.hasPendingRequestForMedicine(medicineID)) {
-                int pendingQty = service.getTotalPendingQuantityForMedicine(medicineID);
-                System.out.println("!!! Warning: There are pending requests for " + pendingQty + " units of this medicine.");
-            }
-        }
-
-        int requestedQuantity = readInt("Enter quantity to request: ");
-
-        if (requestedQuantity <= 0) {
-            System.out.println("Invalid quantity. Must be greater than 0.");
-            return;
-        }
-
-        String requestID = service.createStockRequest(medicineID, requestedQuantity);
-        if (requestID != null) {
-            System.out.println("Stock request created successfully!");
-            System.out.println("Request ID: " + requestID);
-            System.out.println("Requested quantity: " + requestedQuantity);
-            System.out.println("Status: PENDING");
-        } else {
-            System.out.println("Failed to create stock request.");
-        }
+        // Delegate to control layer
+        String result = service.createStockRequestWithValidation(medicineID, requestedQuantity);
+        System.out.println(result);
     }
 
     // View pending stock requests
     private static void viewPendingStockRequests() {
         System.out.println("\n--- Pending Stock Requests ---");
-        MyList<StockRequest> pendingRequests = service.getPendingStockRequests();
-
-        if (pendingRequests.size() == 0) {
-            System.out.println("No pending stock requests.");
-            return;
-        }
-
-        printStockRequestHeader();
-        for (int i = 0; i < pendingRequests.size(); i++) {
-            StockRequest request = pendingRequests.get(i);
-            System.out.println(request);
-        }
+        
+        // Get display from control layer
+        String display = service.getPendingStockRequestsDisplay();
+        System.out.println(display);
     }
 
     // View stock request history
     private static void viewStockRequestHistory() {
         System.out.println("\n--- Stock Request History ---");
-        MyList<StockRequest> completedRequests = service.getCompletedStockRequests();
-
-        if (completedRequests.size() == 0) {
-            System.out.println("No completed stock requests.");
-            return;
-        }
-
-        printStockRequestHeader();
-        for (int i = 0; i < completedRequests.size(); i++) {
-            StockRequest request = completedRequests.get(i);
-            System.out.println(request);
-        }
+        
+        // Get display from control layer
+        String display = service.getStockRequestHistoryDisplay();
+        System.out.println(display);
     }
 
     // Process/Approve stock request
     private static void processStockRequest() {
-        SimpleDateFormat sdf = new SimpleDateFormat(UtilityClass.DATETIME_FORMAT);
         System.out.println("\n--- Process Stock Request ---");
-        MyList<StockRequest> pendingRequests = service.getPendingStockRequests();
-
-        if (pendingRequests.size() == 0) {
-            System.out.println("No pending stock requests to process.");
+        
+        // Get pending requests display from control layer
+        String pendingDisplay = service.getPendingStockRequestsDisplay();
+        
+        if (pendingDisplay.contains("No pending")) {
+            System.out.println(pendingDisplay);
             return;
         }
 
         System.out.println("Pending requests:");
         printStockRequestHeader();
-        for (int i = 0; i < pendingRequests.size(); i++) {
-            StockRequest request = pendingRequests.get(i);
-            System.out.println(request);
-        }
+        System.out.println(pendingDisplay);
 
         String requestID = readLine("\nEnter request ID to process: ");
-        StockRequest request = service.findStockRequestById(requestID);
-
-        if (request == null) {
+        
+        // Get request details from control layer
+        PharmacyManagement.StockRequestProcessingInfo processingInfo = 
+            service.prepareStockRequestProcessing(requestID);
+        
+        if (processingInfo == null) {
             System.out.println("Request not found.");
             return;
         }
 
-        if (!"PENDING".equals(request.getStatus())) {
-            System.out.println("Request is not pending. Current status: " + request.getStatus());
+        if (!processingInfo.isPending()) {
+            System.out.println("Request is not pending. Current status: " + processingInfo.getStatus());
             return;
         }
 
-        System.out.println("\n--- Request Details ---");
-        System.out.println("Request ID: " + request.getRequestID());
-        System.out.println("Medicine: " + request.getMedicineName() + " (ID: " + request.getMedicineID() + ")");
-        System.out.println("Requested quantity: " + request.getRequestedQuantity());
-        System.out.println("Request date: " + sdf.format(request.getRequestDate()));
+        System.out.println(processingInfo.getDetailsDisplay());
 
         System.out.println("\nChoose action:");
         System.out.println("1. Approve and add stock");
@@ -735,31 +558,9 @@ public class PharmacyUI {
 
         int action = readInt("Select action: ");
 
-        switch (action) {
-            case 1:
-                if (service.approveStockRequest(requestID)) {
-                    System.out.println("Request approved and stock updated!");
-                    Medicine medicine = service.findById(request.getMedicineID());
-                    if (medicine != null) {
-                        System.out.println("New stock level: " + medicine.getQuantity() + " " + medicine.getDosageForm());
-                    }
-                } else {
-                    System.out.println("Failed to approve request.");
-                }
-                break;
-            case 2:
-                if (service.updateStockRequestStatus(requestID, "REJECTED")) {
-                    System.out.println("Request rejected.");
-                } else {
-                    System.out.println("Failed to reject request.");
-                }
-                break;
-            case 0:
-                System.out.println("Operation cancelled.");
-                break;
-            default:
-                System.out.println("Invalid choice.");
-        }
+        // Delegate to control layer
+        String result = service.processStockRequestAction(requestID, action);
+        System.out.println(result);
     }
 
     // Print stock request header
@@ -816,19 +617,10 @@ public class PharmacyUI {
     private static void filterByCategory() {
         System.out.println("\n--- Filter by Category ---");
 
-        // Show available categories first
-        DynamicList<String> categories = new DynamicList<>();
-        for (int i = 0; i < service.getAll().size(); i++) {
-            String category = service.getAll().get(i).getCategory();
-            if (!categories.contains(category)) {
-                categories.add(category);
-            }
-        }
-
+        // Get available categories from control layer
+        String categoriesDisplay = service.getAvailableCategoriesDisplay();
         System.out.println("Available categories:");
-        for (int i = 0; i < categories.size(); i++) {
-            System.out.println((i + 1) + ". " + categories.get(i));
-        }
+        System.out.println(categoriesDisplay);
 
         String selectedCategory = readLine("Enter category name: ");
         MyList<Medicine> results = service.filterByCategory(selectedCategory);
@@ -862,19 +654,10 @@ public class PharmacyUI {
     private static void filterByManufacturer() {
         System.out.println("\n--- Filter by Manufacturer ---");
 
-        // Show available manufacturers
-        DynamicList<String> manufacturers = new DynamicList<>();
-        for (int i = 0; i < service.getAll().size(); i++) {
-            String manufacturer = service.getAll().get(i).getManufacturer();
-            if (!manufacturers.contains(manufacturer)) {
-                manufacturers.add(manufacturer);
-            }
-        }
-
+        // Get available manufacturers from control layer
+        String manufacturersDisplay = service.getAvailableManufacturersDisplay();
         System.out.println("Available manufacturers:");
-        for (int i = 0; i < manufacturers.size(); i++) {
-            System.out.println((i + 1) + ". " + manufacturers.get(i));
-        }
+        System.out.println(manufacturersDisplay);
 
         String selectedManufacturer = readLine("Enter manufacturer name: ");
         MyList<Medicine> results = service.filterByManufacturer(selectedManufacturer);
@@ -929,18 +712,11 @@ public class PharmacyUI {
     }
 
     private static void displaySearchResults(String description, DynamicList<Medicine> results) {
-        System.out.println("\n--- Search Results ---");
-        System.out.println("Found " + results.size() + " " + description);
+        // Get formatted search results from control layer
+        PharmacyManagement.SearchResultsInfo searchInfo
+                = service.getSearchResultsInfo(results, description);
 
-        if (results.isEmpty()) {
-            System.out.println("No medicines found matching the criteria.");
-            return;
-        }
-
-        printMedicineHeader();
-        for (int i = 0; i < results.size(); i++) {
-            System.out.println(formatMedicineDisplay(results.get(i)));
-        }
+        System.out.println(searchInfo.getResultsDisplay());
     }
 
     private static void statisticsReportsMenu() {
@@ -963,135 +739,15 @@ public class PharmacyUI {
     }
 
     private static void displayInventoryStatistics() {
-        System.out.println("\n" + "=".repeat(60));
-        System.out.println("                    INVENTORY STATISTICS");
-        System.out.println("=".repeat(60));
-
-        DynamicList<Medicine> medicines = (DynamicList<Medicine>) service.getAll();
-
-        if (medicines.isEmpty()) {
-            System.out.println("│ No medicines in inventory.                           │");
-            System.out.println("=".repeat(60));
-            return;
-        }
-
-        var quantityStats = medicines.getStatistics(Medicine::getQuantity);
-        var priceStats = medicines.getStatistics(m -> m.getPrice());
-
-        // Combined Statistics Table
-        System.out.println("+" + "-".repeat(58) + "+");
-        System.out.println("|                    INVENTORY OVERVIEW                    |");
-        System.out.println("+" + "-".repeat(58) + "+");
-        System.out.printf("| Total medicines: %-39d |%n", service.getMedicineCount());
-        System.out.printf("| Total inventory value: RM %-30.2f |%n", service.calculateTotalInventoryValue());
-        System.out.println("+" + "-".repeat(58) + "+");
-        System.out.println("|                  QUANTITY STATISTICS                     |");
-        System.out.println("+" + "-".repeat(58) + "+");
-        System.out.printf("| Average quantity(units): %-30.2f  |%n", quantityStats.average);
-        System.out.printf("| Minimum stock(units): %-33d  |%n", (int) quantityStats.min);
-        System.out.printf("| Maximum stock(units): %-33d  |%n", (int) quantityStats.max);
-        System.out.printf("| Standard deviation: %-36.2f |%n", quantityStats.standardDeviation);
-        System.out.println("+" + "-".repeat(58) + "+");
-        System.out.println("|                   PRICE STATISTICS                       |");
-        System.out.println("+" + "-".repeat(58) + "+");
-        System.out.printf("| Average price: RM %-38.2f |%n", priceStats.average);
-        System.out.printf("| Lowest price: RM %-39.2f |%n", priceStats.min);
-        System.out.printf("| Highest price: RM %-38.2f |%n", priceStats.max);
-        System.out.printf("| Price standard deviation: RM %-27.2f |%n", priceStats.standardDeviation);
-        System.out.println("+" + "-".repeat(58) + "+");
-
-        System.out.println("=".repeat(60));
+        // Get statistics from control layer
+        String statisticsDisplay = service.getInventoryStatisticsDisplay();
+        System.out.println(statisticsDisplay);
     }
 
     private static void displayInventorySummary() {
-        SimpleDateFormat sdf = new SimpleDateFormat(UtilityClass.DATE_FORMAT);
-
-        System.out.println("\n" + "=".repeat(70));
-        System.out.println("                        INVENTORY SUMMARY");
-        System.out.println("=".repeat(70));
-
-        DynamicList<Medicine> medicines = (DynamicList<Medicine>) service.getAll();
-
-        if (medicines.isEmpty()) {
-            System.out.println("| No medicines in inventory.                                 |");
-            System.out.println("=".repeat(70));
-            return;
-        }
-
-        // Create clones for different sorting
-        MyList<Medicine> byQuantity = medicines.clone();
-        UtilityClass.quickSort(byQuantity, java.util.Comparator.comparing(Medicine::getQuantity));
-
-        MyList<Medicine> byPrice = medicines.clone();
-        UtilityClass.quickSort(byPrice, java.util.Comparator.comparing(Medicine::getPrice).reversed());
-
-        // Use control layer methods instead of manual filtering
-        MyList<Medicine> expired = service.getExpiredMedicines();
-        MyList<Medicine> nearExpiry = service.getMedicinesNearExpiry(180); // 6 months = ~180 days
-
-        // Combined Summary Table
-        System.out.println("+" + "-".repeat(68) + "+");
-        System.out.println("|                         LOWEST STOCK                               |");
-        System.out.println("+" + "-".repeat(68) + "+");
-        for (int i = 0; i < Math.min(3, byQuantity.size()); i++) {
-            Medicine med = byQuantity.get(i);
-            String line = String.format("| %d. %-35s: %3d %-22s |",
-                    (i + 1),
-                    med.getMedicineName(),
-                    med.getQuantity(),
-                    med.getDosageForm());
-            System.out.println(line);
-        }
-        System.out.println("+" + "-".repeat(68) + "+");
-        System.out.println("|                   HIGHEST VALUE MEDICINES                          |");
-        System.out.println("+" + "-".repeat(68) + "+");
-        for (int i = 0; i < Math.min(3, byPrice.size()); i++) {
-            Medicine med = byPrice.get(i);
-            String line = String.format("| %d. %-35s: RM %23.2f |",
-                    (i + 1),
-                    med.getMedicineName(),
-                    med.getPrice());
-            System.out.println(line);
-        }
-        System.out.println("+" + "-".repeat(68) + "+");
-        System.out.printf("|        NEAR EXPIRY (within 6 months): %2d medicines                 |%n", nearExpiry.size());
-        System.out.println("+" + "-".repeat(68) + "+");
-        if (nearExpiry.size() > 0) {
-            for (int i = 0; i < Math.min(3, nearExpiry.size()); i++) {
-                Medicine med = nearExpiry.get(i);
-                String line = String.format("| %d. %-34s - expires %18s |",
-                        (i + 1),
-                        med.getMedicineName(),
-                        sdf.format(med.getExpiryDate()));
-                System.out.println(line);
-            }
-            if (nearExpiry.size() > 3) {
-                System.out.printf("|     ... and %2d more medicines                              |%n", (nearExpiry.size() - 3));
-            }
-        } else {
-            System.out.println("|                    No medicines near expiry                 |");
-        }
-        System.out.println("+" + "-".repeat(68) + "+");
-        System.out.printf("|             EXPIRED MEDICINES: %2d medicines                        |%n", expired.size());
-        System.out.println("+" + "-".repeat(68) + "+");
-        if (expired.size() > 0) {
-            for (int i = 0; i < Math.min(3, expired.size()); i++) {
-                Medicine med = expired.get(i);
-                String line = String.format("| %d. %-34s - expired %18s |",
-                        (i + 1),
-                        med.getMedicineName(),
-                        sdf.format(med.getExpiryDate()));
-                System.out.println(line);
-            }
-            if (expired.size() > 3) {
-                System.out.printf("|     ... and %2d more medicines                              |%n", (expired.size() - 3));
-            }
-        } else {
-            System.out.println("|                     No expired medicines                           |");
-        }
-        System.out.println("+" + "-".repeat(68) + "+");
-
-        System.out.println("=".repeat(70));
+        // Get summary from control layer
+        String summaryDisplay = service.getInventorySummaryDisplay();
+        System.out.println(summaryDisplay);
     }
     
     private static void bulkOperationsMenu() {
@@ -1116,62 +772,46 @@ public class PharmacyUI {
     private static void cloneInventorySnapshot() {
         System.out.println("\n--- Clone Inventory Snapshot ---");
 
-        MyList<Medicine> snapshot = service.createInventorySnapshot();
+        // Get snapshot information from control layer
+        PharmacyManagement.SnapshotInfo snapshotInfo = service.createInventorySnapshotWithInfo();
 
-        if (snapshot.isEmpty()) {
+        if (snapshotInfo.isEmpty()) {
             System.out.println("No medicines to clone.");
             return;
         }
 
-        System.out.println("Inventory snapshot created with " + snapshot.size() + " medicines.");
-        System.out.println("This snapshot can be used for backup or comparison purposes.");
+        System.out.println(snapshotInfo.getSummaryDisplay());
 
-        double totalValue = service.calculateSnapshotTotalValue(snapshot);
-        double averageStock = service.calculateSnapshotAverageStock(snapshot);
-
-        System.out.println("\n=== SNAPSHOT SUMMARY ===");
-        System.out.println("Total medicines: " + snapshot.size());
-        System.out.println("Total inventory value: RM " + String.format("%.2f", totalValue));
-        System.out.printf("Average stock per medicine: %.2f units%n", averageStock);
-
-        // ✅ Display logic only
+        // Display logic only
         System.out.print("Display full snapshot details? (y/n): ");
         String show = sc.nextLine().trim().toLowerCase();
         if (show.equals("y") || show.equals("yes")) {
-            printMedicineHeader();
-            for (int i = 0; i < snapshot.size(); i++) {
-                System.out.println(formatMedicineDisplay(snapshot.get(i)));
-            }
+            System.out.println(snapshotInfo.getFullDisplay());
         }
     }
     
     private static void removeExpiredMedicines() {
         System.out.println("\n--- Remove Expired Medicines ---");
 
-        // Use control layer method to get expired medicines
-        MyList<Medicine> expired = service.getExpiredMedicines();
+        // Get expired medicines information from control layer
+        PharmacyManagement.ExpiredMedicinesInfo expiredInfo = service.getExpiredMedicinesInfo();
 
-        if (expired.isEmpty()) {
+        if (expiredInfo.isEmpty()) {
             System.out.println("No expired medicines found.");
             return;
         }
 
-        System.out.println("Found " + expired.size() + " expired medicines:");
-        printMedicineHeader();
-        for (int i = 0; i < expired.size(); i++) {
-            System.out.println(formatMedicineDisplay(expired.get(i)) + " [EXPIRED]");
-        }
+        System.out.println(expiredInfo.getDisplayInfo());
 
         System.out.print("Remove all expired medicines? (y/n): ");
         String confirm = sc.nextLine().trim().toLowerCase();
 
         if (confirm.equals("y") || confirm.equals("yes")) {
-            // Use control layer method to remove expired medicines
-            int removedCount = service.removeExpiredMedicines();
-            System.out.println(removedCount + " expired medicines removed from inventory.");
+            // Delegate to control layer
+            String result = service.removeAllExpiredMedicines();
+            System.out.println(result);
         } else {
             System.out.println("Operation cancelled.");
         }
     }
-    
 }

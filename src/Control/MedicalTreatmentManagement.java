@@ -7,6 +7,7 @@ package Control;
 import ADT.DynamicList;
 import ADT.MyList;
 import Entity.MedicalTreatment;
+import Entity.MedicalTreatmentItem;
 import java.util.Date;
 
 /**
@@ -18,7 +19,39 @@ public class MedicalTreatmentManagement {
     
     //list to store medical treatment details
     private static final MyList<MedicalTreatment> treatmentList = new DynamicList<>();
+    private static final MyList<MedicalTreatmentItem> medicineList = new DynamicList<>();
 
+    // initialize the medical treatment list
+    public static void initMedicalTreatmentList() {
+        treatmentList.clear();
+    }
+
+    // add the medicine to list
+    public static void addMedicine(MedicalTreatmentItem item) {
+        medicineList.add(item);
+    }
+
+    // get the medicine list
+    public static MyList<MedicalTreatmentItem> getMedicineList() {
+        return medicineList;
+    }
+
+    // get the medicine list size
+    public static int getMedicineListSize() {
+        return medicineList.size();
+    }
+
+    // check if the medicine list is empty
+    public static boolean isMedicineListEmpty() {
+        return medicineList.isEmpty();
+    }
+
+    public static MyList<MedicalTreatmentItem> getMedicineList(MedicalTreatment treatment) {
+        if (treatment != null && treatment.getMedicineList() != null) {
+            return treatment.getMedicineList();
+        }
+        return new DynamicList<>(); // never return null
+    }
 
     //create a new medical treatment
     public static boolean addMedicalTreatment(MedicalTreatment treatment) {
@@ -28,6 +61,51 @@ public class MedicalTreatmentManagement {
         }
         System.out.println("Failed to add treatment. Treatment may already exist or is null.");
         return false;
+    }
+
+    // get the treatment by predefined list and index
+    public static MedicalTreatment getTreatment(MyList<MedicalTreatment> list, int index) {
+        return list.get(index);
+    }
+
+    //check the list whether it is empty by passing a list as parameter
+    public static boolean isTreatmentListEmpty(MyList<MedicalTreatment> list) {
+        return list.isEmpty();
+    }
+
+    // Check if a treatment has any prescribed medicines
+    public static boolean hasMedicines(MedicalTreatment treatment) {
+        return treatment != null 
+            && treatment.getMedicineList() != null 
+            && !treatment.getMedicineList().isEmpty();
+    }
+
+    // Get the number of medicines in a treatment
+    public static int getMedicineCount(MedicalTreatment treatment) {
+        if (treatment != null && treatment.getMedicineList() != null) {
+            return treatment.getMedicineList().size();
+        }
+        return 0;
+    }
+
+    // Get a medicine by index
+    public static MedicalTreatmentItem getMedicineByIndex(MedicalTreatment treatment, int index) {
+        if (treatment != null && treatment.getMedicineList() != null) {
+            if (index >= 0 && index < treatment.getMedicineList().size()) {
+                return treatment.getMedicineList().get(index);
+            }
+        }
+        return null;
+    }
+
+    // get size with certain list in the parameter
+    public static int getTreatmentSize(MyList<MedicalTreatment> list) {
+        return list.size();
+    }
+
+    // get the treatment list by a filtered list and index
+    public static MedicalTreatment getTreatmentByIndex(MyList<MedicalTreatment> list, int index) {
+        return list.get(index);
     }
 
     // get all the medical treatment list
@@ -98,6 +176,11 @@ public class MedicalTreatmentManagement {
             }
         }
         return availableYears;
+    }
+
+    // being called at UI
+    public static boolean hasTreatmentHistory() {
+        return !getAvailableYears().isEmpty();
     }
 
     // retrieve the existing treatment history by month and year
@@ -270,67 +353,94 @@ public class MedicalTreatmentManagement {
     }
 
 
-    //get all medical treatment list that need to follow up
+    // Get all medical treatment list that need to follow up
     public static MyList<MedicalTreatment> getFollowUpList() {
         MyList<MedicalTreatment> treatmentHistory = getMedicalTreatmentList();
-        if (treatmentHistory.isEmpty()) {
-            return null;
-        }
         MyList<MedicalTreatment> followUpList = new DynamicList<>();
-        for (int i = 0; i < treatmentHistory.size(); i++) {
-            MedicalTreatment treatment = treatmentHistory.get(i);
-            if (treatment.getTreatmentOutcome().equalsIgnoreCase("Follow up")) {
-                followUpList.add(treatment);
+        if (treatmentHistory != null) {
+            for (int i = 0; i < treatmentHistory.size(); i++) {
+                MedicalTreatment treatment = treatmentHistory.get(i);
+                if ("Follow up".equalsIgnoreCase(treatment.getTreatmentOutcome())) {
+                    followUpList.add(treatment);
+                }
             }
         }
-        return followUpList;
+        return followUpList; // returns empty list if none found
     }
 
-    //get all medical treatment list that success
+    // Get all medical treatment list that succeeded
     public static MyList<MedicalTreatment> getSuccessList() {
         MyList<MedicalTreatment> treatmentHistory = getMedicalTreatmentList();
-        if (treatmentHistory.isEmpty()) {
-            return null;
-        }
-        MyList<MedicalTreatment> SuccessList = new DynamicList<>();
-        for (int i = 0; i < treatmentHistory.size(); i++) {
-            MedicalTreatment treatment = treatmentHistory.get(i);
-            if (treatment.getTreatmentOutcome().equalsIgnoreCase("Successful")) {
-                SuccessList.add(treatment);
+        MyList<MedicalTreatment> successList = new DynamicList<>();
+        if (treatmentHistory != null) {
+            for (int i = 0; i < treatmentHistory.size(); i++) {
+                MedicalTreatment treatment = treatmentHistory.get(i);
+                if ("Successful".equalsIgnoreCase(treatment.getTreatmentOutcome())) {
+                    successList.add(treatment);
+                }
             }
         }
-        return SuccessList;
+        return successList;
     }
 
-    //get all medical treatment list that success
+    // Get all medical treatment list that are ongoing
     public static MyList<MedicalTreatment> getOngoingList() {
         MyList<MedicalTreatment> treatmentHistory = getMedicalTreatmentList();
-        if (treatmentHistory.isEmpty()) {
-            return null;
-        }
         MyList<MedicalTreatment> ongoingList = new DynamicList<>();
-        for (int i = 0; i < treatmentHistory.size(); i++) {
-            MedicalTreatment treatment = treatmentHistory.get(i);
-            if (treatment.getTreatmentOutcome().equalsIgnoreCase("Ongoing")) {
-                ongoingList.add(treatment);
+        if (treatmentHistory != null) {
+            for (int i = 0; i < treatmentHistory.size(); i++) {
+                MedicalTreatment treatment = treatmentHistory.get(i);
+                if ("Ongoing".equalsIgnoreCase(treatment.getTreatmentOutcome())) {
+                    ongoingList.add(treatment);
+                }
             }
         }
         return ongoingList;
     }
 
-    //get all medical treatment list that failed
+    // Get all medical treatment list that failed
     public static MyList<MedicalTreatment> getFailedList() {
         MyList<MedicalTreatment> treatmentHistory = getMedicalTreatmentList();
-        if (treatmentHistory.isEmpty()) {
-            return null;
-        }
         MyList<MedicalTreatment> failedList = new DynamicList<>();
-        for (int i = 0; i < treatmentHistory.size(); i++) {
-            MedicalTreatment treatment = treatmentHistory.get(i);
-            if (treatment.getTreatmentOutcome().equalsIgnoreCase("Failed")) {
-                failedList.add(treatment);
+        if (treatmentHistory != null) {
+            for (int i = 0; i < treatmentHistory.size(); i++) {
+                MedicalTreatment treatment = treatmentHistory.get(i);
+                if ("Failed".equalsIgnoreCase(treatment.getTreatmentOutcome())) {
+                    failedList.add(treatment);
+                }
             }
         }
         return failedList;
+    }
+
+    public static MyList<MedicalTreatment> getTreatmentHistoryByYearAndMonth(int year, int month) {
+        MyList<MedicalTreatment> allTreatments = getMedicalTreatmentList();
+        MyList<MedicalTreatment> filteredList = new DynamicList<>();
+
+        if (allTreatments != null) {
+            for (int i = 0; i < allTreatments.size(); i++) {
+                MedicalTreatment t = allTreatments.get(i);
+                if (t.getTreatmentDate() != null) {
+                    int treatmentYear = t.getTreatmentDate().getYear() + 1900;
+                    int treatmentMonth = t.getTreatmentDate().getMonth() + 1;
+                    if (treatmentYear == year && treatmentMonth == month) {
+                        filteredList.add(t);
+                    }
+                }
+            }
+        }
+
+        // Sort by day of the month ascending
+        for (int i = 0; i < filteredList.size() - 1; i++) {
+            for (int j = i + 1; j < filteredList.size(); j++) {
+                if (filteredList.get(i).getTreatmentDate().getDate() > filteredList.get(j).getTreatmentDate().getDate()) {
+                    MedicalTreatment temp = filteredList.get(i);
+                    filteredList.replace(i, filteredList.get(j));
+                    filteredList.replace(j, temp);
+                }
+            }
+        }
+
+        return filteredList; // empty list if none found
     }
 }

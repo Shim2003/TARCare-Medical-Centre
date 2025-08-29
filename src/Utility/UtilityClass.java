@@ -32,7 +32,7 @@ public class UtilityClass {
     //Status
     public static final String statusFree = "Free";
     public static final String statusWaiting = "Waiting";
-        public static final String statusReadyToConsult = "ReadyToConsult";
+    public static final String statusReadyToConsult = "ReadyToConsult";
     public static final String statusConsulting = "Consulting";
     public static final String statusCompleted = "Completed";
     public static final String workingStatusOff = "Off";
@@ -43,6 +43,8 @@ public class UtilityClass {
     private static final String mediumLevel = "Medium";
     private static final String highLevel = "High";
     private static final String criticalLevel = "Critical";
+    
+    public static final int DEFAULT_RESTOCK_QUANTITY = 30;
 
     private static final Scanner scanner = new Scanner(System.in);
 
