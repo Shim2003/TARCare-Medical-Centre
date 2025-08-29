@@ -209,9 +209,20 @@ public class ConsultationUI {
     private static void endConsultationUI() {
         System.out.print("Enter Patient ID to end consultation: ");
         String id = sc.nextLine();
-        boolean success = ConsultationManagement.endConsultation(id);
-        System.out.println(success ? "Consultation ended successfully." : "Failed to end consultation.");
+
+        EndConsultationResult result = ConsultationManagement.endConsultation(id);
+
+        if (!result.success) {
+            System.out.println("Failed to end consultation.");
+        } else {
+            System.out.println("Consultation ended for Patient ID: " + result.patientId);
+            System.out.println("Consultation ID: " + result.consultationId);
+            System.out.println("Consultation Duration: " + result.duration);
+            System.out.println(result.patientSavedMsg);
+            System.out.println(result.doctorStatusMsg);
+        }
     }
+
     
     private static void viewCurrentConsultingUI() {
         if (!ConsultationManagement.hasCurrentConsulting()) {

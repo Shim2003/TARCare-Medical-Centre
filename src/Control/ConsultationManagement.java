@@ -291,7 +291,10 @@ public class ConsultationManagement {
     }
 
     // End consultation and save patient info
-    public static boolean endConsultation(String patientId) {
+    public static EndConsultationResult endConsultation(String patientId) {
+        EndConsultationResult result = new EndConsultationResult();
+        result.success = false;
+        
         // Find patient in queue
         QueueEntry queueEntry = null;
         MyList<QueueEntry> queueList = QueueControl.getQueueList();
@@ -304,7 +307,7 @@ public class ConsultationManagement {
         }
 
         if (queueEntry == null) {
-            return false;
+            return result;
         }
 
         queueEntry.setStatus(UtilityClass.statusCompleted);
@@ -323,13 +326,18 @@ public class ConsultationManagement {
 
         if (consultation != null) {
             consultation.setEndTime(LocalDateTime.now());
+            result.consultationId = consultation.getConsultationId();
+            result.duration = getConsultationDuration(consultation.getStartTime());
             completedConsultations.add(consultation);
             if (consultationIndex != -1) ongoingConsultations.remove(consultationIndex);
         }
 
         // Save patient info
         Patient patient = PatientManagement.findPatientById(patientId);
-        if (patient != null) completedPatients.add(patient);
+        if (patient != null) {
+            completedPatients.add(patient);
+            result.patientSavedMsg = "Patient info saved to completed consultations.";
+        }
 
         // Update doctor status in currentConsulting
         int currentIndex = -1;
@@ -345,10 +353,13 @@ public class ConsultationManagement {
             Doctor doctor = DoctorManagement.findDoctorById(current.getDoctorId());
             if (doctor != null) {
                 doctor.setWorkingStatus(UtilityClass.statusFree);
+                result.doctorStatusMsg = "Doctor " + doctor.getName() + " is now free.";
             }
             currentConsulting.remove(currentIndex); // Remove by index
         }
-        return true;
+        result.success = true;
+        result.patientId = patientId;
+        return result;
     }
     
     // ConsultationManagement.java
