@@ -177,7 +177,7 @@ public class ClinicData {
             samples[9].setEndTime(LocalDateTime.of(2025, 8, 24, 14, 55));
 
             // Added to ConsultationManagement's completedConsultations
-            DynamicList<Consultation> completedList = ConsultationManagement.getCompletedConsultations();
+            MyList<Consultation> completedList = ConsultationManagement.getCompletedConsultations();
             for (Consultation c : samples) {
                 completedList.add(c);
             }
@@ -867,6 +867,8 @@ public class ClinicData {
                 LocalTime.of(13, 0), LocalTime.of(18, 0)));
         ScheduleManagement.addSchedule(new Schedule("S015", "D002", DayOfWeek.FRIDAY,
                 LocalTime.of(9, 0), LocalTime.of(13, 30)));
+        ScheduleManagement.addSchedule(new Schedule("S021", "D006", DayOfWeek.FRIDAY,
+                LocalTime.of(14, 0), LocalTime.of(18, 00)));
         ScheduleManagement.addSchedule(new Schedule("S016", "D005", DayOfWeek.SATURDAY,
                 LocalTime.of(9, 0), LocalTime.of(13, 0)));
         ScheduleManagement.addSchedule(new Schedule("S017", "D002", DayOfWeek.SATURDAY,
@@ -877,8 +879,6 @@ public class ClinicData {
                 LocalTime.of(15, 0), LocalTime.of(19, 0)));
         ScheduleManagement.addSchedule(new Schedule("S020", "D005", DayOfWeek.SATURDAY,
                 LocalTime.of(15, 0), LocalTime.of(19, 0)));
-                ScheduleManagement.addSchedule(new Schedule("S021", "D006", DayOfWeek.FRIDAY,
-                LocalTime.of(0, 0), LocalTime.of(23, 59)));
     }
 
     public static void addSampleDoctor() {
@@ -902,8 +902,8 @@ public class ClinicData {
             Doctor d5 = new Doctor("D005", "Lee Zii Jia", sdf.parse("05/03/1998"), 'M',
                     "0123666789", "lzj@example.com", "Bachelor of Medicine, University of Melaya", UtilityClass.workingStatusOff);
 
-                    Doctor d6 = new Doctor("D006", "Brandon Tan", sdf.parse("05/03/1998"), 'M',
-                    "0123666789", "lzj@example.com", "Bachelor of Medicine, University of Melaya", UtilityClass.workingStatusOff);
+            Doctor d6 = new Doctor("D006", "Brandon Tan", sdf.parse("05/03/1998"), 'M',
+                    "0123666789", "brandon@example.com", "Bachelor of Medicine, University of Melaya", UtilityClass.workingStatusOff);
 
 
             DoctorManagement.add(d1);

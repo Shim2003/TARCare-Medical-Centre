@@ -96,11 +96,12 @@ public class DiagnosisManagement {
             }
         }
 
-        // Add top N to result
+        // Populate topSymptoms
         int limit = Math.min(topN, uniqueSymptoms.size());
         for (int i = 0; i < limit; i++) {
             topSymptoms.add(new SymptomCount(uniqueSymptoms.get(i), counts[i]));
         }
+
 
         return topSymptoms;
     }
@@ -129,17 +130,17 @@ public class DiagnosisManagement {
         return null;
     }
 
-    // Return a formatted string for the recommended medicine for top symptoms
-    public static MyList<String> getRecommendedMedicineList(MyList<SymptomCount> topSymptoms) {
-        MyList<String> recommendations = new DynamicList<>();
-        if (topSymptoms != null) {
-            for (int i = 0; i < topSymptoms.size(); i++) {
-                SymptomCount sc = topSymptoms.get(i);
-                String medicine = getMedicineForSymptom(sc.symptom); // control method
-                recommendations.add(String.format("%d. %s -> %s", i + 1, sc.symptom, medicine));
-            }
+    // Return how many recommended medicines exist
+    public static int getRecommendSize(MyList<SymptomCount> topSymptoms) {
+        return (topSymptoms != null) ? topSymptoms.size() : 0;
+    }
+
+    // Return a single SymptomCount object by index
+    public static SymptomCount getRecommendListItem(MyList<SymptomCount> topSymptoms, int index) {
+        if (topSymptoms == null || index < 0 || index >= topSymptoms.size()) {
+            return null;
         }
-        return recommendations;
+        return topSymptoms.get(index);
     }
 
     // return the collected list when done
@@ -187,8 +188,8 @@ public class DiagnosisManagement {
         return null;
     }
     public static String getSymptomByIndex(MyList<String> symptom, int index) {
-        if (index >= 0 && index < symptoms.size()) {
-            return symptoms.get(index);
+        if (index >= 0 && index < symptom.size()) {
+            return symptom.get(index);
         }
         return null;
     }
@@ -265,8 +266,13 @@ public class DiagnosisManagement {
     }
 
     //remove a diagnosis by ID
-    public static boolean removeDiagnosisById(String diagnosisId) {
-        return diagnosisList.removeIf(d -> d.getDiagnosisId().equals(diagnosisId));
+    public static boolean removeDiagnosis(Diagnosis diagnosis) {
+        int index = diagnosisList.indexOf(diagnosis);
+        if (index != -1) {
+            diagnosisList.remove(index);
+            return true;
+        }
+        return false;
     }
 
     // display the all diagnosis list based on diagnosis ID
@@ -443,5 +449,25 @@ public class DiagnosisManagement {
             default:
                 return "General Checkup Needed";
         }
+    }
+
+    // set the treatment status for a treatment
+    public static void setPatientId(Diagnosis diagnosis, String id) {
+        diagnosis.setPatientId(id);
+    }
+
+    // set the treatment status for a treatment
+    public static void setDoctorId(Diagnosis diagnosis, String id) {
+        diagnosis.setDoctorId(id);
+    }
+    
+    // set the diagnosis date for a treatment
+    public static void setDiagnosisDate(Diagnosis diagnosis, Date date) {
+        diagnosis.setDiagnosisDate(date);
+    }
+
+    // set the symptoms for a treatment
+    public static void setSymptoms(Diagnosis diagnosis, MyList symptoms) {
+        diagnosis.setSymptoms(symptoms);
     }
 }

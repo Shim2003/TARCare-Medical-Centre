@@ -4,7 +4,6 @@
  */
 package ADT;
 
-import java.time.LocalDateTime;
 import java.util.Iterator;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -264,11 +263,6 @@ public class DynamicList<T> implements MyList<T>, Iterable<T> {
     @Override
     public T getFirst() {
         return isEmpty() ? null : get(0);
-    }
-
-    @Override
-    public T getLast() {
-        return isEmpty() ? null : get(size - 1);
     }
 
     @Override

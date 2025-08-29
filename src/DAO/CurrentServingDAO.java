@@ -6,7 +6,7 @@ package DAO;
 
 /**
  *
- * @author User
+ * @author Lee Wei Hao
  */
 public class CurrentServingDAO {
 
