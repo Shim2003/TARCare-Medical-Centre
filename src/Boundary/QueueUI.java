@@ -253,8 +253,10 @@ public class QueueUI {
             System.out.println("\nQueue Entries with status: " + selectedStatus);
             System.out.println("Total entries: " + filteredCount);
             System.out.println("-".repeat(50));
-            for (int i = 0; i < filteredCount; i++) {
-                System.out.printf("%2d. %s%n", (i + 1), filteredList.get(i).toString());
+
+            int index = 1;
+            for (QueueEntry entry : filteredList) {
+                System.out.printf("%2d. %s%n", index++, entry.toString());
             }
         }
 
