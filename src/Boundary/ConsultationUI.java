@@ -274,30 +274,33 @@ public class ConsultationUI {
         if (arr.length == 0) {
             System.out.println("No consultation report found.");
         } else {
-            System.out.println("==============================================================================================================");
-            System.out.printf("%-12s %-10s %-10s %-20s %-20s %-20s %-12s%n",
-                              "ConsultID", "Patient", "Doctor", "Symptoms", "Start Time", "End Time", "Duration");
-            System.out.println("==============================================================================================================");
+            System.out.println("======================================");
+            System.out.println("        CONSULTATION REPORT");
+            System.out.println("          Search ID: " + id);
+            System.out.println("======================================");
 
+            int count = 1;
             for (Consultation c : arr) {
                 String startTime = (c.getStartTime() != null ? UtilityClass.formatLocalDateTime(c.getStartTime()) : "-");
                 String endTime = (c.getEndTime() != null ? UtilityClass.formatLocalDateTime(c.getEndTime()) : "-");
                 String symptoms = (c.getSymptoms() != null && !c.getSymptoms().isEmpty()) ? c.getSymptoms() : "-";
                 String duration = (c.getEndTime() != null ? ConsultationManagement.formatDuration(c.getDurationSeconds()) : "-");
 
-                System.out.printf("%-12s %-10s %-10s %-20s %-20s %-20s %-12s%n",
-                                  c.getConsultationId(),
-                                  c.getPatientId(),
-                                  c.getDoctorId(),
-                                  symptoms,
-                                  startTime,
-                                  endTime,
-                                  duration);
+                System.out.println("Consultation #" + count);
+                System.out.println("-------------------------------------");
+                System.out.println("Consultation ID  :" + c.getConsultationId());
+                System.out.println("Doctor ID        :" + c.getDoctorId());
+                System.out.println("Patient ID       :" + c.getPatientId());
+                System.out.println("Start Time       :" + startTime);
+                System.out.println("End Time         :" + endTime);
+                System.out.println("Symptoms         :" + symptoms);
+                System.out.println("-------------------------------------");
+                count++;
             }
-            System.out.println("==============================================================================================================");
+
+            System.out.println("======================================");
         }
     }
-
     
     // ======== MANAGEMENT ========
     private static void deleteConsultationUI() {
