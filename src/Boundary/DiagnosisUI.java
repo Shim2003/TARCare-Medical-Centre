@@ -45,7 +45,7 @@ public class DiagnosisUI {
                     case 2 ->
                         updateDiagnosisDetails();
                     case 3 ->
-                        addDiagnosis();
+                        deleteDiagnosis();
                     case 4 -> {
                         String report = displayDiagnosisList();
                         System.out.println(report);
@@ -504,6 +504,5 @@ public class DiagnosisUI {
             }
         }
         System.out.println("===========================================");
-
     }
 }
