@@ -214,12 +214,15 @@ public class ConsultationUI {
     }
     
     private static void viewCurrentConsultingUI() {
-        var list = ConsultationManagement.getCurrentConsultingInfo();
         if (!ConsultationManagement.hasCurrentConsulting()) {
             System.out.println("No current consultations.");
-        } else {
-            System.out.println("=== Current Consulting Patients ===");
-            ConsultationManagement.printCurrentConsultingInfo(); // Control 内部处理遍历和打印
+            return;
+        }
+
+        System.out.println("=== Current Consulting Patients ===");
+        var list = ConsultationManagement.getCurrentConsultingInfo();
+        for (int i = 0; i < list.size(); i++) {
+            System.out.println(list.get(i));
         }
     }
     
@@ -295,7 +298,10 @@ public class ConsultationUI {
 
     private static void printDoctorsStatus(String header) {
         System.out.println();
-        ConsultationManagement.printAllDoctorsStatus(header);
+        var list = ConsultationManagement.getAllDoctorsStatus(header);
+        for (int i = 0; i < list.size(); i++) {
+            System.out.println(list.get(i));
+        }
         System.out.println();
     }
     
@@ -344,17 +350,5 @@ public class ConsultationUI {
                     + ", Symptoms: " + symptoms
                     + ", Status: " + status);
         }
-    }
-
-
-    // ======== Helper ========
-    private static int readInt() {
-        while (!sc.hasNextInt()) {
-            System.out.print("Invalid input! Enter a number: ");
-            sc.next();
-        }
-        int val = sc.nextInt();
-        sc.nextLine();
-        return val;
     }
 }

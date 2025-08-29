@@ -257,7 +257,8 @@ public class ConsultationManagement {
 
     // View current consulting patients
     public static DynamicList<String> getCurrentConsultingInfo() {
-        DynamicList<String> result = new DynamicList<>();
+        DynamicList<String> infoList = new DynamicList<>();
+
         for (int i = 0; i < currentConsulting.size(); i++) {
             CurrentServingDAO cs = currentConsulting.get(i);
             Patient p = PatientManagement.findPatientById(cs.getPatientId());
@@ -266,7 +267,6 @@ public class ConsultationManagement {
             String patientName = (p != null) ? p.getFullName() : "Unknown Patient";
             String doctorName = (d != null) ? d.getName() : "Unknown Doctor";
 
-            // Find the corresponding "Consultation" and calculate the duration
             Consultation consultation = null;
             for (int j = 0; j < ongoingConsultations.size(); j++) {
                 Consultation c = ongoingConsultations.get(j);
@@ -276,16 +276,18 @@ public class ConsultationManagement {
                 }
             }
 
-            String duration = "N/A";
-            if (consultation != null && consultation.getStartTime() != null) {
-                duration = getConsultationDuration(consultation.getStartTime());
-            }
+            String duration = (consultation != null && consultation.getStartTime() != null)
+                              ? getConsultationDuration(consultation.getStartTime())
+                              : "N/A";
 
-            result.add("Patient: " + patientName + " (ID: " + cs.getPatientId() + ")"
-                    + " | Doctor: " + doctorName + " (ID: " + cs.getDoctorId() + ")"
-                    + " | Duration: " + duration);
+            String line = "Patient: " + patientName + " (ID: " + cs.getPatientId() + ")"
+                        + " | Doctor: " + doctorName + " (ID: " + cs.getDoctorId() + ")"
+                        + " | Duration: " + duration;
+
+            infoList.add(line);
         }
-        return result;
+
+        return infoList;
     }
 
     // End consultation and save patient info
@@ -398,13 +400,17 @@ public class ConsultationManagement {
     }
 
     // Print all doctors' working status with a header
-    public static void printAllDoctorsStatus(String header) {
-        System.out.println("=== " + header + " ===");
+    public static MyList<String> getAllDoctorsStatus(String header) {
+        MyList<String> statusList = new DynamicList<>();
         MyList<Doctor> doctors = DoctorManagement.getAllDoctors();
+
+        statusList.add("=== " + header + " ===");
         for (int i = 0; i < doctors.size(); i++) {
             Doctor d = doctors.get(i);
-            System.out.println(d.getDoctorID() + " - " + d.getName() + " : " + d.getWorkingStatus());
+            statusList.add(d.getDoctorID() + " - " + d.getName() + " : " + d.getWorkingStatus());
         }
+
+        return statusList;
     }
     
     // Method to view all completed patients
