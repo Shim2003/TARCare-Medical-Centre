@@ -26,7 +26,7 @@ public class DoctorManagement {
     private static MyList<Doctor> doctorList = new DynamicList<>();
 
     // Constant
-    public static final String DATE_FORMAT = "dd/MM/yyyy";
+    public static final String DATE_FORMAT = UtilityClass.DATE_FORMAT;
 
     //Register as new doctor
     public static boolean add(Doctor d) {
