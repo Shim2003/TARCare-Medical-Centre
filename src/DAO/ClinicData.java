@@ -397,43 +397,43 @@ public class ClinicData {
 
         // Sample treatments
         MedicalTreatment t1 = new MedicalTreatment("TRMT1001", "P1001", "D001",
-                new Date(), null, "Active", "Failed",
+                new Date(), new Date(), "Active", "Failed",
                 "Rest and hydration advised", "Patient stable", meds1);
 
         MedicalTreatment t2 = new MedicalTreatment("TRMT1002", "P1002", "D002",
-                new Date(), null, "Active", "Failed",
+                new Date(), new Date(), "Active", "Failed",
                 "Antiviral medication prescribed", "Monitor temperature", meds2);
 
         MedicalTreatment t3 = new MedicalTreatment("TRMT1003", "P1003", "D003",
-                new Date(), null, "Completed", "Follow up",
+                new Date(), new Date(), "Completed", "Follow up",
                 "Avoid triggers like bright light", "Headache improving", meds3);
 
         MedicalTreatment t4 = new MedicalTreatment("TRMT1004", "P1004", "D004",
-                new Date(), null, "Active", "Follow up",
+                new Date(), new Date(), "Active", "Follow up",
                 "Physical therapy scheduled", "Muscle pain reduced slightly", meds4);
 
         MedicalTreatment t5 = new MedicalTreatment("TRMT1005", "P1005", "D005",
-                new Date(), null, "Completed", "Successful",
+                new Date(), new Date(), "Completed", "Successful",
                 "Diet modifications suggested", "Patient responding well", meds5);
 
         MedicalTreatment t6 = new MedicalTreatment("TRMT1006", "P1006", "D006",
-                new Date(), null, "Active", "Ongoing",
+                new Date(), new Date(), "Active", "Ongoing",
                 "Antibiotics prescribed", "Throat pain persists", new DynamicList<>());
 
         MedicalTreatment t7 = new MedicalTreatment("TRMT1007", "P1007", "D007",
-                new Date(), null, "Completed", "Successful",
+                new Date(), new Date(), "Completed", "Successful",
                 "Advised to avoid allergens", "No sneezing reported", new DynamicList<>());
 
         MedicalTreatment t8 = new MedicalTreatment("TRMT1008", "P1008", "D008",
-                new Date(), null, "Active", "Ongoing",
+                new Date(), new Date(), "Active", "Ongoing",
                 "Rest and fluids advised", "Fever persists", new DynamicList<>());
 
         MedicalTreatment t9 = new MedicalTreatment("TRMT1009", "P1009", "D009",
-                new Date(), null, "Active", "Follow up",
+                new Date(), new Date(), "Active", "Follow up",
                 "Stress management counseling", "Fatigue continues", new DynamicList<>());
 
         MedicalTreatment t10 = new MedicalTreatment("TRMT1010", "P1010", "D010",
-                new Date(), null, "Active", "Ongoing",
+                new Date(), new Date(), "Active", "Ongoing",
                 "Vestibular therapy planned", "Patient still dizzy", new DynamicList<>());
             
         Date treatmentDate = sdf.parse("04/01/2023");
