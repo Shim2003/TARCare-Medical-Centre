@@ -307,37 +307,18 @@ public class MedicalTreatmentUI {
 
         System.out.println("\n" + "=".repeat(68));
         System.out.println("PATIENT TREATMENT HISTORY - PATIENT ID: " + patientId);
-        System.out.println("Total Records Found: " + MedicalTreatmentManagement.getTreatmentHistoryById(patientId));
+        System.out.println("Total Records Found: " + MedicalTreatmentManagement.getTreatmentHistoryByPatientIdList(patientId).size());
         System.out.println("=".repeat(68) + "\n");
 
         for (int i = 0; i < MedicalTreatmentManagement.getTreatmentListSize(); i++) {
             MedicalTreatment history = MedicalTreatmentManagement.getTreatmentByIndex(treatmentHistoryList, i);
             // display the treatment history list "Treatment history found for ID TRMT1011"
+            treatmentHistoryDisplayForm(history.getTreatmentId());
             System.out.println("Treatment history found for ID " + history.getTreatmentId());
         }
 
         System.out.println("\n" + "=".repeat(68));
         System.out.println("End of treatment history for Patient ID: " + patientId + "\n");
-
-        // allow users to input the treatment id to view the details with validation if users enter wrong then loop back again if enter 'x' then quit directly
-        boolean found = true;
-        while (found) {
-            System.out.print("Enter the Treatment ID to view the details or 'x' to quit: ");
-            String treatmentId = scanner.nextLine().trim();
-
-            if (DiagnosisManagement.isIdEmpty(treatmentId)) {
-                System.out.println("Treatment ID cannot be empty.");
-                return;
-            } else if (treatmentId.equals("x")) {
-                break;
-            } else {
-              treatmentHistoryDisplayForm(treatmentId);  
-                found = false;
-            }
-
-            //Press Enter to continue after view the history
-            UtilityClass.pressEnterToContinue();
-        }
     }
 
     // New method to view a specific treatment history by Treatment ID

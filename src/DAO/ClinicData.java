@@ -837,7 +837,7 @@ public class ClinicData {
     }
     
     public static void addSampleSchedules() {
-        ScheduleManagement.addSchedule(new Schedule("S001", "D001", DayOfWeek.MONDAY,
+        ScheduleManagement.addSchedule(new Schedule("S001", "D001", DayOfWeek.SATURDAY,
                 LocalTime.of(9, 0), LocalTime.of(13, 0)));
         ScheduleManagement.addSchedule(new Schedule("S002", "D002", DayOfWeek.MONDAY,
                 LocalTime.of(9, 0), LocalTime.of(23, 0)));
@@ -853,7 +853,7 @@ public class ClinicData {
                 LocalTime.of(9, 0), LocalTime.of(12, 0)));
         ScheduleManagement.addSchedule(new Schedule("S008", "D005", DayOfWeek.TUESDAY,
                 LocalTime.of(9, 0), LocalTime.of(13, 0)));
-        ScheduleManagement.addSchedule(new Schedule("S009", "D004", DayOfWeek.TUESDAY,
+        ScheduleManagement.addSchedule(new Schedule("S009", "D004", DayOfWeek.SATURDAY,
                 LocalTime.of(13, 0), LocalTime.of(15, 0)));
         ScheduleManagement.addSchedule(new Schedule("S010", "D005", DayOfWeek.TUESDAY,
                 LocalTime.of(15, 0), LocalTime.of(18, 0)));
@@ -863,7 +863,7 @@ public class ClinicData {
                 LocalTime.of(9, 0), LocalTime.of(12, 0)));
         ScheduleManagement.addSchedule(new Schedule("S013", "D001", DayOfWeek.THURSDAY,
                 LocalTime.of(9, 0), LocalTime.of(12, 0)));
-        ScheduleManagement.addSchedule(new Schedule("S014", "D001", DayOfWeek.THURSDAY,
+        ScheduleManagement.addSchedule(new Schedule("S014", "D001", DayOfWeek.SATURDAY,
                 LocalTime.of(13, 0), LocalTime.of(18, 0)));
         ScheduleManagement.addSchedule(new Schedule("S015", "D002", DayOfWeek.FRIDAY,
                 LocalTime.of(9, 0), LocalTime.of(13, 30)));
@@ -888,7 +888,7 @@ public class ClinicData {
         SimpleDateFormat sdf = new SimpleDateFormat(UtilityClass.DATE_FORMAT);
         try {
             Doctor d1 = new Doctor("D001", "Lee Wee Teck", sdf.parse("01/01/1990"), 'M',
-                    "0123456789", "leewt@example.com", "Bachelor of Medicine, TARUMT", UtilityClass.workingStatusOff);
+                    "0123456789", "leewt@example.com", "Bachelor of Medicine, TARUMT", UtilityClass.statusFree);
 
             Doctor d2 = new Doctor("D002", "Lee Chong Wei", sdf.parse("02/01/1985"), 'M',
                     "0123456780", "chongwei@example.com", "Bachelor of Surgery, UTAR", UtilityClass.workingStatusOff);
@@ -900,10 +900,10 @@ public class ClinicData {
                     "0123666789", "wooiyik@example.com", "Bachelor of Medicine, SUNWAY", UtilityClass.workingStatusOff);
 
             Doctor d5 = new Doctor("D005", "Lee Zii Jia", sdf.parse("05/03/1998"), 'M',
-                    "0123666789", "lzj@example.com", "Bachelor of Medicine, University of Melaya", UtilityClass.workingStatusOff);
+                    "0123666789", "lzj@example.com", "Bachelor of Medicine, University of Melaya", UtilityClass.statusFree);
 
             Doctor d6 = new Doctor("D006", "Brandon Tan", sdf.parse("05/03/1998"), 'M',
-                    "0123666789", "brandon@example.com", "Bachelor of Medicine, University of Melaya", UtilityClass.workingStatusOff);
+                    "0123666789", "brandon@example.com", "Bachelor of Medicine, University of Melaya", UtilityClass.statusFree);
 
 
             DoctorManagement.add(d1);

@@ -131,7 +131,7 @@ public class MedicalTreatmentManagement {
 
     // display treatment history by patient ID
     public static MyList<MedicalTreatment> getTreatmentHistoryByPatientIdList(String patientId) {
-        return treatmentList.filter(th -> th.getPatientId().equals(patientId));
+        return treatmentList.findAll(th -> th.getPatientId().equals(patientId));
     }
 
     // get the treatment history by ID

@@ -101,28 +101,29 @@ public class DiagnosisUI {
             System.out.print("Enter Diagnosis Description: ");
             String diagnosisDescription = scanner.nextLine();
 
-            System.out.println("Severity Level");
-            System.out.println("1. Low");
-            System.out.println("2. Medium");
-            System.out.println("3. High");
-            System.out.println("4. Critical");
-            System.out.print("Select Severity Level(1-4): ");
-            String severity = scanner.nextLine();
-            String severityLevel;
-            switch (severity) {
-                case "1" ->
-                    severityLevel = "Low";
-                case "2" ->
-                    severityLevel = "Medium";
-                case "3" ->
-                    severityLevel = "High";
-                case "4" ->
-                    severityLevel = "Critical";
-                default -> {
-                    System.out.println("Invalid Input. Please select again.");
-                    return;
+                        String severityLevel = null;
+            while (true) {
+                System.out.println("Severity Level");
+                System.out.println("1. Low");
+                System.out.println("2. Medium");
+                System.out.println("3. High");
+                System.out.println("4. Critical");
+                System.out.print("Select Severity Level (1-4): ");
+                String severity = scanner.nextLine();
+
+                switch (severity) {
+                    case "1" -> severityLevel = "Low";
+                    case "2" -> severityLevel = "Medium";
+                    case "3" -> severityLevel = "High";
+                    case "4" -> severityLevel = "Critical";
+                    default -> {
+                        System.out.println("Invalid Input. Please try again.");
+                        continue; // ask again instead of exiting
+                    }
                 }
+                break; // exit loop once valid input is given
             }
+
 
             System.out.print("Enter Recommendations: ");
             String recommendations = scanner.nextLine();
@@ -236,7 +237,7 @@ public class DiagnosisUI {
         System.out.println("Symptoms:");
         if (symptoms != null && !DiagnosisManagement.isSymptomEmpty()) {
             for (int i = 0; i < DiagnosisManagement.getSymptomSize(symptoms); i++) {
-                System.out.printf("  [%d] %s\n", i + 1, DiagnosisManagement.getSymptomById(diagnosis.getDiagnosisId(), i + 1));
+                System.out.printf("  [%d] %s\n", i + 1, DiagnosisManagement.getSymptomById(diagnosis.getDiagnosisId(), i));
             }
         } else {
             System.out.println("  No symptoms recorded.");

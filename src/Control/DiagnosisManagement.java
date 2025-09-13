@@ -174,7 +174,7 @@ public class DiagnosisManagement {
         if (diagnosis != null) {
             MyList<String> symptom = diagnosis.getSymptoms();
             if (index >= 0 && index < symptom.size()) {
-                return symptom.get(index-1);
+                return symptom.get(index);
             }
         }
         return null;
