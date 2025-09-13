@@ -190,7 +190,7 @@ public class MedicalTreatmentUI {
 
         //print the diagnosis id
         String diagnosisId = DiagnosisManagement.getCurrentDiagnosisId();
-        System.out.print("Enter Diagnosis ID: " + diagnosisId + "\n");
+        System.out.print("Diagnosis ID: " + diagnosisId + "\n");
 
         // Get the current serving patient ID from the queue list
         String patientId = DiagnosisManagement.getCurrentServingPatient();
